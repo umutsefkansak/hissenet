@@ -18,7 +18,6 @@ import java.util.Set;
 @Table(name = "employees", indexes = {
         @Index(name = "idx_employee_email", columnList = "email"),
         @Index(name = "idx_employee_employee_id", columnList = "employee_id"),
-        @Index(name = "idx_employee_department", columnList = "department"),
         @Index(name = "idx_employee_status", columnList = "status")
 })
 public class Employee extends BaseEntity {

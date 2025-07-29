@@ -1,5 +1,8 @@
 package com.infina.hissenet.entity;
 
+import com.infina.hissenet.entity.base.BaseEntity;
+import com.infina.hissenet.entity.enums.TransactionStatus;
+import com.infina.hissenet.entity.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wallet_transactions")
-public class WalletTransaction extends BaseEntity{
+public class WalletTransaction extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)

@@ -55,9 +55,6 @@ public abstract class Customer extends BaseEntity {
     private RiskProfile riskProfile;
 
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Account account;
-
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
 
@@ -125,13 +122,6 @@ public abstract class Customer extends BaseEntity {
         this.riskProfile = riskProfile;
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
 
     public Set<Address> getAddresses() {
         return addresses;

@@ -122,13 +122,6 @@ public abstract class Customer extends BaseEntity {
         this.riskProfile = riskProfile;
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
 
     public Set<Address> getAddresses() {
         return addresses;

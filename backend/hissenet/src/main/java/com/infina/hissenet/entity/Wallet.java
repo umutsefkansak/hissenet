@@ -1,5 +1,7 @@
 package com.infina.hissenet.entity;
 
+import com.infina.hissenet.entity.base.BaseEntity;
+import com.infina.hissenet.entity.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -62,7 +64,7 @@ public class Wallet extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private WalletStatus walletStatus = WalletStatus.ACTIVE;
+    private Status walletStatus = Status.ACTIVE;
 
 
 
@@ -127,11 +129,11 @@ public class Wallet extends BaseEntity {
         isLocked = locked;
     }
 
-    public WalletStatus getWalletStatus() {
+    public Status getWalletStatus() {
         return walletStatus;
     }
 
-    public void setWalletStatus(WalletStatus walletStatus) {
+    public void setWalletStatus(Status walletStatus) {
         this.walletStatus = walletStatus;
     }
 

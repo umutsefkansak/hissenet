@@ -1,4 +1,4 @@
-package com.infina.hissenet.entity;
+package com.infina.hissenet.entity.enums;
 
 public enum TransactionType {
 

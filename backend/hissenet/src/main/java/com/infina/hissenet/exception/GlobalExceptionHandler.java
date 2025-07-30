@@ -28,6 +28,18 @@ public class GlobalExceptionHandler {
     // 401 unauthorized
     // 403 forbidden
     // 404 not found
+    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class})
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(RuntimeException ex,HttpServletRequest http) {
+        ApiResponse<Void> response=new ApiResponse<>(
+                404,
+                http.getRequestURI(),
+                "Bulunamadi hatasi",
+                LocalDateTime.now(),
+                null,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
     // 429 many request
     // validation exception
     @ExceptionHandler(MethodArgumentNotValidException.class)

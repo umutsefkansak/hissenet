@@ -31,10 +31,9 @@ public class WalletService implements IGenericService<Wallet, Long> {
     private WalletMapper walletMapper;
     private CustomerRepository customerRepository;
 
-    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper, CustomerRepository customerRepository){
+    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper){
         this.walletRepository=walletRepository;
         this.walletMapper=walletMapper;
-        this.customerRepository=customerRepository;
     }
 
 

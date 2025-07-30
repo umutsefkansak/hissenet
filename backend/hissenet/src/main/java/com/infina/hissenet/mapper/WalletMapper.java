@@ -13,7 +13,7 @@ public interface WalletMapper {
 
     WalletMapper INSTANCE = Mappers.getMapper(WalletMapper.class);
 
-    @Mapping(source = "customerId", target = "customer.id")
+    @Mapping(target = "customer", ignore = true)
     Wallet toEntity(CreateWalletRequest dto);
 
     @Mapping(source = "customer.id", target = "customerId")

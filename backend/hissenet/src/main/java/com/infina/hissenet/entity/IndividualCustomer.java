@@ -15,14 +15,14 @@ import java.time.LocalDate;
 public class IndividualCustomer extends Customer {
 
     @NotBlank
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(name = "first_name", length = 50)
     private String firstName;
 
     @Column(name = "middle_name", length = 50)
     private String middleName;
 
     @NotBlank
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(name = "last_name", length = 50)
     private String lastName;
 
     @Pattern(regexp = "^[1-9][0-9]{10}$")
@@ -52,7 +52,6 @@ public class IndividualCustomer extends Customer {
     private String educationLevel;
 
     public IndividualCustomer() {
-        setCustomerType(CustomerType.INDIVIDUAL);
     }
 
     public String getFirstName() {

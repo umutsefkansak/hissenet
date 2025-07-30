@@ -154,10 +154,42 @@ public class WalletService implements IGenericService<Wallet, Long> {
         return walletMapper.toResponse(updatedWallet);
     }
     public WalletResponse unlockWallet(Long customerId){
-        Wallet wallet = getWalletByCustomerIdOrThrow(customerId;
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
         wallet.setLocked(false);
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
+    }
+
+    public WalletResponse resetDailyLimits(Long customerId){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        wallet.setDailyUsedAmount(BigDecimal.ZERO);
+        wallet.setDailyTransactionCount(0);
+        wallet.setLastResetDate(LocalDate.now());
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
+    }
+    public WalletResponse resetMonthlyLimits(Long customerId) {
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        wallet.setMonthlyUsedAmount(BigDecimal.ZERO);
+        wallet.setLastResetDate(LocalDate.now());
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
+    }
+    public boolean canPerformTransaction(Long customerId, BigDecimal amount) {
+        try {
+            Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+            return isWalletActive(wallet) && !isWalletLocked(wallet)
+                    && hasSufficientBalance(wallet, amount)
+                    && !isDailyLimitExceeded(wallet, amount)
+                    && !isMonthlyLimitExceeded(wallet, amount)
+                    && !isTransactionCountExceeded(wallet);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    public BigDecimal getWalletBalance(Long customerId){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        return wallet.getBalance();
     }
 
     private void validateTransactionLimits(Wallet wallet, BigDecimal amount) {

@@ -4,7 +4,9 @@ import com.infina.hissenet.dto.request.PortfolioCreateRequest;
 import com.infina.hissenet.dto.request.PortfolioUpdateRequest;
 import com.infina.hissenet.dto.response.PortfolioResponse;
 import com.infina.hissenet.dto.response.PortfolioSummaryResponse;
+import com.infina.hissenet.entity.CorporateCustomer;
 import com.infina.hissenet.entity.Customer;
+import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.entity.Portfolio;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -52,7 +54,7 @@ public interface PortfolioMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "customerId", source = "customer.id")
-    @Mapping(target = "customerName", expression = "java(portfolio.getCustomer() instanceof com.infina.hissenet.entity.IndividualCustomer ? ((com.infina.hissenet.entity.IndividualCustomer) portfolio.getCustomer()).getFirstName() + \" \" + ((com.infina.hissenet.entity.IndividualCustomer) portfolio.getCustomer()).getLastName() : ((com.infina.hissenet.entity.CorporateCustomer) portfolio.getCustomer()).getCompanyName())")
+    @Mapping(target = "customerName", expression = "java(getCustomerName(portfolio.getCustomer()))")
     @Mapping(target = "portfolioName", source = "portfolioName")
     @Mapping(target = "description", source = "description")
     @Mapping(target = "totalValue", source = "totalValue")
@@ -79,4 +81,23 @@ public interface PortfolioMapper {
     @Mapping(target = "lastRebalanceDate", source = "lastRebalanceDate")
     PortfolioSummaryResponse toSummaryResponse(Portfolio portfolio);
 
+    // Güvenli customer name alma metodu
+    default String getCustomerName(Customer customer) {
+        if (customer == null) {
+            return "Unknown Customer";
+        }
+        
+        // Hibernate proxy'den gerçek nesneyi al
+        Customer realCustomer = org.hibernate.Hibernate.unproxy(customer, Customer.class);
+        
+        if (realCustomer instanceof IndividualCustomer) {
+            IndividualCustomer individual = (IndividualCustomer) realCustomer;
+            return individual.getFirstName() + " " + individual.getLastName();
+        } else if (realCustomer instanceof CorporateCustomer) {
+            CorporateCustomer corporate = (CorporateCustomer) realCustomer;
+            return corporate.getCompanyName();
+        } else {
+            return "Unknown Customer Type";
+        }
+    }
 } 

@@ -36,6 +36,17 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
                 .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
     }
 
+    // portföy getir (eager loading ile)
+    protected Portfolio getPortfolioWithCustomer(Long id){
+        return portfolioRepository.findByIdWithCustomer(id)
+                .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
+    }
+
+    // pörtföy dto döndür
+    public PortfolioResponse getPortfolioResponse(Long portfolioId){
+        return portfolioMapper.toResponse(getPortfolioWithCustomer(portfolioId));
+    }
+
     // portfolio oluştur (müşterinin kaydı olunca otomatik portfolioda oluşturulacak)
     @Transactional
     public PortfolioResponse createPortfolio(PortfolioCreateRequest request,Long customerId) {

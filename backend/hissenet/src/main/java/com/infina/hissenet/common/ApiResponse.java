@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     private int status;
@@ -21,39 +22,21 @@ public class ApiResponse<T> {
         this.path = path;
         this.message = message;
         this.localDateTime = localDateTime;
-        this.errors = errors != null ? errors : new HashMap<>();
+        this.errors = errors;
         this.data = data;
     }
 
 
     public static <T> ApiResponse<T> ok(String message) {
-        return new ApiResponse<>(
-                200,
-                null,
-                message,
-                LocalDateTime.now(),
-                null,
-                null);
+        return new ApiResponse<>(200, null, message, LocalDateTime.now(), null, null);
     }
 
     public static <T> ApiResponse<T> ok(String message, T data) {
-        return new ApiResponse<>(
-                200,
-                null,
-                message,
-                LocalDateTime.now(),
-                null,
-                data);
+        return new ApiResponse<>(200, null, message, LocalDateTime.now(), null, data);
     }
 
-    public static <T> ApiResponse<T> created(String message,T data) {
-        return new ApiResponse<>(
-                201,
-                null,
-                message,
-                LocalDateTime.now(),
-                null,
-                data);
+    public static <T> ApiResponse<T> created(String message, T data) {
+        return new ApiResponse<>(201, null, message, LocalDateTime.now(), null, data);
     }
 
     public int getStatus() {
@@ -79,5 +62,6 @@ public class ApiResponse<T> {
     public T getData() {
         return data;
     }
+
 
 }

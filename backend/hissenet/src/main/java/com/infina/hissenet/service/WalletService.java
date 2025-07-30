@@ -112,6 +112,56 @@ public class WalletService implements IGenericService<Wallet, Long> {
         Wallet updateWallet = update(wallet);
         return walletMapper.toResponse(updateWallet);
     }
+    
+    public WalletResponse substractBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        validateWalletForTransaction(wallet);
+        validateSufficientBalance(wallet, amount);
+        validateTransactionLimits(wallet, amount);
+
+        wallet.setBalance(wallet.getBalance().subtract(amount));
+        wallet.setLastTransactionDate(LocalDateTime.now());
+        updateTransactionTracking(wallet, amount, false);
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
+    }
+
+    private void validateTransactionLimits(Wallet wallet, BigDecimal amount) {
+        if (isDailyLimitExceeded(wallet, amount)){
+            throw new RuntimeException("Daily limit exceeded");
+        }
+        if (isMonthlyLimitExceeded(wallet, amount)){
+            throw new RuntimeException("Monthly limit exceeded");
+        }
+        if (isTransactionCountExceeded(wallet)){
+            throw new RuntimeException("Daily transaction count exceeded");
+        }
+    }
+
+    private boolean isTransactionCountExceeded(Wallet wallet) {
+        if (wallet.getMaxDailyTransactionCount() == null) return false;
+        return wallet.getDailyTransactionCount() >= wallet.getMaxDailyTransactionCount();
+    }
+
+    private boolean isMonthlyLimitExceeded(Wallet wallet, BigDecimal amount) {
+        if (wallet.getMonthlyLimit() == null) return false;
+        return wallet.getMonthlyUsedAmount().add(amount).compareTo(wallet.getMonthlyLimit()) > 0;
+    }
+
+    private boolean isDailyLimitExceeded(Wallet wallet, BigDecimal amount) {
+        if (wallet.getDailyLimit() == null) return false;
+        return wallet.getDailyUsedAmount().add(amount).compareTo(wallet.getDailyLimit()) > 0;
+    }
+
+    private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
+        if (!hasSufficientBalance(wallet, amount)){
+            throw new RuntimeException("Insufficient balance. Required balance: "+ amount+" Exist balance: "+ wallet.getBalance());
+        }
+    }
+
+    private boolean hasSufficientBalance(Wallet wallet, BigDecimal amount) {
+        return wallet.getBalance().compareTo(amount)>=0; //compare to exist balance
+    }
 
     private Wallet getWalletByCustomerIdOrThrow(Long customerId) {
         Optional<Wallet> optionalWallet = walletRepository.findByCustomerId(customerId);
@@ -141,7 +191,6 @@ public class WalletService implements IGenericService<Wallet, Long> {
 
     private void updateTransactionTracking(Wallet wallet, BigDecimal amount, boolean isAddition){
         if (!isAddition){
-            //satis ve satin alim icin
             wallet.setDailyTransactionCount(wallet.getDailyTransactionCount()+1);
             wallet.setDailyUsedAmount(wallet.getDailyUsedAmount().add(amount));
             wallet.setMonthlyUsedAmount(wallet.getMonthlyUsedAmount().add(amount));

@@ -1,4 +1,4 @@
-/*package com.infina.hissenet.mapper;
+package com.infina.hissenet.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,8 +13,8 @@ import com.infina.hissenet.entity.Order;
 public interface OrderMapper {
 	OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
-	@Mapping(source = "customerId", target = "customer.id")
-	@Mapping(source = "stockId", target = "stock.id")
+	@Mapping(target = "customer", ignore = true)
+    @Mapping(target = "stock", ignore = true)
 	Order toEntity(OrderCreateRequest dto);
 	
 	Order toEntity(OrderUpdateRequest dto);
@@ -25,4 +25,4 @@ public interface OrderMapper {
     @Mapping(source = "updatedBy.id", target = "updatedById")
     OrderResponse toResponse(Order entity);
 	
-}*/
+}

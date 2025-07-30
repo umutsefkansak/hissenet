@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-public class Role extends BaseEntity {
+public class Role extends BaseEntity{
 
     @NotBlank
     @Column(name = "name", nullable = false, unique = true, length = 50)

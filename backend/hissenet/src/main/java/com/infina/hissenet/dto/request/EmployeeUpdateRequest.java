@@ -3,6 +3,7 @@ package com.infina.hissenet.dto.request;
 import java.util.Set;
 
 public record EmployeeUpdateRequest(
+		Long id,
 		String firstName,
 		String lastName,
 		String email,

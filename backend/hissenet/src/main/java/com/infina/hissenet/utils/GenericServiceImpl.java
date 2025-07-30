@@ -1,7 +1,10 @@
 package com.infina.hissenet.utils;
 
 import com.infina.hissenet.entity.base.BaseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +45,19 @@ public class GenericServiceImpl<T extends BaseEntity, ID> implements IGenericSer
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<T> findAll() {
         return repository.findAll();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Page<T> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsById(ID id) {
+        return repository.existsById(id);
     }
 }

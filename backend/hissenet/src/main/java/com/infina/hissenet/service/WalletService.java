@@ -101,7 +101,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
         }
         return walletMapper.toResponse(optionalWallet.get());
     }
-    /*
+
     public WalletResponse addBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
 
@@ -109,9 +109,9 @@ public class WalletService implements IGenericService<Wallet, Long> {
         wallet.setBalance(wallet.getBalance().add(amount));
         wallet.setLastTransactionDate(LocalDateTime.now());
         updateTransactionTracking(wallet, amount, true);
-
-
-    } */
+        Wallet updateWallet = update(wallet);
+        return walletMapper.toResponse(updateWallet);
+    }
 
     private Wallet getWalletByCustomerIdOrThrow(Long customerId) {
         Optional<Wallet> optionalWallet = walletRepository.findByCustomerId(customerId);

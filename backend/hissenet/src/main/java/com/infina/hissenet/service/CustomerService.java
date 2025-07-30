@@ -1,11 +1,14 @@
 package com.infina.hissenet.service;
 
 
+import com.infina.hissenet.constants.CustomerConstants;
 import com.infina.hissenet.dto.common.CustomerDto;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.entity.CorporateCustomer;
+import com.infina.hissenet.entity.enums.CustomerType;
+import com.infina.hissenet.event.CustomerCreatedEvent;
 import com.infina.hissenet.exception.CustomerNotFoundException;
 import com.infina.hissenet.mapper.CustomerMapper;
 import com.infina.hissenet.repository.CorporateCustomerRepository;
@@ -13,6 +16,7 @@ import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.IndividualCustomerRepository;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,15 +36,18 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
     private final CorporateCustomerRepository corporateCustomerRepository;
 
     private final CustomerMapper customerMapper;
+    private final ApplicationEventPublisher eventPublisher;
+
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository, IndividualCustomerRepository individualCustomerRepository, CorporateCustomerRepository corporateCustomerRepository,
-                           CustomerMapper customerMapper) {
+                           CustomerMapper customerMapper, ApplicationEventPublisher eventPublisher) {
         super(customerRepository);
         this.customerRepository = customerRepository;
         this.individualCustomerRepository = individualCustomerRepository;
         this.corporateCustomerRepository = corporateCustomerRepository;
         this.customerMapper = customerMapper;
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -56,9 +63,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
         }
 
         IndividualCustomer customer = customerMapper.toEntity(createDto);
-        customer.setCustomerNumber(generateCustomerNumber("IND"));
+        customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.INDIVIDUAL_CUSTOMER_PREFIX));
 
         IndividualCustomer savedCustomer = (IndividualCustomer) save(customer);
+
+        // Cuzdan ve Portfolio otomatik olusturulmasi icin event
+        eventPublisher.publishEvent(new CustomerCreatedEvent(this, savedCustomer.getId(), "INDIVIDUAL"));
         return customerMapper.toDto(savedCustomer);
     }
 
@@ -75,9 +85,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
         }
 
         CorporateCustomer customer = customerMapper.toEntity(createDto);
-        customer.setCustomerNumber(generateCustomerNumber("CORP"));
+        customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.CORPORATE_CUSTOMER_PREFIX));
 
         CorporateCustomer savedCustomer = (CorporateCustomer) save(customer);
+
+        // Cuzdan ve Portfolio otomatik olusturulmasi icin event
+        eventPublisher.publishEvent(new CustomerCreatedEvent(this, savedCustomer.getId(), "CORPORATE"));
         return customerMapper.toDto(savedCustomer);
     }
 
@@ -116,7 +129,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
 
     @Transactional(readOnly = true)
     public List<CustomerDto> getIndividualCustomers() {
-        return customerRepository.findByCustomerType("INDIVIDUAL")
+        return customerRepository.findIndividualCustomers()
                 .stream()
                 .map(customerMapper::toDto)
                 .toList();
@@ -124,7 +137,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
 
     @Transactional(readOnly = true)
     public List<CustomerDto> getCorporateCustomers() {
-        return customerRepository.findByCustomerType("CORPORATE")
+        return customerRepository.findCorporateCustomers()
                 .stream()
                 .map(customerMapper::toDto)
                 .toList();

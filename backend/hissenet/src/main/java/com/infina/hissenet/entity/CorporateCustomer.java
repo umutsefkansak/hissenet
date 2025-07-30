@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class CorporateCustomer extends Customer {
 
     @NotBlank
-    @Column(name = "company_name", nullable = false, length = 200)
+    @Column(name = "company_name", length = 200)
     private String companyName;
 
     @Pattern(regexp = "^[0-9]{10}$")
@@ -38,10 +38,9 @@ public class CorporateCustomer extends Customer {
     @Column(name = "website", length = 200)
     private String website;
 
-    public CorporateCustomer() {
-        setCustomerType(CustomerType.CORPORATE);
-    }
 
+    public CorporateCustomer() {
+    }
 
     public String getCompanyName() {
         return companyName;

@@ -9,9 +9,10 @@ import com.infina.hissenet.entity.Address;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.entity.CorporateCustomer;
+import com.infina.hissenet.repository.CustomerRepository;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CustomerRepository.class})
 public interface AddressMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -25,7 +26,7 @@ public interface AddressMapper {
     AddressResponse toDto(Address address);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "customer", source = "customerId", qualifiedByName = "mapCustomerReference")
+    @Mapping(target = "customer", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -36,8 +37,7 @@ public interface AddressMapper {
         if (customerId == null) {
             return null;
         }
-        // Sadece referans için kullanılacak - gerçek tip bilinmediği için base Customer kullanıyoruz
-        Customer customer = new Customer() {}; // Anonymous implementation for reference
+        Customer customer = new Customer() {};
         customer.setId(customerId);
         return customer;
     }
@@ -51,9 +51,15 @@ public interface AddressMapper {
         // Hibernate proxy'yi gerçek objeye dönüştür
         Customer realCustomer = (Customer) org.hibernate.Hibernate.unproxy(customer);
 
-        String customerType = realCustomer.getCustomerType() != null
-                ? realCustomer.getCustomerType().name()
-                : "UNKNOWN";
+
+        String customerType;
+        if (realCustomer instanceof IndividualCustomer) {
+            customerType = "INDIVIDUAL";
+        } else if (realCustomer instanceof CorporateCustomer) {
+            customerType = "CORPORATE";
+        } else {
+            customerType = "UNKNOWN";
+        }
 
         // Individual customer ise
         if (realCustomer instanceof IndividualCustomer individual) {

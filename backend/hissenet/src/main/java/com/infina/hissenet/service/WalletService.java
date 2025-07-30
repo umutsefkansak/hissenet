@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import com.infina.hissenet.dto.request.CreateWalletRequest;
+import com.infina.hissenet.dto.request.UpdateWalletRequest;
 import com.infina.hissenet.dto.response.WalletResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Wallet;
@@ -10,6 +11,7 @@ import com.infina.hissenet.mapper.WalletMapper;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.utils.IGenericService;
+import org.hibernate.sql.Update;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -190,6 +192,33 @@ public class WalletService implements IGenericService<Wallet, Long> {
     public BigDecimal getWalletBalance(Long customerId){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
         return wallet.getBalance();
+    }
+
+    public WalletResponse updateWalletLimits(Long customerId, UpdateWalletRequest request){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        if (request.dailyLimit() != null){
+            wallet.setDailyLimit(request.dailyLimit());
+        }
+        if (request.monthlyLimit() != null){
+            wallet.setMonthlyLimit(request.monthlyLimit());
+        }
+        if (request.maxTransactionAmount() != null) {
+            wallet.setMaxTransactionAmount(request.maxTransactionAmount());
+        }
+        if (request.minTransactionAmount() != null) {
+            wallet.setMinTransactionAmount(request.minTransactionAmount());
+        }
+        if (request.maxDailyTransactionCount() != null) {
+            wallet.setMaxDailyTransactionCount(request.maxDailyTransactionCount());
+        }
+        if (request.isLocked() != null) {
+            wallet.setLocked(request.isLocked());
+        }
+        if (request.walletStatus() != null) {
+            wallet.setWalletStatus(request.walletStatus());
+        }
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
     }
 
     private void validateTransactionLimits(Wallet wallet, BigDecimal amount) {

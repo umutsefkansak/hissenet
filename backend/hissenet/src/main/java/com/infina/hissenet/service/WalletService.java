@@ -116,7 +116,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
         return walletMapper.toResponse(updateWallet);
     }
     
-    public WalletResponse substractBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
+    public WalletResponse subtractBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
         validateWalletForTransaction(wallet);
         validateSufficientBalance(wallet, amount);
@@ -132,7 +132,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
     //PURCHASE STOCK
     public WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
         BigDecimal totalCost = totalAmount.add(commission).add(tax);
-        return substractBalance(customerId, totalCost, TransactionType.STOCK_PURCHASE);
+        return subtractBalance(customerId, totalCost, TransactionType.STOCK_PURCHASE);
     }
     //SALE STOCK
     public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
@@ -143,7 +143,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
         return addBalance(customerId, dividendAmount, TransactionType.DIVIDEND);
     }
     public WalletResponse processWithdrawal(Long customerId, BigDecimal amount){
-        return substractBalance(customerId, amount, TransactionType.WITHDRAWAL);
+        return subtractBalance(customerId, amount, TransactionType.WITHDRAWAL);
     }
     public WalletResponse processDeposit(Long customerId, BigDecimal amount){
         return addBalance(customerId, amount, TransactionType.DEPOSIT);

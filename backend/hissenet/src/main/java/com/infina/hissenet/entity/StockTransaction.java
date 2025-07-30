@@ -175,11 +175,11 @@ public class StockTransaction extends BaseEntity {
         this.otherFees = otherFees;
     }
 
-    public Order getOrderId() {
+    public Order getOrder() {
         return order;
     }
 
-    public void setOrderId(Order order) {
+    public void setOrder(Order order) {
         this.order = order;
     }
 

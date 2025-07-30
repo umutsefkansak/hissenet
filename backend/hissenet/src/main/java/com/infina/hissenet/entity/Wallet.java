@@ -29,22 +29,22 @@ public class Wallet extends BaseEntity {
     @Column(name = "currency", nullable = false, length = 3)
     private String currency = "TRY";
 
-    @Column(name = "daily_limit", scale = 2)
+    @Column(name = "daily_limit", scale = 4)
     private BigDecimal dailyLimit;
 
-    @Column(name = "monthly_limit", scale = 2)
+    @Column(name = "monthly_limit", scale = 4)
     private BigDecimal monthlyLimit;
 
-    @Column(name = "daily_used_amount", scale = 2)
+    @Column(name = "daily_used_amount", scale = 4)
     private BigDecimal dailyUsedAmount = BigDecimal.ZERO;
 
-    @Column(name = "monthly_used_amount", scale = 2)
+    @Column(name = "monthly_used_amount", scale = 4)
     private BigDecimal monthlyUsedAmount = BigDecimal.ZERO;
 
-    @Column(name = "max_transaction_amount", scale = 2)
+    @Column(name = "max_transaction_amount", scale = 4)
     private BigDecimal maxTransactionAmount;
 
-    @Column(name = "min_transaction_amount", scale = 2)
+    @Column(name = "min_transaction_amount", scale = 4)
     private BigDecimal minTransactionAmount;
 
     @Column(name = "daily_transaction_count")
@@ -137,11 +137,11 @@ public class Wallet extends BaseEntity {
         this.walletStatus = walletStatus;
     }
 
-    public Customer getUser() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setUser(Customer customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 

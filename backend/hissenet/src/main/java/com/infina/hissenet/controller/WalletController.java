@@ -66,7 +66,7 @@ public class WalletController {
     public ApiResponse<WalletResponse> processWithdrawal(@PathVariable Long customerId, @RequestParam BigDecimal amount){
         return ApiResponse.ok("Withdrawal processed successfully", walletService.processWithdrawal(customerId, amount));
     }
-    @PostMapping("/customer/{customerId]/dividend")
+    @PostMapping("/customer/{customerId}/dividend")
     public ApiResponse<WalletResponse> processDividendPayment(@PathVariable Long customerId, @RequestParam BigDecimal amount){
         return ApiResponse.ok("Dividend payment processed successfully", walletService.processDividendPayment(customerId, amount));
     }

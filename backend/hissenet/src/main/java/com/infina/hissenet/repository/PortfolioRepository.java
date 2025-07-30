@@ -2,8 +2,11 @@ package com.infina.hissenet.repository;
 
 import com.infina.hissenet.entity.Portfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
     
@@ -18,4 +21,8 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
     
     // Portföy türüne göre portföyleri getir
     List<Portfolio> findByPortfolioType(String portfolioType);
+    
+    // Portfolio'yu customer ile birlikte getir (fetch join)
+    @Query("SELECT p FROM Portfolio p JOIN FETCH p.customer WHERE p.id = :id")
+    Optional<Portfolio> findByIdWithCustomer(@Param("id") Long id);
 }

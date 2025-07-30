@@ -15,10 +15,8 @@ import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 @Service
 public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     private final PortfolioRepository portfolioRepository;
@@ -36,6 +34,17 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     protected Portfolio getPortfolio(Long id){
         return portfolioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
+    }
+
+    // portföy getir (eager loading ile)
+    protected Portfolio getPortfolioWithCustomer(Long id){
+        return portfolioRepository.findByIdWithCustomer(id)
+                .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
+    }
+
+    // pörtföy dto döndür
+    public PortfolioResponse getPortfolioResponse(Long portfolioId){
+        return portfolioMapper.toResponse(getPortfolioWithCustomer(portfolioId));
     }
 
     // portfolio oluştur (müşterinin kaydı olunca otomatik portfolioda oluşturulacak)
@@ -64,7 +73,7 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     }
 
     // toplam değer hesapla
-    public BigDecimal calculateTotalValue(Portfolio portfolio) {
+    private BigDecimal calculateTotalValue(Portfolio portfolio) {
         if (portfolio.getTransactions() == null || portfolio.getTransactions().isEmpty()) {
             return BigDecimal.ZERO;
         }
@@ -74,7 +83,7 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     }
 
     // toplam maliyet hesapla
-    public BigDecimal calculateTotalCost(Portfolio portfolio) {
+    private BigDecimal calculateTotalCost(Portfolio portfolio) {
         if (portfolio.getTransactions() == null || portfolio.getTransactions().isEmpty()) {
             return BigDecimal.ZERO;
         }
@@ -84,7 +93,7 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     }
 
     // kar zarar hesapla
-    public BigDecimal calculateProfitLoss(Portfolio portfolio) {
+    private BigDecimal calculateProfitLoss(Portfolio portfolio) {
         BigDecimal totalValue = calculateTotalValue(portfolio);
         BigDecimal totalCost = calculateTotalCost(portfolio);
         return totalValue.subtract(totalCost);

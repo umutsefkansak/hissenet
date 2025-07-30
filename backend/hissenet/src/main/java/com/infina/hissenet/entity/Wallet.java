@@ -137,11 +137,11 @@ public class Wallet extends BaseEntity {
         this.walletStatus = walletStatus;
     }
 
-    public Customer getUser() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setUser(Customer customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 

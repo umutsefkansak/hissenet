@@ -30,7 +30,7 @@ public interface WalletMapper {
     @Mapping(target = "lastResetDate", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     void updateEntityFromRequest(UpdateWalletRequest dto, @org.mapstruct.MappingTarget Wallet wallet);

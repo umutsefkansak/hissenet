@@ -23,11 +23,6 @@ import java.util.Set;
 public abstract class Customer extends BaseEntity {
 
 
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "customer_type", nullable = false, insertable = false, updatable = false)
-    private CustomerType customerType;
-
     @Column(name = "customer_number", nullable = false, unique = true, length = 20)
     private String customerNumber; // Otomatik oluşturulacak müşteri numarası
 
@@ -131,11 +126,5 @@ public abstract class Customer extends BaseEntity {
         this.addresses = addresses;
     }
 
-    public CustomerType getCustomerType() {
-        return customerType;
-    }
 
-    public void setCustomerType(CustomerType customerType) {
-        this.customerType = customerType;
-    }
 }

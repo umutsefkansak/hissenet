@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     // 401 unauthorized
     // 403 forbidden
     // 404 not found
-    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class})
+    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class,AddressNotFoundException.class,CustomerNotFoundException.class})
     public ResponseEntity<ApiResponse<Void>> handleNotFoundException(RuntimeException ex,HttpServletRequest http) {
         ApiResponse<Void> response=new ApiResponse<>(
                 404,

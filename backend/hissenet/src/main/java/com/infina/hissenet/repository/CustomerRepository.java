@@ -29,5 +29,5 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findByKycVerifiedTrue();
     List<Customer> findByKycVerifiedFalse();
     boolean existsByCustomerNumber(String customerNumber);
-
 } 
+

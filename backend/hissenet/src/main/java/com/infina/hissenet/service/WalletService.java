@@ -29,9 +29,10 @@ public class WalletService implements IGenericService<Wallet, Long> {
     private WalletMapper walletMapper;
     private CustomerRepository customerRepository;
 
-    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper){
+    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper, CustomerRepository customerRepository){
         this.walletRepository=walletRepository;
         this.walletMapper=walletMapper;
+        this.customerRepository=customerRepository;
     }
 
 
@@ -122,6 +123,39 @@ public class WalletService implements IGenericService<Wallet, Long> {
         wallet.setBalance(wallet.getBalance().subtract(amount));
         wallet.setLastTransactionDate(LocalDateTime.now());
         updateTransactionTracking(wallet, amount, false);
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
+    }
+
+    //PURCHASE STOCK
+    public WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
+        BigDecimal totalCost = totalAmount.add(commission).add(tax);
+        return substractBalance(customerId, totalCost, TransactionType.STOCK_PURCHASE);
+    }
+    //SALE STOCK
+    public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
+        BigDecimal netAmount = totalAmount.subtract(commission).subtract(tax);
+        return addBalance(customerId, netAmount, TransactionType.STOCK_SALE);
+    }
+    public WalletResponse processDividendPayment(Long customerId, BigDecimal dividendAmount){
+        return addBalance(customerId, dividendAmount, TransactionType.DIVIDEND);
+    }
+    public WalletResponse processWithdrawal(Long customerId, BigDecimal amount){
+        return substractBalance(customerId, amount, TransactionType.WITHDRAWAL);
+    }
+    public WalletResponse processDeposit(Long customerId, BigDecimal amount){
+        return addBalance(customerId, amount, TransactionType.DEPOSIT);
+    }
+
+    public WalletResponse lockWallet(Long customerId){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        wallet.setLocked(true);
+        Wallet updatedWallet = update(wallet);
+        return walletMapper.toResponse(updatedWallet);
+    }
+    public WalletResponse unlockWallet(Long customerId){
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId;
+        wallet.setLocked(false);
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
     }

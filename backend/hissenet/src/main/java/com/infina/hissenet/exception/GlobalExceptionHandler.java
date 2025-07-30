@@ -15,9 +15,9 @@ import java.util.Map;
 
 /*
 Buradaki hata yönetimimiz şu şekilde olacak
-RuntimeException'dan türeyen birden fazla özel hatayı tek bir yerden yakalayacak.
-Böylece her özel exception için ayrı metot yazmamıza gerek kalmaz ve kod daha sade, esnek hale gelecek.
-Aşağıdaki örnekte olduğu gibi birden fazla exception sınıfı birlikte handle edilebilir:
+	RuntimeException'dan türeyen birden fazla özel hatayı tek bir yerden yakalayacak.
+	Böylece her özel exception için ayrı metot yazmamıza gerek kalmaz ve kod daha sade, esnek hale gelecek.
+	Aşağıdaki örnekte olduğu gibi birden fazla exception sınıfı birlikte handle edilebilir:
 @ExceptionHandler({FailedToFieldException.class, CloudinaryException.class, RuntimeException.class, MaxFilesException.class, OnlyImageException.class})
 public ResponseEntity<ApiResponse<Void>> badRequestException(RuntimeException ex, HttpServletRequest http)
 çünkü hepsi runtimedan extends ediliyor.
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response=new ApiResponse<>(
                 404,
                 http.getRequestURI(),
-                "Bulunamadi hatasi",
+                "Not Found Exception",
                 LocalDateTime.now(),
                 null,
                 null
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = new ApiResponse<>(
                 400,
                 http.getRequestURI(),
-                "Doğrulama Hatası",
+                "Validation Exception",
                 LocalDateTime.now(),
                 errors,
                 null

@@ -46,6 +46,16 @@ public class ApiResponse<T> {
                 data);
     }
 
+    public static <T> ApiResponse<T> created(String message,T data) {
+        return new ApiResponse<>(
+                201,
+                null,
+                message,
+                LocalDateTime.now(),
+                null,
+                data);
+    }
+
     public int getStatus() {
         return status;
     }

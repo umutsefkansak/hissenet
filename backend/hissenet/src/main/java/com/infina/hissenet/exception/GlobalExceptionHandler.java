@@ -15,9 +15,9 @@ import java.util.Map;
 
 /*
 Buradaki hata yönetimimiz şu şekilde olacak
-	RuntimeException'dan türeyen birden fazla özel hatayı tek bir yerden yakalayacak.
-	Böylece her özel exception için ayrı metot yazmamıza gerek kalmaz ve kod daha sade, esnek hale gelecek.
-	Aşağıdaki örnekte olduğu gibi birden fazla exception sınıfı birlikte handle edilebilir:
+RuntimeException'dan türeyen birden fazla özel hatayı tek bir yerden yakalayacak.
+Böylece her özel exception için ayrı metot yazmamıza gerek kalmaz ve kod daha sade, esnek hale gelecek.
+Aşağıdaki örnekte olduğu gibi birden fazla exception sınıfı birlikte handle edilebilir:
 @ExceptionHandler({FailedToFieldException.class, CloudinaryException.class, RuntimeException.class, MaxFilesException.class, OnlyImageException.class})
 public ResponseEntity<ApiResponse<Void>> badRequestException(RuntimeException ex, HttpServletRequest http)
 çünkü hepsi runtimedan extends ediliyor.
@@ -28,12 +28,12 @@ public class GlobalExceptionHandler {
     // 401 unauthorized
     // 403 forbidden
     // 404 not found
-    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class,AddressNotFoundException.class,CustomerNotFoundException.class})
+    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class})
     public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex,HttpServletRequest http) {
         ApiResponse<Void> response=new ApiResponse<>(
                 404,
                 http.getRequestURI(),
-                ex.getMessage(),
+                "Bulunamadi hatasi",
                 LocalDateTime.now(),
                 null,
                 null
@@ -52,9 +52,9 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = new ApiResponse<>(
                 400,
                 http.getRequestURI(),
-                "Validation Exception",
+                "Doğrulama Hatası",
                 LocalDateTime.now(),
-                errors.isEmpty() ? null : errors, // Boşsa null gönder
+                errors,
                 null
         );
 

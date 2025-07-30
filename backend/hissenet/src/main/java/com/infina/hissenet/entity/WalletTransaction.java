@@ -20,7 +20,7 @@ public class WalletTransaction extends BaseEntity {
     private Wallet wallet;
 
     @DecimalMin(value = "0.01", message = "Transaction amount must be greater than 0")
-    @Column(name = "amount", nullable = false, scale = 2)
+    @Column(name = "amount", nullable = false, scale = 4)
     private BigDecimal amount=BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -38,7 +38,7 @@ public class WalletTransaction extends BaseEntity {
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate = LocalDateTime.now();
 
-    @Column(name = "balance_before", scale = 2)
+    @Column(name = "balance_before", scale = 4)
     private BigDecimal balanceBefore;
 
 
@@ -47,11 +47,11 @@ public class WalletTransaction extends BaseEntity {
     private String referenceNumber;
 
     @DecimalMin(value = "0.0", message = "Fee amount cannot be negative")
-    @Column(name = "fee_amount", scale = 2)
+    @Column(name = "fee_amount", scale = 4)
     private BigDecimal feeAmount;
 
     @DecimalMin(value = "0.0", message = "Tax amount cannot be empty")
-    @Column(name = "tax_amount", scale = 2)
+    @Column(name = "tax_amount", scale = 4)
     private BigDecimal taxAmount;
 
     @Column(name = "source")
@@ -60,7 +60,7 @@ public class WalletTransaction extends BaseEntity {
     @Column(name = "destination")
     private String destination;
 
-    @Column(name = "balance_after", scale = 2)
+    @Column(name = "balance_after", scale = 4)
     private BigDecimal balanceAfter;
 
     

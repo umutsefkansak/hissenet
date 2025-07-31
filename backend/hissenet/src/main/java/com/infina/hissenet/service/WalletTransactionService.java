@@ -67,7 +67,12 @@ public class WalletTransactionService implements IGenericService<WalletTransacti
         return walletTransactionRepository.findAll(pageable)
                 .map(walletTransactionMapper::toResponse);
     }
+    public WalletTransactionResponse getTransactionById(Long transactionId) {
+        WalletTransaction walletTransaction = findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
 
+        return walletTransactionMapper.toResponse(walletTransaction);
+    }
     @Override
     public WalletTransaction save(WalletTransaction entity) {
         return walletTransactionRepository.save(entity);

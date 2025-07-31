@@ -19,7 +19,6 @@ import com.infina.hissenet.exception.OrderNotFoundException;
 import com.infina.hissenet.exception.StockNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
-import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.utils.GenericServiceImpl;
 
 @Service
@@ -27,17 +26,17 @@ public class OrderService extends GenericServiceImpl<Order, Long> {
 
 	private final OrderRepository orderRepository;
 	private final CustomerService customerService;
-	private final StockRepository stockRepository;
+	private final StockService stockService;
 	private final OrderMapper orderMapper;
 	private final WalletService walletService;
 
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			StockRepository stockRepository, OrderMapper orderMapper, WalletService walletService) {
+			StockService stockService, OrderMapper orderMapper, WalletService walletService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
-		this.stockRepository = stockRepository;
+		this.stockService = stockService;
 		this.orderMapper = orderMapper;
 		this.walletService = walletService;
 	}
@@ -45,7 +44,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> {
 	public OrderResponse createOrder(OrderCreateRequest request) {
         Customer customer = customerService.findById(request.customerId())
                 .orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
-        Stock stock = stockRepository.findById(request.stockId())
+        Stock stock = stockService.findById(request.stockId())
                 .orElseThrow(() -> new StockNotFoundException(request.stockId()));
 
         Order order = orderMapper.toEntity(request);

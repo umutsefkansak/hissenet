@@ -1,9 +1,8 @@
 package com.infina.hissenet.exception;
 
-import com.infina.hissenet.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,53 +12,54 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-Buradaki hata yönetimimiz şu şekilde olacak
-RuntimeException'dan türeyen birden fazla özel hatayı tek bir yerden yakalayacak.
-Böylece her özel exception için ayrı metot yazmamıza gerek kalmaz ve kod daha sade, esnek hale gelecek.
-Aşağıdaki örnekte olduğu gibi birden fazla exception sınıfı birlikte handle edilebilir:
-@ExceptionHandler({FailedToFieldException.class, CloudinaryException.class, RuntimeException.class, MaxFilesException.class, OnlyImageException.class})
-public ResponseEntity<ApiResponse<Void>> badRequestException(RuntimeException ex, HttpServletRequest http)
-çünkü hepsi runtimedan extends ediliyor.
-*/
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // 400 bad request
-    // 401 unauthorized
-    // 403 forbidden
-    // 404 not found
-    @ExceptionHandler({NotFoundException.class,UserNotFoundException.class, AddressNotFoundException.class, CustomerNotFoundException.class})
-    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(NotFoundException ex,HttpServletRequest http) {
-        ApiResponse<Void> response=new ApiResponse<>(
-                404,
-                http.getRequestURI(),
-                ex.getMessage(),
-                LocalDateTime.now(),
-                null,
-                null
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+    // 404 - Not Found
+    @ExceptionHandler({
+            NotFoundException.class,
+            UserNotFoundException.class,
+            AddressNotFoundException.class,
+            CustomerNotFoundException.class
+    })
+    public ProblemDetail handleNotFound(NotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Resource Not Found");
+        problem.setProperty("timestamp", LocalDateTime.now());
+
+        return problem;
     }
-    // 429 many request
-    // validation exception
+
+    // 400 - Validation Error
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> validationException(MethodArgumentNotValidException ex, HttpServletRequest http) {
+    public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         for (FieldError fieldError : ex.getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        ApiResponse<Void> response = new ApiResponse<>(
-                400,
-                http.getRequestURI(),
-                "Doğrulama Hatası",
-                LocalDateTime.now(),
-                errors,
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        problem.setTitle("Validation Error");
+        problem.setProperty("errors", errors);
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
     }
 
+    // 409 - Conflict (Role already exists)
+    @ExceptionHandler(RoleAlreadyExistsException.class)
+    public ProblemDetail handleConflict(RoleAlreadyExistsException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Conflict Error");
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
 
+    // 500 - Internal Server Error
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGeneric(Exception ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problem.setTitle("Internal Server Error");
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
 }

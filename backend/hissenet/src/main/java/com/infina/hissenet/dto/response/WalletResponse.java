@@ -6,7 +6,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record WalletResponse(
+public record
+
+
+WalletResponse(
         Long id,
         Long customerId,
         BigDecimal balance,

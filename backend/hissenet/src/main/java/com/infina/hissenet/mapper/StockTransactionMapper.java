@@ -14,31 +14,22 @@ import org.mapstruct.ReportingPolicy;
 public interface StockTransactionMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "portfolio", source = "portfolio")
-    @Mapping(target = "stock", source = "stock")
-    @Mapping(target = "order", source = "order")
-    @Mapping(target = "transactionType", source = "request.transactionType")
-    @Mapping(target = "transactionStatus", source = "request.transactionStatus")
-    @Mapping(target = "quantity", source = "request.quantity")
-    @Mapping(target = "price", source = "request.price")
-    @Mapping(target = "totalAmount", source = "request.totalAmount")
-    @Mapping(target = "commission", source = "request.commission")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "quantity", source = "request.quantity")
+    @Mapping(target = "price", source = "request.price")
+    @Mapping(target = "totalAmount", source = "request.totalAmount")
     StockTransaction toEntity(StockTransactionCreateRequest request, Portfolio portfolio, Stock stock, Order order);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "portfolioId", source = "portfolio.id")
-    @Mapping(target = "portfolioName", source = "portfolio.portfolioName")
-    @Mapping(target = "stockId", source = "stock.id")
-    @Mapping(target = "stockTicker", source = "stock.ticker")
-    @Mapping(target = "stockName", source = "stock.issuerName")
-    @Mapping(target = "orderId", source = "order.id")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "updatedAt", source = "updatedAt")
+    @Mapping(source = "portfolio.id", target = "portfolioId")
+    @Mapping(source = "portfolio.portfolioName", target = "portfolioName")
+    @Mapping(source = "stock.id", target = "stockId")
+    @Mapping(source = "stock.ticker", target = "stockTicker")
+    @Mapping(source = "stock.issuerName", target = "stockName")
+    @Mapping(source = "order.id", target = "orderId")
     StockTransactionResponse toResponse(StockTransaction transaction);
 
 }

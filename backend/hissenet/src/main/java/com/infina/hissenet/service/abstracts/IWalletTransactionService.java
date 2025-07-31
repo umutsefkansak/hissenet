@@ -8,6 +8,10 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
+/**
+ * Service interface for wallet transaction operations.
+ * Handles creation, update, retrieval, and listing of wallet transactions.
+ */
 
 public interface IWalletTransactionService {
     /**

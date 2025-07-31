@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -35,16 +36,16 @@ public class AuthController {
      */
     @PostMapping("/login")
     ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
-        int oneWeek = 7 * 24 * 60 * 60;
         AuthResponse response = authService.login(request);
-        ResponseCookie cookie = ResponseCookie.from("login-token", response.token()).path("/").maxAge(oneWeek)
+        ResponseCookie cookie = ResponseCookie.from("sessionId", response.sessionId()).path("/").maxAge(response.time())
                 .httpOnly(true).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok("Login Successful", response));
     }
     // logout
     @DeleteMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@CookieValue(name = "login-token",required = false) String token){
-        ResponseCookie cookie=ResponseCookie.from("login-token","").path("/").maxAge(0).httpOnly(true).build();
+    public ResponseEntity<ApiResponse<Void>> logout(@CookieValue(name = "sessionId",required = false) String token){
+        authService.logout(token);
+        ResponseCookie cookie=ResponseCookie.from("sessionId","").path("/").maxAge(0).httpOnly(true).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok("Logout Successful"));
 
     }

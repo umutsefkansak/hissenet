@@ -18,10 +18,7 @@ public class GlobalExceptionHandler {
 
     // 404 - Not Found
     @ExceptionHandler({
-            NotFoundException.class,
-            UserNotFoundException.class,
-            AddressNotFoundException.class,
-            CustomerNotFoundException.class
+            NotFoundException.class
     })
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -48,8 +45,8 @@ public class GlobalExceptionHandler {
     }
 
     // 409 - Conflict
-    @ExceptionHandler(RoleAlreadyExistsException.class)
-    public ProblemDetail handleConflict(RoleAlreadyExistsException ex) {
+    @ExceptionHandler({RoleAlreadyExistsException.class,InsufficientBalanceException.class, TransactionAlreadyCancelledException.class, TransactionAlreadyCompletedException.class, WalletAlreadyExistsException.class,WalletNotActiveException.class})
+    public ProblemDetail handleConflict(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Conflict Error");
         problem.setType(URI.create("https://www.hissenet.com/errors/conflict"));
@@ -77,13 +74,23 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
-    // 429 - Too Many Requests (Rate Limit)
-    @ExceptionHandler(RateLimitException.class)
-    public ProblemDetail rateLimitException(RateLimitException ex) {
+    // 429 - Too Many Requests (Rate Limit) and limit exceptiom
+    @ExceptionHandler({RateLimitException.class,WalletLimitExceededException.class})
+    public ProblemDetail rateLimitException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
         problem.setTitle("Too Many Requests");
         problem.setType(URI.create("https://www.hissenet.com/errors/rate-limit"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }
+    // 423 Locked Exception
+    @ExceptionHandler({WalletLockedException.class})
+    public ProblemDetail lockedException(RuntimeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.LOCKED, ex.getMessage());
+        problem.setTitle("Too Many Requests");
+        problem.setType(URI.create("https://www.hissenet.com/errors/rate-limit"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
+
 }

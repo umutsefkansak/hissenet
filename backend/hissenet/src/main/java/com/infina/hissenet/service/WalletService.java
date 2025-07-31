@@ -28,9 +28,9 @@ import java.util.Optional;
 @Transactional
 public class WalletService implements IGenericService<Wallet, Long> {
 
-    private WalletRepository walletRepository;
-    private WalletMapper walletMapper;
-    private CustomerRepository customerRepository;
+    private final WalletRepository walletRepository;
+    private final WalletMapper walletMapper;
+    private final CustomerRepository customerRepository;
 
     public WalletService(WalletRepository walletRepository, WalletMapper walletMapper,CustomerRepository customerRepository){
         this.walletRepository=walletRepository;

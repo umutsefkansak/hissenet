@@ -5,13 +5,11 @@ import com.infina.hissenet.dto.request.UpdateWalletRequest;
 import com.infina.hissenet.dto.response.WalletResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Wallet;
-import com.infina.hissenet.entity.enums.Status;
 import com.infina.hissenet.entity.enums.TransactionType;
 import com.infina.hissenet.mapper.WalletMapper;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.utils.IGenericService;
-import org.hibernate.sql.Update;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,12 +122,12 @@ public class WalletService implements IGenericService<Wallet, Long> {
         return walletMapper.toResponse(updatedWallet);
     }
 
-    //PURCHASE STOCK
+
     public WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
         BigDecimal totalCost = totalAmount.add(commission).add(tax);
         return subtractBalance(customerId, totalCost, TransactionType.STOCK_PURCHASE);
     }
-    //SALE STOCK
+
     public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
         BigDecimal netAmount = totalAmount.subtract(commission).subtract(tax);
         return addBalance(customerId, netAmount, TransactionType.STOCK_SALE);
@@ -173,7 +170,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
     public boolean canPerformTransaction(Long customerId, BigDecimal amount) {
         try {
             Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-            return wallet.isActive() && !wallet.isLocked() // Entity metodlarını kullan
+            return wallet.isActive() && !wallet.isLocked()
                     && wallet.hasSufficientBalance(amount)
                     && !wallet.isDailyLimitExceeded(amount)
                     && !wallet.isMonthlyLimitExceeded(amount)
@@ -215,41 +212,23 @@ public class WalletService implements IGenericService<Wallet, Long> {
     }
 
     private void validateTransactionLimits(Wallet wallet, BigDecimal amount) {
-        if (isDailyLimitExceeded(wallet, amount)){
+        if (wallet.isDailyLimitExceeded(amount)){
             throw new RuntimeException("Daily limit exceeded");
         }
-        if (isMonthlyLimitExceeded(wallet, amount)){
+        if (wallet.isMonthlyLimitExceeded(amount)){
             throw new RuntimeException("Monthly limit exceeded");
         }
-        if (isTransactionCountExceeded(wallet)){
+        if (wallet.isTransactionCountExceeded()){
             throw new RuntimeException("Daily transaction count exceeded");
         }
     }
 
-    private boolean isTransactionCountExceeded(Wallet wallet) {
-        if (wallet.getMaxDailyTransactionCount() == null) return false;
-        return wallet.getDailyTransactionCount() >= wallet.getMaxDailyTransactionCount();
-    }
-
-    private boolean isMonthlyLimitExceeded(Wallet wallet, BigDecimal amount) {
-        if (wallet.getMonthlyLimit() == null) return false;
-        return wallet.getMonthlyUsedAmount().add(amount).compareTo(wallet.getMonthlyLimit()) > 0;
-    }
-
-    private boolean isDailyLimitExceeded(Wallet wallet, BigDecimal amount) {
-        if (wallet.getDailyLimit() == null) return false;
-        return wallet.getDailyUsedAmount().add(amount).compareTo(wallet.getDailyLimit()) > 0;
-    }
-
     private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
-        if (!hasSufficientBalance(wallet, amount)){
+        if (!wallet.hasSufficientBalance(amount)){
             throw new RuntimeException("Insufficient balance. Required balance: "+ amount+" Exist balance: "+ wallet.getBalance());
         }
     }
 
-    private boolean hasSufficientBalance(Wallet wallet, BigDecimal amount) {
-        return wallet.getBalance().compareTo(amount)>=0; //compare to exist balance
-    }
 
     private Wallet getWalletByCustomerIdOrThrow(Long customerId) {
         Optional<Wallet> optionalWallet = walletRepository.findByCustomerId(customerId);
@@ -261,26 +240,19 @@ public class WalletService implements IGenericService<Wallet, Long> {
 
 
     private void validateWalletForTransaction(Wallet wallet){
-        if (!isWalletActive(wallet)){
+        if (!wallet.isActive()){
             throw new RuntimeException("Wallet is not active");
         }
-        if (isWalletLocked(wallet)){
+        if (wallet.isLocked()){
             throw new RuntimeException("Wallet is locked");
         }
     }
 
-    private boolean isWalletLocked(Wallet wallet) {
-        return Boolean.TRUE.equals(wallet.getLocked());
-    }
-
-    private boolean isWalletActive(Wallet wallet) {
-        return Status.ACTIVE.equals(wallet.getWalletStatus());
-    }
 
     private void updateTransactionTracking(Wallet wallet, BigDecimal amount, boolean isAddition){
         if (!isAddition){
             wallet.incrementTransactionCount();
-            wallet.addToMonthlyUsedAmount(amount);
+            wallet.addToDailyUsedAmount(amount);
             wallet.addToMonthlyUsedAmount(amount);
         }
     }

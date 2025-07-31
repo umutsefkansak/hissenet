@@ -29,9 +29,10 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@PutMapping()
-	public ApiResponse<OrderResponse> updateOrder(@Valid @RequestBody OrderUpdateRequest request) {
-		return ApiResponse.ok("Order updated successfully", service.updateOrder(request));
+	@PatchMapping("/{id}")
+	public ApiResponse<OrderResponse> updateOrder(@PathVariable Long id,
+			@Valid @RequestBody OrderUpdateRequest request) {
+		return ApiResponse.ok("Order updated successfully", service.updateOrder(id, request));
 	}
 
 	@GetMapping("/{id}")
@@ -44,24 +45,4 @@ public class OrderController {
 		return ApiResponse.ok("Orders retrieved successfully", service.getAllOrders());
 	}
 
-	@DeleteMapping("/{id}")
-	public ApiResponse<Void> deleteOrder(@PathVariable Long id) {
-		service.deleteOrder(id);
-		return ApiResponse.ok("Order deleted successfully");
-	}
-	
-	@PostMapping("/{id}/fill")
-	public ApiResponse<OrderResponse> markOrderAsFilled(@PathVariable Long id) {
-		return ApiResponse.ok("Order marked as FILLED", service.markAsFilled(id));
-	}
-
-	@PostMapping("/{id}/cancel")
-	public ApiResponse<OrderResponse> cancelOrder(@PathVariable Long id) {
-		return ApiResponse.ok("Order canceled successfully", service.cancelOrder(id));
-	}
-
-	@PostMapping("/{id}/reject")
-	public ApiResponse<OrderResponse> rejectOrder(@PathVariable Long id) {
-		return ApiResponse.ok("Order rejected successfully", service.rejectOrder(id));
-	}
 }

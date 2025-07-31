@@ -9,6 +9,7 @@ import com.infina.hissenet.exception.RoleNotFoundException;
 import com.infina.hissenet.exception.RoleAlreadyExistsException;
 import com.infina.hissenet.mapper.RoleMapper;
 import com.infina.hissenet.repository.RoleRepository;
+import com.infina.hissenet.service.abstracts.IRoleService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class RoleService extends GenericServiceImpl<Role, Long> {
+public class RoleService extends GenericServiceImpl<Role, Long> implements IRoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;

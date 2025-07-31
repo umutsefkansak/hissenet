@@ -4,7 +4,7 @@ import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.dto.request.RoleCreateDto;
 import com.infina.hissenet.dto.request.RoleUpdateDto;
 import com.infina.hissenet.dto.response.RoleResponse;
-import com.infina.hissenet.service.RoleService;
+import com.infina.hissenet.service.abstracts.IRoleService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +19,9 @@ import java.util.Optional;
 @RequestMapping("/api/roles")
 public class RoleController {
 
-    private final RoleService roleService;
+    private final IRoleService roleService;
 
-    public RoleController(RoleService roleService) {
+    public RoleController(IRoleService roleService) {
         this.roleService = roleService;
     }
 

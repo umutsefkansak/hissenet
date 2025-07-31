@@ -10,15 +10,14 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface WalletTransactionMapper {
-
     WalletTransactionMapper INSTANCE = Mappers.getMapper(WalletTransactionMapper.class);
 
     @Mapping(target = "wallet", ignore = true)
     @Mapping(target = "transactionStatus", constant = "PENDING")
     @Mapping(target = "transactionDate", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "referenceNumber", ignore = true) // Service'de generate edilecek
-    @Mapping(target = "balanceBefore", ignore = true) // Service'de set edilecek
-    @Mapping(target = "balanceAfter", ignore = true) // Service'de set edilecek
+    @Mapping(target = "referenceNumber", ignore = true)
+    @Mapping(target = "balanceBefore", ignore = true)
+    @Mapping(target = "balanceAfter", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

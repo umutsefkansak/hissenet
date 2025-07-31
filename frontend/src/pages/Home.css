@@ -3,14 +3,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: transparent;
+  padding: 40px 20px;
 }
 
 .home-content {
   text-align: center;
-  color: #2c3e50;
-  max-width: 600px;
-  padding: 40px;
+  color: #1e3a8a;
+  max-width: 800px;
+  padding: 60px 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(30, 58, 138, 0.1);
+  box-shadow: 0 20px 40px rgba(30, 58, 138, 0.1);
 }
 
 .logo-container {
@@ -30,9 +37,10 @@
 
 
 .home-content p {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin-bottom: 40px;
-  color: #6c757d;
+  color: #374151;
+  font-weight: 400;
 }
 
 .home-buttons {
@@ -52,14 +60,14 @@
 }
 
 .btn-primary {
-  background: #3498db;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
   color: white;
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
 }
 
 .btn-primary:hover {
-  background: #2980b9;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
 }
 
 /* Responsive Design */

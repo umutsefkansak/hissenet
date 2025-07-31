@@ -23,16 +23,17 @@ public class AccountService extends GenericServiceImpl<Account, Long> implements
 	private final AccountRepository accountRepository;
 	private final EmployeeService employeeService;
 	private final AccountMapper accountMapper;
-	private final BCryptPasswordEncoder passwordEncoder;
+	//private final BCryptPasswordEncoder passwordEncoder;
 
 
 	public AccountService(AccountRepository accountRepository, EmployeeService employeeService,
-			AccountMapper accountMapper, BCryptPasswordEncoder passwordEncoder) {
+			AccountMapper accountMapper//, BCryptPasswordEncoder passwordEncoder
+			) {
 		super(accountRepository);
 		this.accountRepository = accountRepository;
 		this.employeeService = employeeService;
 		this.accountMapper = accountMapper;
-		this.passwordEncoder = passwordEncoder;
+		//this.passwordEncoder = passwordEncoder;
 	}
 
 	public AccountResponse createAccount(AccountCreateRequest request) {
@@ -42,8 +43,8 @@ public class AccountService extends GenericServiceImpl<Account, Long> implements
         Account account = accountMapper.toEntity(request);
         account.setEmployee(employee);
 
-        String hashedPassword = passwordEncoder.encode(request.passwordHash());
-        account.setPasswordHash(hashedPassword);
+       // String hashedPassword = passwordEncoder.encode(request.passwordHash());
+        //account.setPasswordHash(hashedPassword);
 
         Account saved = save(account);
         return accountMapper.toResponse(saved);

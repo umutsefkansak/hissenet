@@ -8,9 +8,9 @@ import com.infina.hissenet.exception.AddressNotFoundException;
 import com.infina.hissenet.exception.CustomerNotFoundException;
 import com.infina.hissenet.mapper.AddressMapper;
 import com.infina.hissenet.repository.AddressRepository;
-import com.infina.hissenet.repository.CustomerRepository;
+import com.infina.hissenet.service.abstracts.IAddressService;
+import com.infina.hissenet.service.abstracts.ICustomerService;
 import com.infina.hissenet.utils.GenericServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,33 +22,33 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AddressService extends GenericServiceImpl<Address, Long> {
+public class AddressService extends GenericServiceImpl<Address, Long> implements IAddressService {
 
     private final AddressRepository addressRepository;
-    private final CustomerRepository customerRepository;
+    private final ICustomerService customerService;
     private final AddressMapper addressMapper;
 
     @Autowired
     public AddressService(AddressRepository addressRepository,
-                          CustomerRepository customerRepository,
+                          ICustomerService customerService,
                           AddressMapper addressMapper) {
         super(addressRepository);
         this.addressRepository = addressRepository;
-        this.customerRepository = customerRepository;
+        this.customerService = customerService;
         this.addressMapper = addressMapper;
     }
 
 
     public AddressResponse createAddress(AddressCreateDto createAddressDto) {
 
-        if (!customerRepository.existsById(createAddressDto.customerId())) {
+        if (!customerService.existsById(createAddressDto.customerId())) {
             throw new CustomerNotFoundException(createAddressDto.customerId());
         }
 
         Address address = addressMapper.toEntity(createAddressDto);
 
 
-        address.setCustomer(customerRepository.getReferenceById(createAddressDto.customerId()));
+        address.setCustomer(customerService.getReferenceById(createAddressDto.customerId()));
 
         // Eğer primary adres olarak işaretlendiyse, aynı müşteriye ait diğer adreslerin primary durumunu kaldır
         if (Boolean.TRUE.equals(createAddressDto.isPrimary())) {
@@ -111,10 +111,10 @@ public class AddressService extends GenericServiceImpl<Address, Long> {
         // Müşteri değiştiriliyorsa kontrol et ve set et
         if (updateAddressDto.customerId() != null &&
                 !updateAddressDto.customerId().equals(existingAddress.getCustomer().getId())) {
-            if (!customerRepository.existsById(updateAddressDto.customerId())) {
+            if (!customerService.existsById(updateAddressDto.customerId())) {
                 throw new CustomerNotFoundException(updateAddressDto.customerId());
             }
-            existingAddress.setCustomer(customerRepository.getReferenceById(updateAddressDto.customerId()));
+            existingAddress.setCustomer(customerService.getReferenceById(updateAddressDto.customerId()));
         }
 
         // Primary address kontrolü

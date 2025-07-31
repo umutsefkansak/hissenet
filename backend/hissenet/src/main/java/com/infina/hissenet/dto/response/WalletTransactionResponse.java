@@ -6,7 +6,7 @@ import com.infina.hissenet.entity.enums.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record UpdateWalletTransactionResponse(
+public record WalletTransactionResponse(
         Long id,
         Long walletId,
         BigDecimal amount,

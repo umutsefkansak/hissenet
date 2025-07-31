@@ -11,6 +11,7 @@ import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.OrderRepository;
 import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.repository.StockTransactionRepository;
+import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,23 +22,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> {
+public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
 
     private final StockTransactionRepository stockTransactionRepository;
     private final PortfolioService portfolioService;
     private final StockRepository stockRepository;
-    private final OrderService orderService;
+    private final OrderRepository orderRepository;
     private final StockTransactionMapper stockTransactionMapper;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockRepository stockRepository, OrderService orderService, StockTransactionMapper stockTransactionMapper) {
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockRepository stockRepository, OrderRepository orderRepository, StockTransactionMapper stockTransactionMapper) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
         this.stockRepository = stockRepository;
-        this.orderService = orderService;
+        this.orderRepository = orderRepository;
         this.stockTransactionMapper = stockTransactionMapper;
     }
-  // order emri üzerine stocktransaction oluşturma
+    // order emri üzerine stocktransaction oluşturma
     @Transactional
     public StockTransactionResponse createTransactionFromOrder(StockTransactionCreateRequest request) {
         Portfolio portfolio = findPortfolioOrThrow(request.portfolioId());
@@ -76,7 +77,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
 
         return stockTransactionMapper.toResponse(stockTransactionRepository.save(transaction));
     }
- // Belirli bir portföye ait tüm işlemleri getirir.
+    // Belirli bir portföye ait tüm işlemleri getirir.
     public List<StockTransactionResponse> getTransactionsByPortfolioId(Long portfolioId) {
         return stockTransactionRepository.findByPortfolioId(portfolioId).stream()
                 .map(stockTransactionMapper::toResponse)
@@ -88,19 +89,19 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
- // Belirli bir emire ait tüm işlemleri getirir.
+    // Belirli bir emire ait tüm işlemleri getirir.
     public List<StockTransactionResponse> getTransactionsByOrderId(Long orderId) {
         return stockTransactionRepository.findByOrderId(orderId).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-// Belirtilen tarih aralığındaki işlemleri getirir.
+    // Belirtilen tarih aralığındaki işlemleri getirir.
     public List<StockTransactionResponse> getTransactionsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return stockTransactionRepository.findByTransactionDateBetween(startDate, endDate).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-// Belirli bir işlem türüne göre işlemleri getirir.
+    // Belirli bir işlem türüne göre işlemleri getirir.
     public List<StockTransactionResponse> getTransactionsByType(String transactionType) {
         return stockTransactionRepository.findByTransactionType(transactionType).stream()
                 .map(stockTransactionMapper::toResponse)
@@ -112,14 +113,14 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private Portfolio findPortfolioOrThrow(Long id) {
         return portfolioService.getPortfolio(id);
     }
-/* Buralarda servise olması lazım hata da servisten dönmesi lazım */
+    /* Buralarda servise olması lazım hata da servisten dönmesi lazım */
     private Stock findStockOrThrow(Long id) {
         return stockRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Stock bulunamadı: " + id));
     }
 
     private Order findOrderOrThrow(Long id) {
-        return orderService.findById(id)
+        return orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order bulunamadı: " + id));
     }
 }

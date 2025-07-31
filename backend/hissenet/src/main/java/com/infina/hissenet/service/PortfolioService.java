@@ -9,16 +9,18 @@ import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.exception.NotFoundException;
 import com.infina.hissenet.exception.UserNotFoundException;
 import com.infina.hissenet.mapper.PortfolioMapper;
-import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.PortfolioRepository;
+import com.infina.hissenet.service.abstracts.IPortfolioService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 @Service
-public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
+public class PortfolioService extends GenericServiceImpl<Portfolio,Long> implements IPortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final CustomerService customerService;
     private final PortfolioMapper portfolioMapper;

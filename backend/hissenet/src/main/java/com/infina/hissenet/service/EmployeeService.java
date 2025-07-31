@@ -2,7 +2,16 @@ package com.infina.hissenet.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
+import com.infina.hissenet.entity.Role;
+import com.infina.hissenet.exception.UserNotFoundException;
+import com.infina.hissenet.repository.RoleRepository;
+import com.infina.hissenet.security.PasswordEncoderBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.infina.hissenet.dto.request.EmployeeCreateRequest;
@@ -15,30 +24,36 @@ import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.utils.GenericServiceImpl;
 
 @Service
-public class EmployeeService extends GenericServiceImpl<Employee, Long> {
+public class EmployeeService extends GenericServiceImpl<Employee, Long> implements UserDetailsService {
 
 	private final EmployeeRepository employeeRepository;
 	// private final RoleRepository roleRepository;
 	private final EmployeeMapper employeeMapper;
 
+	private final PasswordEncoder encoder;
+	private final RoleRepository roleRepository;
+
 	public EmployeeService(EmployeeRepository employeeRepository,
-			// RoleRepository roleRepository,
-			EmployeeMapper employeeMapper) {
+						   // RoleRepository roleRepository,
+						   EmployeeMapper employeeMapper, PasswordEncoder encoder, RoleRepository roleRepository) {
 		super(employeeRepository);
 		this.employeeRepository = employeeRepository;
 		// this.roleRepository = roleRepository;
 		this.employeeMapper = employeeMapper;
+		this.encoder = encoder;
+		this.roleRepository = roleRepository;
 	}
 
 	public EmployeeResponse createEmployee(EmployeeCreateRequest request) {
-
+		System.out.println("şifre: "+request.password()+" email: " +request.email());
 		Employee employee = employeeMapper.toEntity(request);
 
 		employee.setHireDate(LocalDate.now());
+		employee.setPassword(encoder.encode(request.password()));
 
 		if (request.roleIds() != null && !request.roleIds().isEmpty()) {
-			// List<Role> roles = roleRepository.findAllById(request.roleIds());
-			// employee.setRoles(Set.copyOf(roles));
+			 List<Role> roles = roleRepository.findAllById(request.roleIds());
+			 employee.setRoles(Set.copyOf(roles));
 		}
 
 		Employee saved = save(employee);
@@ -48,14 +63,34 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> {
 	public EmployeeResponse updateEmployee(EmployeeUpdateRequest request) {
 		Employee existing = findById(request.id()).orElseThrow(() -> new EmployeeNotFoundException(request.id()));
 
-		employeeMapper.toEntity(request);
+		// Update fields from request
+		if (request.firstName() != null) {
+			existing.setFirstName(request.firstName());
+		}
+		if (request.lastName() != null) {
+			existing.setLastName(request.lastName());
+		}
+		if (request.email() != null) {
+			existing.setEmail(request.email());
+		}
+		if (request.phone() != null) {
+			existing.setPhone(request.phone());
+		}
+		if (request.position() != null) {
+			existing.setPosition(request.position());
+		}
+		if (request.emergencyContactName() != null) {
+			existing.setEmergencyContactName(request.emergencyContactName());
+		}
+		if (request.emergencyContactPhone() != null) {
+			existing.setEmergencyContactPhone(request.emergencyContactPhone());
+		}
 
-		// Rolleri güncellemek isterseniz RoleRepository'yi servise yeniden ekleyin:
-		/*
-		 * if (request.roleIds() != null) { List<Role> roles =
-		 * roleRepository.findAllById(request.roleIds());
-		 * existing.setRoles(Set.copyOf(roles)); }
-		 */
+		// Update roles if provided
+		if (request.roleIds() != null && !request.roleIds().isEmpty()) {
+			List<Role> roles = roleRepository.findAllById(request.roleIds());
+			existing.setRoles(Set.copyOf(roles));
+		}
 
 		Employee updated = update(existing);
 		return employeeMapper.toResponse(updated);
@@ -74,5 +109,12 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> {
 		Employee employee = findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
 		delete(employee);
 	}
+	public Employee findByEmail(String email) {
+		return employeeRepository.findByEmail(email).orElseThrow(()->new EmployeeNotFoundException());
+	}
 
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return findByEmail(username);
+	}
 }

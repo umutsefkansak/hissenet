@@ -8,9 +8,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +22,7 @@ import java.util.Set;
         @Index(name = "idx_employee_email", columnList = "email"),
         @Index(name = "idx_employee_status", columnList = "status")
 })
-public class Employee extends BaseEntity {
+public class Employee extends BaseEntity implements UserDetails {
 
     @NotBlank
     @Size(min = 2, max = 50)
@@ -36,8 +39,9 @@ public class Employee extends BaseEntity {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotBlank
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$")
+    @Column(name = "password", nullable = false, length = 100)
+    private String password;
+
     @Column(name = "phone", length = 20)
     private String phone;
 
@@ -62,8 +66,6 @@ public class Employee extends BaseEntity {
     @Column(name = "emergency_contact_name", length = 100)
     private String emergencyContactName;
 
-    @NotBlank
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$")
     @Column(name = "emergency_contact_phone", length = 20)
     private String emergencyContactPhone;
 
@@ -173,5 +175,45 @@ public class Employee extends BaseEntity {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

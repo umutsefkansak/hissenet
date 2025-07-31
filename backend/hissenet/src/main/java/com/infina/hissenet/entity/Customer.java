@@ -1,6 +1,7 @@
 package com.infina.hissenet.entity;
 
 
+import com.infina.hissenet.constants.CustomerConstants;
 import com.infina.hissenet.entity.base.BaseEntity;
 import com.infina.hissenet.entity.enums.CustomerType;
 import com.infina.hissenet.entity.enums.RiskProfile;
@@ -24,7 +25,7 @@ public abstract class Customer extends BaseEntity {
 
 
     @Column(name = "customer_number", nullable = false, unique = true, length = 20)
-    private String customerNumber; // Otomatik oluşturulacak müşteri numarası
+    private String customerNumber;
 
     @Email
     @NotBlank
@@ -36,7 +37,7 @@ public abstract class Customer extends BaseEntity {
     private String phone;
 
     @Column(name = "nationality", length = 50)
-    private String nationality = "TR";
+    private String nationality = CustomerConstants.DEFAULT_NATIONALITY;
 
 
     @Column(name = "kyc_verified", nullable = false)
@@ -53,13 +54,6 @@ public abstract class Customer extends BaseEntity {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
 
-    /*@ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "customer_roles",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();*/
 
     public String getCustomerNumber() {
         return customerNumber;

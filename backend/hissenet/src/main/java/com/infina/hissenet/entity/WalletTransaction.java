@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "wallet_transactions")
 public class WalletTransaction extends BaseEntity {
 
+    @NotNull(message = "Wallet cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
@@ -23,6 +24,7 @@ public class WalletTransaction extends BaseEntity {
     @Column(name = "amount", nullable = false, scale = 4)
     private BigDecimal amount=BigDecimal.ZERO;
 
+    @NotNull(message = "TransactionType cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
@@ -196,5 +198,4 @@ public class WalletTransaction extends BaseEntity {
     public void setBalanceAfter(BigDecimal balanceAfter) {
         this.balanceAfter = balanceAfter;
     }
-
 }

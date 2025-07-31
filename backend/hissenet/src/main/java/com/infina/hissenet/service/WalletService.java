@@ -6,6 +6,7 @@ import com.infina.hissenet.dto.response.WalletResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Wallet;
 import com.infina.hissenet.entity.enums.TransactionType;
+import com.infina.hissenet.exception.*;
 import com.infina.hissenet.mapper.WalletMapper;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.WalletRepository;
@@ -39,12 +40,12 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     public WalletResponse createWallet(CreateWalletRequest request){
         Optional<Customer> optionalCustomer = customerRepository.findById(request.customerId());
         if (optionalCustomer.isEmpty()){
-            throw new RuntimeException("Customer not found with ID: " + request.customerId());
+            throw new CustomerNotFoundException(request.customerId());
         }
         Optional<Wallet> existingWallet = walletRepository.findByCustomerId(request.customerId());
 
         if (existingWallet.isPresent()){
-            throw new RuntimeException("This customer already has wallet");
+            throw new WalletAlreadyExistsException(request.customerId());
         }
         Wallet wallet = walletMapper.toEntity(request);
         wallet.setCustomer(optionalCustomer.get());
@@ -54,11 +55,8 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         return walletMapper.toResponse(savedWallet);
     }
     public WalletResponse getWalletByCustomerId(Long customerId){
-        Optional<Wallet> optionalWallet = walletRepository.findByCustomerId(customerId);
-        if (optionalWallet.isEmpty()){
-            throw new RuntimeException("Wallet not found for this customer ID: " + customerId);
-        }
-        return walletMapper.toResponse(optionalWallet.get());
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        return walletMapper.toResponse(wallet);
     }
     public WalletResponse addBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
@@ -165,35 +163,35 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
 
     private void validateTransactionLimits(Wallet wallet, BigDecimal amount) {
         if (wallet.isDailyLimitExceeded(amount)){
-            throw new RuntimeException("Daily limit exceeded");
+            throw new WalletLimitExceededException("Daily");
         }
         if (wallet.isMonthlyLimitExceeded(amount)){
-            throw new RuntimeException("Monthly limit exceeded");
+            throw new WalletLimitExceededException("Monthly");
         }
         if (wallet.isTransactionCountExceeded()){
-            throw new RuntimeException("Daily transaction count exceeded");
+            throw new WalletLimitExceededException("Daily transaction count");
         }
     }
 
     private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
         if (!wallet.hasSufficientBalance(amount)){
-            throw new RuntimeException("Insufficient balance. Required balance: "+ amount+" Exist balance: "+ wallet.getBalance());
+            throw new InsufficientBalanceException(amount, wallet.getBalance());
         }
     }
 
     private Wallet getWalletByCustomerIdOrThrow(Long customerId) {
         Optional<Wallet> optionalWallet = walletRepository.findByCustomerId(customerId);
         if (optionalWallet.isEmpty()){
-            throw new RuntimeException("Wallet not found for customer ID: "+ customerId);
+            throw new WalletNotFoundException(customerId);
         }
         return optionalWallet.get();
     }
     private void validateWalletForTransaction(Wallet wallet){
         if (!wallet.isActive()){
-            throw new RuntimeException("Wallet is not active");
+            throw new WalletNotActiveException();
         }
         if (wallet.isLocked()){
-            throw new RuntimeException("Wallet is locked");
+            throw new WalletLockedException();
         }
     }
 

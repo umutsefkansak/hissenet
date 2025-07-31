@@ -18,7 +18,7 @@ import com.infina.hissenet.dto.request.EmployeeUpdateRequest;
 import com.infina.hissenet.dto.response.EmployeeResponse;
 import com.infina.hissenet.service.EmployeeService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_account_username", columnList = "username"),
         @Index(name = "idx_account_status", columnList = "status")
 })
-public class Account extends BaseEntity {
+public class Account extends BaseEntity  {
 
     @NotBlank
     @Column(name = "username", nullable = false, unique = true, length = 50)

@@ -86,4 +86,9 @@ public class WalletController {
     public ApiResponse<WalletResponse> resetMonthlyLimits(@PathVariable Long customerId){
         return ApiResponse.ok("Monthly limits reset successfully", walletService.resetMonthlyLimits(customerId));
     }
+    @DeleteMapping("/{walletId}")
+    public ApiResponse<String> deleteWalletById(@PathVariable Long walletId) {
+        walletService.deleteById(walletId);
+        return ApiResponse.ok("Wallet deleted successfully");
+    }
 }

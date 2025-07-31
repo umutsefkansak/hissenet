@@ -71,10 +71,25 @@ public class WalletTransaction extends BaseEntity {
         this.amount = amount;
         this.transactionType = transactionType;
         this.description = description;
-        this.transactionStatus = TransactionStatus.PENDING;
+        this.transactionStatus = transactionStatus;
         this.balanceBefore=wallet.getBalance();
-        this.transactionDate = LocalDateTime.now();
+        this.transactionDate = transactionDate;
         this.referenceNumber=referenceNumber;
+    }
+    public void completeTransaction(BigDecimal finalBalance){
+        this.transactionStatus=TransactionStatus.COMPLETED;
+        this.balanceAfter=finalBalance;
+        this.transactionDate = LocalDateTime.now();
+    }
+    public void cancelTransaction(){
+        this.transactionStatus = TransactionStatus.CANCELLED;
+        this.transactionDate = LocalDateTime.now();
+    }
+    public boolean isCompleted(){
+        return TransactionStatus.COMPLETED.equals(this.transactionStatus);
+    }
+    public boolean isPending(){
+        return TransactionStatus.PENDING.equals(this.transactionStatus);
     }
 
     public Wallet getWallet() {

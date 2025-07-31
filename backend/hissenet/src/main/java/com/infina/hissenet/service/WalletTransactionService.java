@@ -8,7 +8,8 @@ import com.infina.hissenet.entity.WalletTransaction;
 import com.infina.hissenet.mapper.WalletTransactionMapper;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.repository.WalletTransactionRepository;
-import com.infina.hissenet.utils.IGenericService;
+import com.infina.hissenet.service.abstracts.IWalletTransactionService;
+import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class WalletTransactionService implements IGenericService<WalletTransaction, Long> {
+public class WalletTransactionService extends GenericServiceImpl<WalletTransaction, Long> implements IWalletTransactionService {
 
     private final WalletTransactionRepository walletTransactionRepository;
     private final WalletTransactionMapper walletTransactionMapper;
     private final WalletRepository walletRepository;
-    public WalletTransactionService(WalletTransactionRepository walletTransactionRepository, WalletRepository walletRepository, WalletTransactionMapper walletTransactionMapper){
+    public WalletTransactionService(WalletTransactionRepository walletTransactionRepository,
+                                    WalletRepository walletRepository,
+                                    WalletTransactionMapper walletTransactionMapper){
+        super(walletTransactionRepository);
         this.walletTransactionMapper=walletTransactionMapper;
         this.walletRepository=walletRepository;
         this.walletTransactionRepository=walletTransactionRepository;
@@ -52,10 +55,12 @@ public class WalletTransactionService implements IGenericService<WalletTransacti
     public void completeTransaction(Long transactionId, BigDecimal finalBalance){
         WalletTransaction walletTransaction = findById(transactionId).orElseThrow(() -> new RuntimeException("Transaction not found"));
         walletTransaction.completeTransaction(finalBalance);
+        update(walletTransaction);
     }
     public void cancelTransaction(Long transactionId){
         WalletTransaction walletTransaction = findById(transactionId).orElseThrow(() -> new RuntimeException("Transaction not found"));
         walletTransaction.cancelTransaction();
+        update(walletTransaction);
     }
     public List<WalletTransactionResponse> getTransactionHistory(Long walletId){
         return walletTransactionRepository.findByWalletIdOrderByTransactionDateDesc(walletId)
@@ -73,44 +78,4 @@ public class WalletTransactionService implements IGenericService<WalletTransacti
 
         return walletTransactionMapper.toResponse(walletTransaction);
     }
-    @Override
-    public WalletTransaction save(WalletTransaction entity) {
-        return walletTransactionRepository.save(entity);
-    }
-
-    @Override
-    public WalletTransaction update(WalletTransaction entity) {
-        return walletTransactionRepository.save(entity);
-    }
-
-    @Override
-    public void delete(WalletTransaction entity) {
-        entity.setDeleted(true);
-        update(entity);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        walletTransactionRepository.deleteById(id);
-    }
-
-    @Override
-    public Optional<WalletTransaction> findById(Long id) {
-        return walletTransactionRepository.findById(id);
-    }
-
-    @Override
-    public List<WalletTransaction> findAll() {
-        return walletTransactionRepository.findAll();
-    }
-
-    @Override
-    public Page<WalletTransaction> findAll(Pageable pageable) {
-        return walletTransactionRepository.findAll(pageable);
-    }
-
-    @Override
-    public boolean existsById(Long id) {
-        return walletTransactionRepository.existsById(id);
-    }
-}
+  }

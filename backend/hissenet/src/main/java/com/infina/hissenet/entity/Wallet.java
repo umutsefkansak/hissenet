@@ -66,7 +66,69 @@ public class Wallet extends BaseEntity {
     @Column(name = "status", nullable = false)
     private Status walletStatus = Status.ACTIVE;
 
+    public void addBalance(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+        this.lastTransactionDate = LocalDateTime.now();
+    }
+    public void subtractBalance(BigDecimal amount) {
+        if (!hasSufficientBalance(amount)) {
+            throw new RuntimeException("Insufficient balance. Required: " + amount + ", Available: " + this.balance);
+        }
+        this.balance = this.balance.subtract(amount);
+        this.lastTransactionDate = LocalDateTime.now();
+    }
+    public boolean hasSufficientBalance(BigDecimal amount) {
+        return this.balance.compareTo(amount) >= 0;
+    }
+    public boolean isActive() {
+        return Status.ACTIVE.equals(this.walletStatus);
+    }
 
+    public boolean isLocked() {
+        return Boolean.TRUE.equals(this.isLocked);
+    }
+    public boolean isDailyLimitExceeded(BigDecimal amount) {
+        if (this.dailyLimit == null) return false;
+        return this.dailyUsedAmount.add(amount).compareTo(this.dailyLimit) > 0;
+    }
+
+    public boolean isMonthlyLimitExceeded(BigDecimal amount) {
+        if (this.monthlyLimit == null) return false;
+        return this.monthlyUsedAmount.add(amount).compareTo(this.monthlyLimit) > 0;
+    }
+    public boolean isTransactionCountExceeded() {
+        if (this.maxDailyTransactionCount == null) return false;
+        return this.dailyTransactionCount >= this.maxDailyTransactionCount;
+    }
+
+    public void incrementTransactionCount() {
+        this.dailyTransactionCount++;
+    }
+    public void addToDailyUsedAmount(BigDecimal amount) {
+        this.dailyUsedAmount = this.dailyUsedAmount.add(amount);
+    }
+
+    public void addToMonthlyUsedAmount(BigDecimal amount) {
+        this.monthlyUsedAmount = this.monthlyUsedAmount.add(amount);
+    }
+    public void resetDailyLimits() {
+        this.dailyUsedAmount = BigDecimal.ZERO;
+        this.dailyTransactionCount = 0;
+        this.lastResetDate = LocalDate.now();
+    }
+
+    public void resetMonthlyLimits() {
+        this.monthlyUsedAmount = BigDecimal.ZERO;
+        this.lastResetDate = LocalDate.now();
+    }
+
+    public void lockWallet() {
+        this.isLocked = true;
+    }
+
+    public void unlockWallet() {
+        this.isLocked = false;
+    }
 
     public Wallet(){}
 

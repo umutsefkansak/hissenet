@@ -198,4 +198,23 @@ public class WalletTransaction extends BaseEntity {
     public void setBalanceAfter(BigDecimal balanceAfter) {
         this.balanceAfter = balanceAfter;
     }
+
+    @Override
+    public String toString() {
+        return "WalletTransaction{" +
+                "wallet=" + wallet +
+                ", amount=" + amount +
+                ", transactionType=" + transactionType +
+                ", description='" + description + '\'' +
+                ", transactionStatus=" + transactionStatus +
+                ", transactionDate=" + transactionDate +
+                ", balanceBefore=" + balanceBefore +
+                ", referenceNumber='" + referenceNumber + '\'' +
+                ", feeAmount=" + feeAmount +
+                ", taxAmount=" + taxAmount +
+                ", source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", balanceAfter=" + balanceAfter +
+                '}';
+    }
 }

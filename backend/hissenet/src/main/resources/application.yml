@@ -1,6 +1,15 @@
 spring:
   application:
     name: hissenet
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: true
+      timeout: 6000ms
+      database: 0
 
   datasource:
     url: ${DB_URL}
@@ -15,7 +24,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}

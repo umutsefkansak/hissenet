@@ -68,7 +68,7 @@ public class WalletTransaction extends BaseEntity {
     
     public WalletTransaction(){}
 
-    public WalletTransaction(Wallet wallet, BigDecimal amount, String referenceNumber, TransactionType transactionType, String description, TransactionStatus transactionStatus, LocalDateTime transactionDate) {
+    public WalletTransaction(Wallet wallet, BigDecimal amount, TransactionType transactionType, String description, TransactionStatus transactionStatus, LocalDateTime transactionDate) {
         this.wallet = wallet;
         this.amount = amount;
         this.transactionType = transactionType;
@@ -76,7 +76,6 @@ public class WalletTransaction extends BaseEntity {
         this.transactionStatus = transactionStatus;
         this.balanceBefore=wallet.getBalance();
         this.transactionDate = transactionDate;
-        this.referenceNumber=referenceNumber;
     }
     public void completeTransaction(BigDecimal finalBalance){
         this.transactionStatus=TransactionStatus.COMPLETED;

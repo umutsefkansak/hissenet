@@ -107,10 +107,8 @@ public class WalletService implements IGenericService<Wallet, Long> {
 
     public WalletResponse addBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-
         validateWalletForTransaction(wallet);
-        wallet.setBalance(wallet.getBalance().add(amount));
-        wallet.setLastTransactionDate(LocalDateTime.now());
+        wallet.addBalance(amount);
         updateTransactionTracking(wallet, amount, true);
         Wallet updateWallet = update(wallet);
         return walletMapper.toResponse(updateWallet);
@@ -121,9 +119,7 @@ public class WalletService implements IGenericService<Wallet, Long> {
         validateWalletForTransaction(wallet);
         validateSufficientBalance(wallet, amount);
         validateTransactionLimits(wallet, amount);
-
-        wallet.setBalance(wallet.getBalance().subtract(amount));
-        wallet.setLastTransactionDate(LocalDateTime.now());
+        wallet.subtractBalance(amount);
         updateTransactionTracking(wallet, amount, false);
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
@@ -151,40 +147,37 @@ public class WalletService implements IGenericService<Wallet, Long> {
 
     public WalletResponse lockWallet(Long customerId){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-        wallet.setLocked(true);
+        wallet.lockWallet();
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
     }
     public WalletResponse unlockWallet(Long customerId){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-        wallet.setLocked(false);
+        wallet.unlockWallet();
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
     }
 
     public WalletResponse resetDailyLimits(Long customerId){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-        wallet.setDailyUsedAmount(BigDecimal.ZERO);
-        wallet.setDailyTransactionCount(0);
-        wallet.setLastResetDate(LocalDate.now());
+        wallet.resetDailyLimits();
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
     }
     public WalletResponse resetMonthlyLimits(Long customerId) {
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-        wallet.setMonthlyUsedAmount(BigDecimal.ZERO);
-        wallet.setLastResetDate(LocalDate.now());
+        wallet.resetMonthlyLimits();
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
     }
     public boolean canPerformTransaction(Long customerId, BigDecimal amount) {
         try {
             Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
-            return isWalletActive(wallet) && !isWalletLocked(wallet)
-                    && hasSufficientBalance(wallet, amount)
-                    && !isDailyLimitExceeded(wallet, amount)
-                    && !isMonthlyLimitExceeded(wallet, amount)
-                    && !isTransactionCountExceeded(wallet);
+            return wallet.isActive() && !wallet.isLocked() // Entity metodlarını kullan
+                    && wallet.hasSufficientBalance(amount)
+                    && !wallet.isDailyLimitExceeded(amount)
+                    && !wallet.isMonthlyLimitExceeded(amount)
+                    && !wallet.isTransactionCountExceeded();
         } catch (Exception e) {
             return false;
         }
@@ -286,9 +279,9 @@ public class WalletService implements IGenericService<Wallet, Long> {
 
     private void updateTransactionTracking(Wallet wallet, BigDecimal amount, boolean isAddition){
         if (!isAddition){
-            wallet.setDailyTransactionCount(wallet.getDailyTransactionCount()+1);
-            wallet.setDailyUsedAmount(wallet.getDailyUsedAmount().add(amount));
-            wallet.setMonthlyUsedAmount(wallet.getMonthlyUsedAmount().add(amount));
+            wallet.incrementTransactionCount();
+            wallet.addToMonthlyUsedAmount(amount);
+            wallet.addToMonthlyUsedAmount(amount);
         }
     }
 

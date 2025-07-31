@@ -255,6 +255,11 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> {
                 .toList();
     }
 
+    public Customer getReferenceById(Long id) {
+        return customerRepository.getReferenceById(id);
+    }
+
+
     private String generateCustomerNumber(String prefix) {
 
         String shortUuid = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();

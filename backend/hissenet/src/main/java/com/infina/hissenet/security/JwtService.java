@@ -1,6 +1,7 @@
 package com.infina.hissenet.security;
 
 import com.infina.hissenet.entity.Employee;
+import com.infina.hissenet.security.abstracts.IJwtService;
 import com.infina.hissenet.service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class JwtService {
+public class JwtService implements IJwtService {
     private final EmployeeService employeeService;
     @Value("${jwt.secret}")
     private String JWT_SECRET;

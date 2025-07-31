@@ -6,12 +6,12 @@ import com.infina.hissenet.entity.Employee;
 import com.infina.hissenet.exception.LoginException;
 import com.infina.hissenet.mapper.EmployeeMapper;
 import com.infina.hissenet.security.JwtService;
-import com.infina.hissenet.security.PasswordEncoderBean;
+import com.infina.hissenet.service.abstracts.IAuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
+public class AuthService implements IAuthService {
     private final EmployeeService employeeService;
     private final JwtService jwtService;
     private final PasswordEncoder encoder;

@@ -4,7 +4,7 @@ package com.infina.hissenet.controller;
 import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.dto.common.CustomerDto;
 import com.infina.hissenet.dto.request.*;
-import com.infina.hissenet.service.CustomerService;
+import com.infina.hissenet.service.abstracts.ICustomerService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +19,9 @@ import java.util.Optional;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerService customerService;
+    private final ICustomerService customerService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(ICustomerService customerService) {
         this.customerService = customerService;
     }
 

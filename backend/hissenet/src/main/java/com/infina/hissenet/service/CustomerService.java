@@ -14,6 +14,7 @@ import com.infina.hissenet.mapper.CustomerMapper;
 import com.infina.hissenet.repository.CorporateCustomerRepository;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.IndividualCustomerRepository;
+import com.infina.hissenet.service.abstracts.ICustomerService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class CustomerService extends GenericServiceImpl<Customer, Long> {
+public class CustomerService extends GenericServiceImpl<Customer, Long> implements ICustomerService {
 
     private final CustomerRepository customerRepository;
     private final IndividualCustomerRepository individualCustomerRepository;

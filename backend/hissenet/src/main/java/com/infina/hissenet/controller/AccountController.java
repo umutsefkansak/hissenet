@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.dto.request.AccountCreateRequest;
+import com.infina.hissenet.dto.request.AccountUpdateRequest;
 import com.infina.hissenet.dto.response.AccountResponse;
 import com.infina.hissenet.service.AccountService;
 
@@ -39,7 +40,7 @@ public class AccountController {
 
 	@PutMapping("/{id}")
 	public ApiResponse<AccountResponse> updateAccount(@PathVariable Long id,
-			@Valid @RequestBody AccountCreateRequest request) {
+			@Valid @RequestBody AccountUpdateRequest request) {
 		return ApiResponse.ok("Account updated successfully", service.updateAccount(id, request));
 	}
 
@@ -58,5 +59,5 @@ public class AccountController {
 		service.deleteAccount(id);
 		return ApiResponse.ok("Account deleted successfully");
 	}
-	
+
 }

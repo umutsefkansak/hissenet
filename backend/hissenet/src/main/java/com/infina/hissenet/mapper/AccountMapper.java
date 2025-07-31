@@ -17,6 +17,7 @@ import com.infina.hissenet.entity.Account;
 public interface AccountMapper {
 	AccountMapper INSTANCE = Mappers.getMapper(AccountMapper.class);
 	
+	@Mapping(target = "passwordHash", ignore = true)
 	@Mapping(target = "employee", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "lastLoginAt", ignore = true)

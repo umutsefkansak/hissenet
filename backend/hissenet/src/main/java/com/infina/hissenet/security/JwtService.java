@@ -42,7 +42,7 @@ public class JwtService {
     // useri al
     public Employee getUser(String token) {
         String email=getEmail(token);
-        return employeeService.findByEmail(email);
+        return employeeService.findByEmailWithRoles(email);
     }
     // validate token
     public boolean validateToken(String token) {

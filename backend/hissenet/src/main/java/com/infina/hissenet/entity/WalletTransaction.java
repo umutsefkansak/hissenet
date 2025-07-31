@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "wallet_transactions")
 public class WalletTransaction extends BaseEntity {
 
+    @NotNull(message = "Wallet cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
@@ -23,6 +24,7 @@ public class WalletTransaction extends BaseEntity {
     @Column(name = "amount", nullable = false, scale = 4)
     private BigDecimal amount=BigDecimal.ZERO;
 
+    @NotNull(message = "TransactionType cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
@@ -66,15 +68,29 @@ public class WalletTransaction extends BaseEntity {
     
     public WalletTransaction(){}
 
-    public WalletTransaction(Wallet wallet, BigDecimal amount, String referenceNumber, TransactionType transactionType, String description, TransactionStatus transactionStatus, LocalDateTime transactionDate) {
+    public WalletTransaction(Wallet wallet, BigDecimal amount, TransactionType transactionType, String description, TransactionStatus transactionStatus, LocalDateTime transactionDate) {
         this.wallet = wallet;
         this.amount = amount;
         this.transactionType = transactionType;
         this.description = description;
-        this.transactionStatus = TransactionStatus.PENDING;
+        this.transactionStatus = transactionStatus;
         this.balanceBefore=wallet.getBalance();
+        this.transactionDate = transactionDate;
+    }
+    public void completeTransaction(BigDecimal finalBalance){
+        this.transactionStatus=TransactionStatus.COMPLETED;
+        this.balanceAfter=finalBalance;
         this.transactionDate = LocalDateTime.now();
-        this.referenceNumber=referenceNumber;
+    }
+    public void cancelTransaction(){
+        this.transactionStatus = TransactionStatus.CANCELLED;
+        this.transactionDate = LocalDateTime.now();
+    }
+    public boolean isCompleted(){
+        return TransactionStatus.COMPLETED.equals(this.transactionStatus);
+    }
+    public boolean isPending(){
+        return TransactionStatus.PENDING.equals(this.transactionStatus);
     }
 
     public Wallet getWallet() {
@@ -182,4 +198,22 @@ public class WalletTransaction extends BaseEntity {
         this.balanceAfter = balanceAfter;
     }
 
+    @Override
+    public String toString() {
+        return "WalletTransaction{" +
+                "wallet=" + wallet +
+                ", amount=" + amount +
+                ", transactionType=" + transactionType +
+                ", description='" + description + '\'' +
+                ", transactionStatus=" + transactionStatus +
+                ", transactionDate=" + transactionDate +
+                ", balanceBefore=" + balanceBefore +
+                ", referenceNumber='" + referenceNumber + '\'' +
+                ", feeAmount=" + feeAmount +
+                ", taxAmount=" + taxAmount +
+                ", source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", balanceAfter=" + balanceAfter +
+                '}';
+    }
 }

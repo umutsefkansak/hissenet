@@ -21,12 +21,7 @@ import org.springframework.context.annotation.Configuration;
                 @Server(url="https://api.hissenet.com", description="Prod")
         }
 )
-//@SecurityScheme(
-//        name         = "bearerAuth",
-//        type         = SecuritySchemeType.HTTP,
-//        scheme       = "bearer",
-//        bearerFormat = "JWT"
-//)
+
 public class OpenApiConfig {
     // Tüm konfigürasyon annotation’lar ile sağlanıyor
 }

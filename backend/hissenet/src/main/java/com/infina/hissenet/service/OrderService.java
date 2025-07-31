@@ -19,10 +19,11 @@ import com.infina.hissenet.exception.OrderNotFoundException;
 import com.infina.hissenet.exception.StockNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
+import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 
 @Service
-public class OrderService extends GenericServiceImpl<Order, Long> {
+public class OrderService extends GenericServiceImpl<Order, Long> implements IOrderService{
 
 	private final OrderRepository orderRepository;
 	private final CustomerService customerService;

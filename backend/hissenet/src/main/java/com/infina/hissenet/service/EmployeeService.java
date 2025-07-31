@@ -9,9 +9,9 @@ import com.infina.hissenet.exception.EmployeeNotFoundException;
 import com.infina.hissenet.mapper.EmployeeMapper;
 import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.repository.RoleRepository;
+import com.infina.hissenet.service.abstracts.IEmployeeService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class EmployeeService extends GenericServiceImpl<Employee, Long> implements UserDetailsService {
+public class EmployeeService extends GenericServiceImpl<Employee, Long> implements IEmployeeService {
 
     private final EmployeeRepository employeeRepository;
     // private final RoleRepository roleRepository;

@@ -5,6 +5,8 @@ import com.infina.hissenet.dto.request.UpdateWalletTransactionRequest;
 import com.infina.hissenet.dto.response.WalletTransactionResponse;
 import com.infina.hissenet.entity.Wallet;
 import com.infina.hissenet.entity.WalletTransaction;
+import com.infina.hissenet.exception.TransactionNotFoundException;
+import com.infina.hissenet.exception.WalletNotFoundException;
 import com.infina.hissenet.mapper.WalletTransactionMapper;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.repository.WalletTransactionRepository;
@@ -37,7 +39,7 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
 
     public WalletTransactionResponse createWalletTransaction(CreateWalletTransactionRequest request){
         Wallet wallet = walletRepository.findById(request.walletId())
-                .orElseThrow(() -> new RuntimeException("Wallet not found by ID: "+ request.walletId()));
+                .orElseThrow(() -> new WalletNotFoundException(request.walletId()));
 
         WalletTransaction walletTransaction = walletTransactionMapper.toEntity(request);
         walletTransaction.setWallet(wallet);
@@ -47,18 +49,20 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
     }
     public WalletTransactionResponse updateWalletTransaction(Long walletTransactionId, UpdateWalletTransactionRequest updateWalletTransactionRequest){
         WalletTransaction walletTransaction = findById(walletTransactionId)
-                .orElseThrow(()-> new RuntimeException("Transaction not found by id: " + walletTransactionId));
+                .orElseThrow(()-> new TransactionNotFoundException(walletTransactionId));
         walletTransactionMapper.updateEntityFromRequest(updateWalletTransactionRequest, walletTransaction);
         WalletTransaction updatedTransaction = update(walletTransaction);
         return walletTransactionMapper.toResponse(updatedTransaction);
     }
     public void completeTransaction(Long transactionId, BigDecimal finalBalance){
-        WalletTransaction walletTransaction = findById(transactionId).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        WalletTransaction walletTransaction = findById(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException(transactionId));
         walletTransaction.completeTransaction(finalBalance);
         update(walletTransaction);
     }
     public void cancelTransaction(Long transactionId){
-        WalletTransaction walletTransaction = findById(transactionId).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        WalletTransaction walletTransaction = findById(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException(transactionId));
         walletTransaction.cancelTransaction();
         update(walletTransaction);
     }
@@ -74,7 +78,7 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
     }
     public WalletTransactionResponse getTransactionById(Long transactionId) {
         WalletTransaction walletTransaction = findById(transactionId)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
+                .orElseThrow(() -> new TransactionNotFoundException(transactionId));
 
         return walletTransactionMapper.toResponse(walletTransaction);
     }

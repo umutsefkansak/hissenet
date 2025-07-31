@@ -62,4 +62,13 @@ public class GlobalExceptionHandler {
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }
+
+    // 401 Unauthorized Exception
+    @ExceptionHandler(LoginException.class)
+    public ProblemDetail unauthorizedException(RuntimeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        problem.setTitle("Internal Server Error");
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
 }

@@ -8,10 +8,9 @@ import com.infina.hissenet.exception.AddressNotFoundException;
 import com.infina.hissenet.exception.CustomerNotFoundException;
 import com.infina.hissenet.mapper.AddressMapper;
 import com.infina.hissenet.repository.AddressRepository;
-import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.service.abstracts.IAddressService;
+import com.infina.hissenet.service.abstracts.ICustomerService;
 import com.infina.hissenet.utils.GenericServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +25,12 @@ import java.util.Optional;
 public class AddressService extends GenericServiceImpl<Address, Long> implements IAddressService {
 
     private final AddressRepository addressRepository;
-    private final CustomerService customerService;
+    private final ICustomerService customerService;
     private final AddressMapper addressMapper;
 
     @Autowired
     public AddressService(AddressRepository addressRepository,
-                          CustomerService customerService,
+                          ICustomerService customerService,
                           AddressMapper addressMapper) {
         super(addressRepository);
         this.addressRepository = addressRepository;

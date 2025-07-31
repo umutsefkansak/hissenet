@@ -5,6 +5,7 @@ import com.infina.hissenet.dto.request.AddressCreateDto;
 import com.infina.hissenet.dto.request.AddressUpdateDto;
 import com.infina.hissenet.dto.response.AddressResponse;
 import com.infina.hissenet.service.AddressService;
+import com.infina.hissenet.service.abstracts.IAddressService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,9 @@ import java.util.Optional;
 @RequestMapping("/api/addresses")
 public class AddressController {
 
-    private final AddressService addressService;
+    private final IAddressService addressService;
 
-    public AddressController(AddressService addressService) {
+    public AddressController(IAddressService addressService) {
         this.addressService = addressService;
     }
 

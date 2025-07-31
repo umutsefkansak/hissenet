@@ -9,6 +9,7 @@ import com.infina.hissenet.exception.CustomerNotFoundException;
 import com.infina.hissenet.mapper.AddressMapper;
 import com.infina.hissenet.repository.AddressRepository;
 import com.infina.hissenet.repository.CustomerRepository;
+import com.infina.hissenet.service.abstracts.IAddressService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AddressService extends GenericServiceImpl<Address, Long> {
+public class AddressService extends GenericServiceImpl<Address, Long> implements IAddressService {
 
     private final AddressRepository addressRepository;
     private final CustomerService customerService;

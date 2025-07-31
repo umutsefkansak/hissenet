@@ -26,7 +26,7 @@ public interface IOrderService {
      * @param request order update data
      * @return updated order details
      */
-    OrderResponse updateOrder(OrderUpdateRequest request);
+    OrderResponse updateOrder(Long id, OrderUpdateRequest request);
 
     /**
      * Retrieves an order by ID.

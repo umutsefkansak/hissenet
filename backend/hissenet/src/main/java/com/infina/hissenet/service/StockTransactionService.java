@@ -26,15 +26,15 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private final StockTransactionRepository stockTransactionRepository;
     private final PortfolioService portfolioService;
     private final StockRepository stockRepository;
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
     private final StockTransactionMapper stockTransactionMapper;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockRepository stockRepository, OrderRepository orderRepository, StockTransactionMapper stockTransactionMapper) {
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockRepository stockRepository, OrderService orderService, StockTransactionMapper stockTransactionMapper) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
         this.stockRepository = stockRepository;
-        this.orderRepository = orderRepository;
+        this.orderService = orderService;
         this.stockTransactionMapper = stockTransactionMapper;
     }
   // order emri üzerine stocktransaction oluşturma
@@ -119,7 +119,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
 
     private Order findOrderOrThrow(Long id) {
-        return orderRepository.findById(id)
+        return orderService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order bulunamadı: " + id));
     }
 }

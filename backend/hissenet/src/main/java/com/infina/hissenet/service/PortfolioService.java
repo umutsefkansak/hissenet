@@ -20,13 +20,13 @@ import java.util.List;
 @Service
 public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     private final PortfolioRepository portfolioRepository;
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
     private final PortfolioMapper portfolioMapper;
 
-    public PortfolioService(JpaRepository<Portfolio, Long> repository, PortfolioRepository portfolioRepository, CustomerRepository customerRepository, PortfolioMapper portfolioMapper) {
+    public PortfolioService(JpaRepository<Portfolio, Long> repository, PortfolioRepository portfolioRepository, CustomerService customerService, PortfolioMapper portfolioMapper) {
         super(repository);
         this.portfolioRepository = portfolioRepository;
-        this.customerRepository = customerRepository;
+        this.customerService = customerService;
         this.portfolioMapper = portfolioMapper;
     }
 
@@ -36,7 +36,7 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
                 .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
     }
 
-    // portföy getir (eager loading ile)
+    // portföy getir
     protected Portfolio getPortfolioWithCustomer(Long id){
         return portfolioRepository.findByIdWithCustomer(id)
                 .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
@@ -140,7 +140,7 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> {
     }
 
     private Customer findCustomerOrThrow(Long customerId) {
-        return customerRepository.findById(customerId)
+        return customerService.findById(customerId)
                 .orElseThrow(() -> new UserNotFoundException("Müşteri "));
     }
 }

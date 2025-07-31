@@ -7,6 +7,7 @@ import com.infina.hissenet.dto.response.WalletResponse;
 import com.infina.hissenet.entity.enums.TransactionType;
 import com.infina.hissenet.service.WalletService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +43,11 @@ public class WalletController {
     }
     //balance processes
     @PostMapping("/customer/{customerId}/add-balance")
-    public ApiResponse<WalletResponse> addBalance(@PathVariable Long customerId, @RequestParam BigDecimal amount, @RequestParam TransactionType transactionType){
+    public ApiResponse<WalletResponse> addBalance(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount, @RequestParam TransactionType transactionType){
         return ApiResponse.ok("Balance added successfully", walletService.addBalance(customerId, amount, transactionType));
     }
     @PostMapping("/customer/{customerId}/subtract-balance")
-    public ApiResponse<WalletResponse> subtractBalance(@PathVariable Long customerId, @RequestParam BigDecimal amount, @RequestParam TransactionType transactionType){
+    public ApiResponse<WalletResponse> subtractBalance(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount, @RequestParam TransactionType transactionType){
         return ApiResponse.ok("Balance subtracted successfully", walletService.subtractBalance(customerId,amount, transactionType));
     }
     @PostMapping("/customer/{customerId}/stock/purchase")
@@ -59,15 +60,15 @@ public class WalletController {
         return ApiResponse.ok("Stock sale processed successfully", walletService.processStockSale(customerId, totalAmount, commission, tax));
     }
     @PostMapping("/customer/{customerId}/deposit")
-    public ApiResponse<WalletResponse> processDeposit(@PathVariable Long customerId, @RequestParam BigDecimal amount){
+    public ApiResponse<WalletResponse> processDeposit(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){
         return ApiResponse.ok("Deposit processed successfully", walletService.processDeposit(customerId, amount));
     }
     @PostMapping("/customer/{customerId}/withdrawal")
-    public ApiResponse<WalletResponse> processWithdrawal(@PathVariable Long customerId, @RequestParam BigDecimal amount){
+    public ApiResponse<WalletResponse> processWithdrawal(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){
         return ApiResponse.ok("Withdrawal processed successfully", walletService.processWithdrawal(customerId, amount));
     }
     @PostMapping("/customer/{customerId}/dividend")
-    public ApiResponse<WalletResponse> processDividendPayment(@PathVariable Long customerId, @RequestParam BigDecimal amount){
+    public ApiResponse<WalletResponse> processDividendPayment(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){
         return ApiResponse.ok("Dividend payment processed successfully", walletService.processDividendPayment(customerId, amount));
     }
     @PostMapping("/customer/{customerId}/lock")
@@ -85,5 +86,10 @@ public class WalletController {
     @PostMapping("/customer/{customerId}/reset-monthly-limits")
     public ApiResponse<WalletResponse> resetMonthlyLimits(@PathVariable Long customerId){
         return ApiResponse.ok("Monthly limits reset successfully", walletService.resetMonthlyLimits(customerId));
+    }
+    @DeleteMapping("/{walletId}")
+    public ApiResponse<String> deleteWalletById(@PathVariable Long walletId) {
+        walletService.deleteById(walletId);
+        return ApiResponse.ok("Wallet deleted successfully");
     }
 }

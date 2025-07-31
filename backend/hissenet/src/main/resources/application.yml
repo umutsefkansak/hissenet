@@ -1,6 +1,19 @@
 spring:
   application:
     name: hissenet
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
 
   datasource:
     url: ${DB_URL}
@@ -15,3 +28,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
+
+mail:
+  from:
+    email: ${MAIL_FROM:noreply@hissenet.com}
+    name: ${MAIL_FROM_NAME:HisseNet Aracı Kurum}
+  verification:
+    code-length: 6
+    expiry-minutes: 10
+  templates:
+    enabled: true

@@ -6,7 +6,7 @@ import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.Stock;
 import com.infina.hissenet.entity.StockTransaction;
-import com.infina.hissenet.exception.NotFoundException;
+import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.OrderRepository;
 import com.infina.hissenet.repository.StockRepository;

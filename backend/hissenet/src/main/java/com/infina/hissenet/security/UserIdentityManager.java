@@ -1,7 +1,7 @@
 package com.infina.hissenet.security;
 
 import com.infina.hissenet.entity.Employee;
-import com.infina.hissenet.exception.UserNotFoundException;
+import com.infina.hissenet.exception.employee.UserNotFoundException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 

@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.common;
 
 public class RateLimitException extends RuntimeException {
     public RateLimitException() {

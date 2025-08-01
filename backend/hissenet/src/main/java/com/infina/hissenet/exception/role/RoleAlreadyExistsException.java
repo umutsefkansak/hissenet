@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.role;
 
 
 public class RoleAlreadyExistsException extends RuntimeException {

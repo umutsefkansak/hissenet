@@ -3,7 +3,7 @@ package com.infina.hissenet.service;
 import com.infina.hissenet.dto.request.LoginRequest;
 import com.infina.hissenet.dto.response.AuthResponse;
 import com.infina.hissenet.entity.Employee;
-import com.infina.hissenet.exception.LoginException;
+import com.infina.hissenet.exception.auth.LoginException;
 import com.infina.hissenet.mapper.EmployeeMapper;
 import com.infina.hissenet.security.JwtService;
 import com.infina.hissenet.security.RedisTokenService;

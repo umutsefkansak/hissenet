@@ -1,5 +1,9 @@
 package com.infina.hissenet.exception;
 
+import com.infina.hissenet.exception.mail.MailException;
+import com.infina.hissenet.exception.mail.MailRateLimitException;
+import com.infina.hissenet.exception.mail.VerificationCodeException;
+import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -18,7 +22,8 @@ public class GlobalExceptionHandler {
 
     // 404 - Not Found
     @ExceptionHandler({
-            NotFoundException.class
+            NotFoundException.class,
+            VerificationCodeNotFoundException.class
     })
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -75,7 +80,7 @@ public class GlobalExceptionHandler {
     }
 
     // 429 - Too Many Requests (Rate Limit) and limit exceptiom
-    @ExceptionHandler({RateLimitException.class,WalletLimitExceededException.class})
+    @ExceptionHandler({RateLimitException.class, WalletLimitExceededException.class, MailRateLimitException.class})
     public ProblemDetail rateLimitException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
         problem.setTitle("Too Many Requests");
@@ -92,5 +97,17 @@ public class GlobalExceptionHandler {
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }
+
+    // 422 - Unprocessable Entity (Mail/Verification işlemleri için)
+    @ExceptionHandler({MailException.class, VerificationCodeException.class})
+    public ProblemDetail handleMailException(RuntimeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        problem.setTitle("Mail Processing Error");
+        problem.setType(URI.create("https://www.hissenet.com/errors/mail-processing"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
+
+
 
 }

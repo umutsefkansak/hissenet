@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.transaction;
 
 public class TransactionAlreadyCompletedException extends RuntimeException {
     public TransactionAlreadyCompletedException(Long transactionId) {

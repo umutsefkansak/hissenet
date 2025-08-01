@@ -1,4 +1,6 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.customer;
+
+import com.infina.hissenet.exception.common.NotFoundException;
 
 public class CustomerNotFoundException extends NotFoundException {
     public CustomerNotFoundException(Long id) {

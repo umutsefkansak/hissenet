@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.role;
 
 public class RoleNotFoundException extends RuntimeException {
     public RoleNotFoundException(Long id) {

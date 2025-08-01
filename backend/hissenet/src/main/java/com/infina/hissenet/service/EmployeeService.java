@@ -5,7 +5,7 @@ import com.infina.hissenet.dto.request.EmployeeUpdateRequest;
 import com.infina.hissenet.dto.response.EmployeeResponse;
 import com.infina.hissenet.entity.Employee;
 import com.infina.hissenet.entity.Role;
-import com.infina.hissenet.exception.EmployeeNotFoundException;
+import com.infina.hissenet.exception.employee.EmployeeNotFoundException;
 import com.infina.hissenet.mapper.EmployeeMapper;
 import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.repository.RoleRepository;

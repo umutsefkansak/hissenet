@@ -3,6 +3,8 @@ package com.infina.hissenet.service.abstracts;
 import com.infina.hissenet.dto.request.RoleCreateDto;
 import com.infina.hissenet.dto.request.RoleUpdateDto;
 import com.infina.hissenet.dto.response.RoleResponse;
+import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
+import com.infina.hissenet.exception.role.RoleNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,7 +33,7 @@ public interface IRoleService {
      *
      * @param createRoleDto the role creation data transfer object
      * @return the created role response
-     * @throws com.infina.hissenet.exception.RoleAlreadyExistsException if role name already exists
+     * @throws RoleAlreadyExistsException if role name already exists
      */
     RoleResponse createRole(RoleCreateDto createRoleDto);
 
@@ -40,7 +42,7 @@ public interface IRoleService {
      *
      * @param id the role identifier
      * @return the role response
-     * @throws com.infina.hissenet.exception.RoleNotFoundException if the role does not exist
+     * @throws RoleNotFoundException if the role does not exist
      */
     RoleResponse getRoleById(Long id);
 
@@ -107,8 +109,8 @@ public interface IRoleService {
      * @param id the role identifier
      * @param updateRoleDto the role update data transfer object
      * @return the updated role response
-     * @throws com.infina.hissenet.exception.RoleNotFoundException if the role does not exist
-     * @throws com.infina.hissenet.exception.RoleAlreadyExistsException if new role name already exists
+     * @throws RoleNotFoundException if the role does not exist
+     * @throws RoleAlreadyExistsException if new role name already exists
      */
     RoleResponse updateRole(Long id, RoleUpdateDto updateRoleDto);
 
@@ -116,7 +118,7 @@ public interface IRoleService {
      * Deletes a role by its unique identifier.
      *
      * @param id the role identifier
-     * @throws com.infina.hissenet.exception.RoleNotFoundException if the role does not exist
+     * @throws RoleNotFoundException if the role does not exist
      */
     void deleteRole(Long id);
 
@@ -124,7 +126,7 @@ public interface IRoleService {
      * Activates a role by setting its status to active.
      *
      * @param id the role identifier
-     * @throws com.infina.hissenet.exception.RoleNotFoundException if the role does not exist
+     * @throws RoleNotFoundException if the role does not exist
      */
     void activateRole(Long id);
 
@@ -132,7 +134,7 @@ public interface IRoleService {
      * Deactivates a role by setting its status to inactive.
      *
      * @param id the role identifier
-     * @throws com.infina.hissenet.exception.RoleNotFoundException if the role does not exist
+     * @throws RoleNotFoundException if the role does not exist
      */
     void deactivateRole(Long id);
 

@@ -3,6 +3,8 @@ package com.infina.hissenet.service.abstracts;
 import com.infina.hissenet.dto.request.AddressCreateDto;
 import com.infina.hissenet.dto.request.AddressUpdateDto;
 import com.infina.hissenet.dto.response.AddressResponse;
+import com.infina.hissenet.exception.address.AddressNotFoundException;
+import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,7 +33,7 @@ public interface IAddressService {
      *
      * @param createAddressDto the address creation data transfer object
      * @return the created address response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      */
     AddressResponse createAddress(AddressCreateDto createAddressDto);
 
@@ -40,7 +42,7 @@ public interface IAddressService {
      *
      * @param id the address identifier
      * @return the address response
-     * @throws com.infina.hissenet.exception.AddressNotFoundException if the address does not exist
+     * @throws AddressNotFoundException if the address does not exist
      */
     AddressResponse getAddressById(Long id);
 
@@ -82,8 +84,8 @@ public interface IAddressService {
      * @param id the address identifier
      * @param updateAddressDto the address update data transfer object
      * @return the updated address response
-     * @throws com.infina.hissenet.exception.AddressNotFoundException if the address does not exist
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the new customer does not exist
+     * @throws AddressNotFoundException if the address does not exist
+     * @throws CustomerNotFoundException if the new customer does not exist
      */
     AddressResponse updateAddress(Long id, AddressUpdateDto updateAddressDto);
 
@@ -91,7 +93,7 @@ public interface IAddressService {
      * Deletes an address by its unique identifier.
      *
      * @param id the address identifier
-     * @throws com.infina.hissenet.exception.AddressNotFoundException if the address does not exist
+     * @throws AddressNotFoundException if the address does not exist
      */
     void deleteAddress(Long id);
 

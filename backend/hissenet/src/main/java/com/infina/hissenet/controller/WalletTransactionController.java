@@ -1,6 +1,8 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.WalletControllerDoc;
+import com.infina.hissenet.controller.doc.WalletTransactionControllerDoc;
 import com.infina.hissenet.dto.request.CreateWalletRequest;
 import com.infina.hissenet.dto.request.CreateWalletTransactionRequest;
 import com.infina.hissenet.dto.request.UpdateWalletTransactionRequest;
@@ -19,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/wallet-transactions")
-public class WalletTransactionController {
+public class WalletTransactionController implements WalletTransactionControllerDoc {
 
     private final WalletTransactionService walletTransactionService;
 

@@ -80,7 +80,7 @@ public class MailService implements IMailService {
 
         } catch (Exception e) {
             logger.error("Error sending email: {} -> {}", fromEmail, request.to(), e);
-            throw new MailException("MailConstants.Messages.MAIL_SEND_ERROR " + e.getMessage(), e);
+            throw new MailException(MailConstants.Messages.MAIL_SEND_ERROR + e.getMessage(), e);
         }
     }
 

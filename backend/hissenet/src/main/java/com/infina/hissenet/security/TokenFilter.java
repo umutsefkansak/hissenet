@@ -14,11 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 @Component
-public class Filter extends OncePerRequestFilter{
+public class TokenFilter extends OncePerRequestFilter{
     private final JwtService jwtService;
     private final RedisTokenService redisTokenService;
 
-    public Filter(JwtService jwtService, RedisTokenService redisTokenService) {
+    public TokenFilter(JwtService jwtService, RedisTokenService redisTokenService) {
         this.jwtService = jwtService;
         this.redisTokenService = redisTokenService;
     }

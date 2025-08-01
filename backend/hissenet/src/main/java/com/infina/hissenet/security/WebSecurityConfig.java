@@ -10,14 +10,20 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
+
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-    private final Filter filter;
+    private final TokenFilter tokenFilter;
+    private final SessionExtensionFilter sessionExtensionFilter;
 
-    public WebSecurityConfig(Filter filter) {
-        this.filter = filter;
+    public WebSecurityConfig(TokenFilter tokenFilter, SessionExtensionFilter sessionExtensionFilter) {
+        this.tokenFilter = tokenFilter;
+        this.sessionExtensionFilter = sessionExtensionFilter;
     }
+
+
 
     @Bean
     SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -59,7 +65,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(sessionExtensionFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

@@ -5,7 +5,8 @@ import com.infina.hissenet.controller.doc.OrderControllerDoc;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
-import com.infina.hissenet.service.OrderService;
+import com.infina.hissenet.service.abstracts.IOrderService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,9 @@ import java.util.List;
 @RequestMapping("api/v1/orders")
 public class OrderController implements OrderControllerDoc{
 
-	private final OrderService service;
+	private final IOrderService service;
 
-	public OrderController(OrderService service) {
+	public OrderController(IOrderService service) {
 		this.service = service;
 	}
 	

@@ -15,7 +15,6 @@ public interface WalletTransactionMapper {
     @Mapping(target = "wallet", ignore = true)
     @Mapping(target = "transactionStatus", constant = "PENDING")
     @Mapping(target = "transactionDate", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "referenceNumber", ignore = true)
     @Mapping(target = "balanceBefore", ignore = true)
     @Mapping(target = "balanceAfter", ignore = true)
     @Mapping(target = "id", ignore = true)

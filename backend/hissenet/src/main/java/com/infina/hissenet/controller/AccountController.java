@@ -17,7 +17,7 @@ import com.infina.hissenet.controller.doc.AccountControllerDoc;
 import com.infina.hissenet.dto.request.AccountCreateRequest;
 import com.infina.hissenet.dto.request.AccountUpdateRequest;
 import com.infina.hissenet.dto.response.AccountResponse;
-import com.infina.hissenet.service.AccountService;
+import com.infina.hissenet.service.abstracts.IAccountService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
@@ -25,9 +25,10 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("api/v1/accounts")
 public class AccountController implements AccountControllerDoc {
-	private final AccountService service;
+	
+	private final IAccountService service;
 
-	public AccountController(AccountService service) {
+	public AccountController(IAccountService service) {
 		this.service = service;
 	}
 	

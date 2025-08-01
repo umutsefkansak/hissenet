@@ -9,6 +9,7 @@ import java.time.Duration;
 public class RedisTokenService {
     private final RedisTemplate<String, String> redisTemplate;
 
+
     public RedisTokenService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
@@ -25,5 +26,18 @@ public class RedisTokenService {
     public void deleteSession(String sessionId) {
         String key="session:"+sessionId;
         redisTemplate.delete(key);
+    }
+
+    public void extendSession(String sessionId, long extensionSeconds) {
+        String key = "session:" + sessionId;
+        String token = redisTemplate.opsForValue().get(key);
+        if (token != null) {
+            Long currentTtl = redisTemplate.getExpire(key);
+            if (currentTtl != null && currentTtl > 0) {
+                redisTemplate.expire(key, Duration.ofSeconds(currentTtl + extensionSeconds));
+            } else {
+                redisTemplate.expire(key, Duration.ofSeconds(extensionSeconds));
+            }
+        }
     }
 }

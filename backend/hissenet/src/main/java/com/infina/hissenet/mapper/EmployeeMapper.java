@@ -28,7 +28,6 @@ public interface EmployeeMapper {
     @Mapping(target = "hireDate", ignore = true)
     @Mapping(target = "terminationDate", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "emergencyContactPhone", ignore = true)
     Employee toEntity(EmployeeCreateRequest dto);
 
     

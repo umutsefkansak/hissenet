@@ -4,6 +4,7 @@ package com.infina.hissenet.entity;
 import com.infina.hissenet.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.security.core.GrantedAuthority;
 
 
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-public class Role extends BaseEntity{
+public class Role extends BaseEntity implements GrantedAuthority {
 
     @NotBlank
     @Column(name = "name", nullable = false, unique = true, length = 50)
@@ -57,5 +58,10 @@ public class Role extends BaseEntity{
 
     public void setEmployees(Set<Employee> employees) {
         this.employees = employees;
+    }
+
+    @Override
+    public String getAuthority() {
+        return getName();
     }
 }

@@ -13,21 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.EmployeeControllerDoc;
 import com.infina.hissenet.dto.request.EmployeeCreateRequest;
 import com.infina.hissenet.dto.request.EmployeeUpdateRequest;
 import com.infina.hissenet.dto.response.EmployeeResponse;
-import com.infina.hissenet.service.EmployeeService;
+import com.infina.hissenet.service.abstracts.IEmployeeService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/employee")
-public class EmployeeController {
+@RequestMapping("api/v1/employees")
+public class EmployeeController implements EmployeeControllerDoc {
 
-	private final EmployeeService service;
+	private final IEmployeeService service;
 
-	public EmployeeController(EmployeeService service) {
+	public EmployeeController(IEmployeeService service) {
 		this.service = service;
 	}
 
@@ -59,4 +60,5 @@ public class EmployeeController {
 		service.deleteEmployee(id);
 		return ApiResponse.ok("Employee deleted successfully");
 	}
+
 }

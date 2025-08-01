@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.WalletControllerDoc;
 import com.infina.hissenet.dto.request.CreateWalletRequest;
 import com.infina.hissenet.dto.request.UpdateWalletRequest;
 import com.infina.hissenet.dto.response.WalletResponse;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/v1/wallet")
-public class WalletController {
+public class WalletController implements WalletControllerDoc {
 
     private final WalletService walletService;
 

@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.MailControllerDoc;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.*;
 import com.infina.hissenet.service.abstracts.IMailService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/mail")
-public class MailController{
+public class MailController implements MailControllerDoc {
 
     private final IMailService mailService;
 

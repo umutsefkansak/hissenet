@@ -135,8 +135,8 @@ public interface MailControllerDoc {
                 {
                   "email": "kullanici@example.com",
                   "recipientName": "Ahmet Yılmaz",
-                  "message": "Hesabınızda önemli bir güncelleme yapıldı. Lütfen kontrol edin.",
-                  "title": "Hesap Güncelleme Bildirimi"
+                  "message": "THYAO hissesinden 50 adet satım işleminiz 45.30 TL fiyatından gerçekleşmiştir. İşlem numarası: TXN-2024-001234",
+                  "title": "Hisse Satım İşlemi"
                 }
                 """
                     )

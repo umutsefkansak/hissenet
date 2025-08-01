@@ -4,11 +4,7 @@ import com.infina.hissenet.constants.MailConstants;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.*;
 import com.infina.hissenet.entity.VerificationCode;
-import com.infina.hissenet.entity.enums.EmailType;
-import com.infina.hissenet.exception.mail.MailException;
-import com.infina.hissenet.exception.mail.MailRateLimitException;
-import com.infina.hissenet.exception.mail.VerificationCodeException;
-import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
+import com.infina.hissenet.exception.mail.*;
 import com.infina.hissenet.repository.VerificationCodeRepository;
 import com.infina.hissenet.service.abstracts.IEmailTemplateService;
 import com.infina.hissenet.service.abstracts.IMailService;
@@ -45,216 +41,185 @@ public class MailService implements IMailService {
     private String fromName;
 
     @Value("${mail.verification.code-length:6}")
-    private int codeLength;
+    private int defaultCodeLength;
 
-    @Value("${mail.verification.expiry-minutes:10}")
-    private int expiryMinutes;
+    @Value("${mail.verification.default-expiry-minutes:10}")
+    private int defaultExpiryMinutes;
 
-    @Value("${mail.verification.max-attempts:3}")
+    @Value("${mail.verification.default-max-attempts:3}")
     private int defaultMaxAttempts;
 
     @Value("${mail.verification.ip-limit-per-hour:20}")
     private int ipLimitPerHour;
 
+    @Value("${mail.verification.max-codes-per-day:10}")
+    private int maxCodesPerDay;
+
     private static final SecureRandom random = new SecureRandom();
 
-    public MailService(JavaMailSender mailSender, VerificationCodeRepository verificationCodeRepository, IEmailTemplateService emailTemplateService) {
+    public MailService(JavaMailSender mailSender, VerificationCodeRepository verificationCodeRepository,
+                       IEmailTemplateService emailTemplateService) {
         this.mailSender = mailSender;
         this.verificationCodeRepository = verificationCodeRepository;
         this.emailTemplateService = emailTemplateService;
     }
 
-
     @Async
-    public MailSendResponse sendMail(MailSendDto request) {
+    public MailSendResponse sendMail(MailSendRequest request) {
         try {
-            MimeMessage message = createMimeMessage(request.to(), request.subject(),
-                    request.content(), request.recipientName());
+            MimeMessage message = createMimeMessage(
+                    request.to(),
+                    request.subject(),
+                    request.content(),
+                    request.recipientName()
+            );
             mailSender.send(message);
 
             logger.info("Email sent successfully: {} -> {}", fromEmail, request.to());
-            return MailSendResponse.success(MailConstants.Messages.MAIL_SENT_SUCCESS);
+            return MailSendResponse.success("Mail sent successfully");
 
         } catch (Exception e) {
             logger.error("Error sending email: {} -> {}", fromEmail, request.to(), e);
-            throw new MailException(MailConstants.Messages.MAIL_SEND_ERROR + e.getMessage(), e);
+            throw new MailException("An error occurred while sending the mail: " + e.getMessage(), e);
         }
     }
 
+    public CodeSendResponse sendVerificationCode(CodeSendRequest request) {
 
-    public MailSendResponse sendVerificationCode(VerificationCodeSendDto request) {
-        return sendVerificationCodeWithAttempts(request, defaultMaxAttempts);
-    }
+        int maxAttempts = request.maxAttempts() != null ? request.maxAttempts() : defaultMaxAttempts;
+        int expiryMinutes = request.expiryMinutes() != null ? request.expiryMinutes() : defaultExpiryMinutes;
 
 
-    public MailSendResponse sendVerificationCodeWithAttempts(VerificationCodeSendDto request, int maxAttempts) {
-        // Check daily request limit
         long todayCount = verificationCodeRepository.countCodesSentSince(
-                request.to(), LocalDateTime.now().minusDays(1));
+                request.email(), LocalDateTime.now().minusDays(1));
 
-        if (todayCount >= MailConstants.MAX_CODES_PER_DAY) {
-            throw new MailRateLimitException(MailConstants.Messages.DAILY_LIMIT_EXCEEDED);
+        if (todayCount >= maxCodesPerDay) {
+            throw new MailRateLimitException("Daily verification code sending limit has been reached");
         }
 
-        // Check if the code is blocked
-        if (verificationCodeRepository.hasBlockedCodeForEmailAndType(request.to(), request.type(), LocalDateTime.now())) {
-            throw new VerificationCodeException(MailConstants.Messages.TOO_MANY_WRONG_ATTEMPTS);
+
+        long blockedCount = verificationCodeRepository.countBlockedCodesByEmail(
+                request.email(), LocalDateTime.now().minusHours(1));
+
+        if (blockedCount > 0) {
+            throw new VerificationCodeException("You have been temporarily blocked due to too many incorrect attempts");
         }
 
-        // Invalidate old codes
-        verificationCodeRepository.invalidateAllCodesForEmailAndType(request.to(), request.type());
 
-        // Generate new code
         String code = generateVerificationCode();
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(expiryMinutes);
 
-        // Save to database
-        VerificationCode verificationCode = new VerificationCode(request.to(), code,
-                request.type(), expiresAt, maxAttempts);
-        verificationCodeRepository.save(verificationCode);
 
-        // Create email content
-        String subject = createSubjectForType(request.type());
-        String content = createContentForVerificationCode(code, request.recipientName(),
-                request.type(), request.additionalInfo(), maxAttempts);
+        String subject = createVerificationSubject(request.description());
+        String content = createVerificationContent(
+                request.recipientName(),
+                code,
+                request.description(),
+                request.additionalInfo(),
+                maxAttempts,
+                expiryMinutes
+        );
 
-        // Send email
         try {
-            MimeMessage message = createMimeMessage(request.to(), subject, content, request.recipientName());
+            MimeMessage message = createMimeMessage(request.email(), subject, content, request.recipientName());
             mailSender.send(message);
 
-            logger.info("Verification code sent: {} -> {} (Type: {}, MaxAttempts: {})",
-                    fromEmail, request.to(), request.type(), maxAttempts);
-            return MailSendResponse.successWithCode(MailConstants.Messages.VERIFICATION_CODE_SENT,
-                    code, maxAttempts, expiryMinutes);
+
+            verificationCodeRepository.invalidateAllCodesForEmail(request.email());
+
+
+            VerificationCode verificationCode = new VerificationCode(
+                    request.email(), code, request.description(), expiresAt, maxAttempts
+            );
+            verificationCodeRepository.save(verificationCode);
+
+            logger.info("Verification code sent: {} -> {} (MaxAttempts: {}, ExpiryMinutes: {})",
+                    fromEmail, request.email(), maxAttempts, expiryMinutes);
+
+            return CodeSendResponse.success(
+                    "Verification code sent",
+                    maxAttempts,
+                    expiryMinutes
+            );
 
         } catch (Exception e) {
-            logger.error("Error sending verification code: {} -> {}", fromEmail, request.to(), e);
-            throw new MailException(MailConstants.Messages.VERIFICATION_CODE_SEND_ERROR + e.getMessage(), e);
+            logger.error("Error sending verification code: {} -> {}", fromEmail, request.email(), e);
+            throw new MailException("An error occurred while sending the verification code: " + e.getMessage(), e);
         }
     }
 
+    public CodeVerifyResponse verifyCode(CodeVerifyRequest request, HttpServletRequest httpRequest) {
+        String ipAddress = getClientIpAddress(httpRequest);
 
-    public VerifyCodeResponse verifyCode(VerifyCodeDto dto, HttpServletRequest request) {
-        String ipAddress = getClientIpAddress(request);
 
-        // Check IP-based attempt limit
         long ipAttempts = verificationCodeRepository.countAttemptsByIpSince(
                 ipAddress, LocalDateTime.now().minusHours(1));
 
         if (ipAttempts >= ipLimitPerHour) {
             logger.warn("IP-based attempt limit exceeded: {} (Attempts: {})", ipAddress, ipAttempts);
-            throw new MailRateLimitException(MailConstants.Messages.IP_LIMIT_EXCEEDED);
+            return CodeVerifyResponse.failure("Your IP address has been temporarily blocked", 0);
         }
 
-        // Find active verification code
+
         Optional<VerificationCode> activeCodeOpt = verificationCodeRepository
-                .findActiveCodeByEmailAndType(dto.email(), dto.type(), LocalDateTime.now());
+                .findActiveCodeByEmail(request.email(), LocalDateTime.now());
 
         if (activeCodeOpt.isEmpty()) {
-            logger.warn("No active verification code found: {} (Type: {})", dto.email(), dto.type());
-            throw new VerificationCodeNotFoundException(MailConstants.Messages.ACTIVE_CODE_NOT_FOUND);
+            logger.warn("No active verification code found: {}", request.email());
+            return CodeVerifyResponse.failure("No active verification code found", 0);
         }
 
         VerificationCode activeCode = activeCodeOpt.get();
 
-        // Verify if the code is correct
-        if (!activeCode.getCode().equals(dto.code())) {
-            // Incorrect code - increase attempt count
-            incrementVerificationAttempt(activeCode);
-            activeCode.setIpAddress(ipAddress);
+
+        if (!activeCode.getCode().equals(request.code())) {
+
+            incrementAttempt(activeCode, ipAddress);
             verificationCodeRepository.save(activeCode);
 
             int remainingAttempts = getRemainingAttempts(activeCode);
 
             if (activeCode.getBlocked()) {
-                logger.warn("Code blocked due to too many failed attempts: {} (Type: {})", dto.email(), dto.type());
-                throw new VerificationCodeException(MailConstants.Messages.CODE_BLOCKED);
-
+                logger.warn("Code blocked due to too many failed attempts: {}", request.email());
+                return CodeVerifyResponse.blocked(
+                        "Too many incorrect attempts. The code has been blocked.",
+                        activeCode.getBlockedAt()
+                );
             } else {
-                logger.warn("Incorrect verification code: {} (Type: {}, Remaining: {})",
-                        dto.email(), dto.type(), remainingAttempts);
-                throw new VerificationCodeException(
-                        String.format(MailConstants.Messages.WRONG_CODE_FORMAT, remainingAttempts)
+                logger.warn("Incorrect verification code: {} (Remaining: {})",
+                        request.email(), remainingAttempts);
+                return CodeVerifyResponse.failure(
+                        String.format("Incorrect code. Remaining attempts: %d", remainingAttempts),
+                        remainingAttempts
                 );
             }
         }
 
-        // Correct code - mark as used
+
         markAsUsed(activeCode, ipAddress);
         verificationCodeRepository.save(activeCode);
 
-        logger.info("Verification code successfully validated: {} (Type: {})", dto.email(), dto.type());
-        return VerifyCodeResponse.success(MailConstants.Messages.CODE_VERIFIED_SUCCESS);
+        logger.info("Verification code successfully validated: {}", request.email());
+        return CodeVerifyResponse.success("Code successfully verified");
     }
-
-
-    public MailSendResponse sendHighSecurityCode(VerificationCodeSendDto request) {
-        return sendVerificationCodeWithAttempts(request, MailConstants.HIGH_SECURITY_MAX_ATTEMPTS);
-    }
-
-
-    public MailSendResponse sendStandardCode(VerificationCodeSendDto request) {
-        return sendVerificationCodeWithAttempts(request, MailConstants.STANDARD_SECURITY_MAX_ATTEMPTS);
-    }
-
-
-    public MailSendResponse sendLowSecurityCode(VerificationCodeSendDto request) {
-        return sendVerificationCodeWithAttempts(request, MailConstants.LOW_SECURITY_MAX_ATTEMPTS);
-    }
-
-    public void markAsUsed(VerificationCode code, String ipAddress) {
-        code.setUsed(true);
-        code.setUsedAt(LocalDateTime.now());
-        code.setIpAddress(ipAddress);
-    }
-
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(MailConstants.HttpHeaders.X_FORWARDED_FOR);
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-
-        String xRealIp = request.getHeader(MailConstants.HttpHeaders.X_REAL_IP);
-        if (xRealIp != null && !xRealIp.isEmpty()) {
-            return xRealIp;
-        }
-
-        return request.getRemoteAddr();
-    }
-
 
     @Async
-    public void sendNotification(String email, String recipientName, EmailType type, String message) {
-        String subject = createSubjectForType(type);
-        String content = createNotificationContent(recipientName, type, message);
-
-        MailSendDto request = new MailSendDto(email, type, subject, content, recipientName);
-        sendMail(request);
-    }
-
-
-    public MailSendResponse sendLoginCode(LoginCodeDto dto) {
-        VerificationCodeSendDto verificationDto = new VerificationCodeSendDto(
-                dto.email(),
-                EmailType.LOGIN_NOTIFICATION,
-                dto.recipientName(),
-                MailConstants.Messages.LOGIN_CODE_ADDITIONAL_INFO
+    public void sendNotification(NotificationSendRequest request) {
+        String subject = request.title() != null ? request.title() : "Bildirim";
+        String content = createNotificationContent(
+                request.recipientName(),
+                request.message()
         );
-        return sendStandardCode(verificationDto);
-    }
 
-
-    public MailSendResponse sendPasswordResetCode(PasswordResetCodeDto dto) {
-        VerificationCodeSendDto verificationDto = new VerificationCodeSendDto(
-                dto.email(),
-                EmailType.PASSWORD_RESET,
-                dto.recipientName(),
-                MailConstants.Messages.PASSWORD_RESET_ADDITIONAL_INFO
+        MailSendRequest mailRequest = new MailSendRequest(
+                request.email(),
+                subject,
+                content,
+                request.recipientName()
         );
-        return sendHighSecurityCode(verificationDto);
-    }
 
+        sendMail(mailRequest);
+    }
 
     private MimeMessage createMimeMessage(String to, String subject, String content, String recipientName)
             throws MessagingException {
@@ -275,80 +240,48 @@ public class MailService implements IMailService {
 
     private String generateVerificationCode() {
         StringBuilder code = new StringBuilder();
-        for (int i = 0; i < codeLength; i++) {
+        for (int i = 0; i < defaultCodeLength; i++) {
             code.append(random.nextInt(10));
         }
         return code.toString();
     }
 
-    private String createSubjectForType(EmailType type) {
-        return switch (type) {
-            case VERIFICATION_CODE -> MailConstants.Subjects.VERIFICATION_CODE;
-            case PASSWORD_RESET -> MailConstants.Subjects.PASSWORD_RESET;
-            case LOGIN_NOTIFICATION -> MailConstants.Subjects.LOGIN_NOTIFICATION;
-            case TRADE_NOTIFICATION -> MailConstants.Subjects.TRADE_NOTIFICATION;
-            case ACCOUNT_STATUS -> MailConstants.Subjects.ACCOUNT_STATUS;
-            case ERROR_NOTIFICATION -> MailConstants.Subjects.ERROR_NOTIFICATION;
-            default -> MailConstants.Subjects.DEFAULT;
-        };
+    private String createVerificationSubject(String description) {
+        if (description != null && !description.trim().isEmpty()) {
+            return description + " - Doğrulama Kodu";
+        }
+        return "Doğrulama Kodu";
     }
 
-    private String createContentForVerificationCode(String code, String recipientName,
-                                                    EmailType type, String additionalInfo, int maxAttempts) {
-        return emailTemplateService.renderVerificationCodeTemplate(
-                recipientName, code, type, additionalInfo, maxAttempts, expiryMinutes
+    private String createVerificationContent(String recipientName, String code, String description,
+                                             String additionalInfo, int maxAttempts, int expiryMinutes) {
+        return emailTemplateService.renderVerificationTemplate(
+                recipientName, code, description, additionalInfo, maxAttempts, expiryMinutes
         );
     }
-    private String createNotificationContent(String recipientName, EmailType type, String message) {
-        return emailTemplateService.renderNotificationTemplate(recipientName, type, message);
+
+    private String createNotificationContent(String recipientName, String message) {
+        return emailTemplateService.renderNotificationTemplate(recipientName, message);
     }
 
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
 
-    public void cleanupExpiredCodes() {
-        verificationCodeRepository.deleteExpiredCodes(
-                LocalDateTime.now().minusDays(MailConstants.EXPIRED_CODES_CLEANUP_DAYS));
-        logger.info(MailConstants.Messages.EXPIRED_CODES_CLEANED);
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty()) {
+            return xRealIp;
+        }
+
+        return request.getRemoteAddr();
     }
 
-
-    public void unblockExpiredCodes() {
-        verificationCodeRepository.unblockOldCodes(
-                LocalDateTime.now().minusHours(MailConstants.BLOCKED_CODES_UNBLOCK_HOURS));
-        logger.info(MailConstants.Messages.BLOCKED_CODES_UNBLOCKED);
-    }
-
-
-    public boolean isEmailLimitExceeded(String email) {
-        long todayCount = verificationCodeRepository.countCodesSentSince(
-                email, LocalDateTime.now().minusDays(1));
-        return todayCount >= MailConstants.MAX_CODES_PER_DAY;
-    }
-
-
-    public boolean isIpLimitExceeded(String ipAddress) {
-        long hourlyCount = verificationCodeRepository.countAttemptsByIpSince(
-                ipAddress, LocalDateTime.now().minusHours(1));
-        return hourlyCount >= ipLimitPerHour;
-    }
-
-    public boolean isCodeExpired(VerificationCode code) {
-        return LocalDateTime.now().isAfter(code.getExpiresAt());
-    }
-
-    public boolean isCodeValid(VerificationCode code) {
-        return !code.getUsed() && !isCodeExpired(code) && !code.getBlocked();
-    }
-
-    public boolean canAttemptVerification(VerificationCode code) {
-        return !code.getBlocked() &&
-                code.getAttemptCount() < code.getMaxAttempts() &&
-                !isCodeExpired(code) &&
-                !code.getUsed();
-    }
-
-    public void incrementVerificationAttempt(VerificationCode code) {
+    private void incrementAttempt(VerificationCode code, String ipAddress) {
         code.setAttemptCount(code.getAttemptCount() + 1);
         code.setLastAttemptAt(LocalDateTime.now());
+        code.setIpAddress(ipAddress);
 
         if (code.getAttemptCount() >= code.getMaxAttempts()) {
             code.setBlocked(true);
@@ -356,8 +289,31 @@ public class MailService implements IMailService {
         }
     }
 
-    public int getRemainingAttempts(VerificationCode code) {
+    private void markAsUsed(VerificationCode code, String ipAddress) {
+        code.setUsed(true);
+        code.setUsedAt(LocalDateTime.now());
+        code.setIpAddress(ipAddress);
+    }
+
+    private int getRemainingAttempts(VerificationCode code) {
         return Math.max(0, code.getMaxAttempts() - code.getAttemptCount());
+    }
+
+
+    public void cleanupExpiredCodes() {
+        verificationCodeRepository.deleteExpiredCodes(LocalDateTime.now().minusDays(MailConstants.EXPIRED_CODES_CLEANUP_DAYS));
+        logger.info(MailConstants.Messages.EXPIRED_CODES_CLEANED);
+    }
+
+    public void unblockExpiredCodes() {
+        verificationCodeRepository.unblockOldCodes(LocalDateTime.now().minusHours(MailConstants.BLOCKED_CODES_UNBLOCK_HOURS));
+        logger.info(MailConstants.Messages.BLOCKED_CODES_UNBLOCKED);
+    }
+
+    public boolean isEmailLimitExceeded(String email) {
+        long todayCount = verificationCodeRepository.countCodesSentSince(
+                email, LocalDateTime.now().minusDays(1));
+        return todayCount >= MailConstants.MAX_CODES_PER_DAY;
     }
 
 }

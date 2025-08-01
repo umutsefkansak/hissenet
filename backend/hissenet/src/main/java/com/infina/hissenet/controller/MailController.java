@@ -30,27 +30,21 @@ public class MailController {
     @PostMapping("/send-verification-code")
     public ApiResponse<MailSendResponse> sendVerificationCode(@Valid @RequestBody VerificationCodeSendDto dto) {
         MailSendResponse response = mailService.sendVerificationCode(dto);
-        return response.success() ?
-                ApiResponse.ok("Doğrulama kodu gönderildi", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Doğrulama kodu gönderildi", response);
     }
 
 
     @PostMapping("/send-high-security-code")
     public ApiResponse<MailSendResponse> sendHighSecurityCode(@Valid @RequestBody VerificationCodeSendDto dto) {
         MailSendResponse response = mailService.sendHighSecurityCode(dto);
-        return response.success() ?
-                ApiResponse.ok("Yüksek güvenlikli doğrulama kodu gönderildi", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Yüksek güvenlikli doğrulama kodu gönderildi", response);
     }
 
 
     @PostMapping("/send-low-security-code")
     public ApiResponse<MailSendResponse> sendLowSecurityCode(@Valid @RequestBody VerificationCodeSendDto dto) {
         MailSendResponse response = mailService.sendLowSecurityCode(dto);
-        return response.success() ?
-                ApiResponse.ok("Doğrulama kodu gönderildi", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Doğrulama kodu gönderildi", response);
     }
 
 
@@ -58,27 +52,21 @@ public class MailController {
     public ApiResponse<VerifyCodeResponse> verifyCode(@Valid @RequestBody VerifyCodeDto dto,
                                                       HttpServletRequest request) {
         VerifyCodeResponse response = mailService.verifyCode(dto, request);
-        return response.valid() ?
-                ApiResponse.ok("Kod başarıyla doğrulandı", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Kod başarıyla doğrulandı", response);
     }
 
 
     @PostMapping("/send-password-reset-code")
     public ApiResponse<MailSendResponse> sendPasswordResetCode(@Valid @RequestBody PasswordResetCodeDto dto) {
         MailSendResponse response = mailService.sendPasswordResetCode(dto);
-        return response.success() ?
-                ApiResponse.ok("Şifre sıfırlama kodu gönderildi", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Şifre sıfırlama kodu gönderildi", response);
     }
 
 
     @PostMapping("/send-login-code")
     public ApiResponse<MailSendResponse> sendLoginCode(@Valid @RequestBody LoginCodeDto dto) {
         MailSendResponse response = mailService.sendLoginCode(dto);
-        return response.success() ?
-                ApiResponse.ok("Giriş doğrulama kodu gönderildi", response) :
-                ApiResponse.ok(response.message(), response);
+        return ApiResponse.ok("Giriş doğrulama kodu gönderildi", response);
     }
 
 

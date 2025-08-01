@@ -76,11 +76,11 @@ public class MailService implements IMailService {
             mailSender.send(message);
 
             logger.info("Email sent successfully: {} -> {}", fromEmail, request.to());
-            return MailSendResponse.success("Mail sent successfully");
+            return MailSendResponse.success(MailConstants.Messages.MAIL_SENT_SUCCESS);
 
         } catch (Exception e) {
             logger.error("Error sending email: {} -> {}", fromEmail, request.to(), e);
-            throw new MailException("An error occurred while sending the mail: " + e.getMessage(), e);
+            throw new MailException("MailConstants.Messages.MAIL_SEND_ERROR " + e.getMessage(), e);
         }
     }
 
@@ -94,7 +94,7 @@ public class MailService implements IMailService {
                 request.email(), LocalDateTime.now().minusDays(1));
 
         if (todayCount >= maxCodesPerDay) {
-            throw new MailRateLimitException("Daily verification code sending limit has been reached");
+            throw new MailRateLimitException(MailConstants.Messages.DAILY_LIMIT_EXCEEDED);
         }
 
 
@@ -102,7 +102,7 @@ public class MailService implements IMailService {
                 request.email(), LocalDateTime.now().minusHours(1));
 
         if (blockedCount > 0) {
-            throw new VerificationCodeException("You have been temporarily blocked due to too many incorrect attempts");
+            throw new VerificationCodeException(MailConstants.Messages.TOO_MANY_WRONG_ATTEMPTS);
         }
 
 
@@ -137,14 +137,14 @@ public class MailService implements IMailService {
                     fromEmail, request.email(), maxAttempts, expiryMinutes);
 
             return CodeSendResponse.success(
-                    "Verification code sent",
+                    MailConstants.Messages.VERIFICATION_CODE_SENT,
                     maxAttempts,
                     expiryMinutes
             );
 
         } catch (Exception e) {
             logger.error("Error sending verification code: {} -> {}", fromEmail, request.email(), e);
-            throw new MailException("An error occurred while sending the verification code: " + e.getMessage(), e);
+            throw new MailException(MailConstants.Messages.VERIFICATION_CODE_SEND_ERROR + e.getMessage(), e);
         }
     }
 
@@ -157,7 +157,7 @@ public class MailService implements IMailService {
 
         if (ipAttempts >= ipLimitPerHour) {
             logger.warn("IP-based attempt limit exceeded: {} (Attempts: {})", ipAddress, ipAttempts);
-            return CodeVerifyResponse.failure("Your IP address has been temporarily blocked", 0);
+            return CodeVerifyResponse.failure(MailConstants.Messages.IP_LIMIT_EXCEEDED, 0);
         }
 
 
@@ -166,7 +166,7 @@ public class MailService implements IMailService {
 
         if (activeCodeOpt.isEmpty()) {
             logger.warn("No active verification code found: {}", request.email());
-            return CodeVerifyResponse.failure("No active verification code found", 0);
+            return CodeVerifyResponse.failure(MailConstants.Messages.ACTIVE_CODE_NOT_FOUND, 0);
         }
 
         VerificationCode activeCode = activeCodeOpt.get();
@@ -182,14 +182,14 @@ public class MailService implements IMailService {
             if (activeCode.getBlocked()) {
                 logger.warn("Code blocked due to too many failed attempts: {}", request.email());
                 return CodeVerifyResponse.blocked(
-                        "Too many incorrect attempts. The code has been blocked.",
+                        MailConstants.Messages.CODE_BLOCKED,
                         activeCode.getBlockedAt()
                 );
             } else {
                 logger.warn("Incorrect verification code: {} (Remaining: {})",
                         request.email(), remainingAttempts);
                 return CodeVerifyResponse.failure(
-                        String.format("Incorrect code. Remaining attempts: %d", remainingAttempts),
+                        String.format(MailConstants.Messages.WRONG_CODE_FORMAT, remainingAttempts),
                         remainingAttempts
                 );
             }
@@ -200,12 +200,12 @@ public class MailService implements IMailService {
         verificationCodeRepository.save(activeCode);
 
         logger.info("Verification code successfully validated: {}", request.email());
-        return CodeVerifyResponse.success("Code successfully verified");
+        return CodeVerifyResponse.success(MailConstants.Messages.CODE_VERIFIED_SUCCESS);
     }
 
     @Async
     public void sendNotification(NotificationSendRequest request) {
-        String subject = request.title() != null ? request.title() : "Bildirim";
+        String subject = request.title() != null ? request.title() : MailConstants.Config.DEFAULT_NOTIFICATION_SUBJECT;;
         String content = createNotificationContent(
                 request.recipientName(),
                 request.message()
@@ -224,7 +224,7 @@ public class MailService implements IMailService {
     private MimeMessage createMimeMessage(String to, String subject, String content, String recipientName)
             throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, MailConstants.Config.DEFAULT_MAIL_ENCODING);
 
         try {
             helper.setFrom(fromEmail, fromName);
@@ -248,9 +248,9 @@ public class MailService implements IMailService {
 
     private String createVerificationSubject(String description) {
         if (description != null && !description.trim().isEmpty()) {
-            return description + " - Doğrulama Kodu";
+            return String.format(MailConstants.Config.VERIFICATION_SUBJECT_WITH_DESC_FORMAT, description);
         }
-        return "Doğrulama Kodu";
+        return MailConstants.Config.DEFAULT_VERIFICATION_SUBJECT;
     }
 
     private String createVerificationContent(String recipientName, String code, String description,
@@ -265,12 +265,12 @@ public class MailService implements IMailService {
     }
 
     private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        String xForwardedFor = request.getHeader(MailConstants.HttpHeaders.X_FORWARDED_FOR);
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();
         }
 
-        String xRealIp = request.getHeader("X-Real-IP");
+        String xRealIp = request.getHeader(MailConstants.HttpHeaders.X_REAL_IP);
         if (xRealIp != null && !xRealIp.isEmpty()) {
             return xRealIp;
         }

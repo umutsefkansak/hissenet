@@ -5,6 +5,10 @@ import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.*;
 import com.infina.hissenet.entity.VerificationCode;
 import com.infina.hissenet.entity.enums.EmailType;
+import com.infina.hissenet.exception.mail.MailException;
+import com.infina.hissenet.exception.mail.MailRateLimitException;
+import com.infina.hissenet.exception.mail.VerificationCodeException;
+import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
 import com.infina.hissenet.repository.VerificationCodeRepository;
 import com.infina.hissenet.service.abstracts.IEmailTemplateService;
 import com.infina.hissenet.service.abstracts.IMailService;
@@ -73,7 +77,7 @@ public class MailService implements IMailService {
 
         } catch (Exception e) {
             logger.error("Error sending email: {} -> {}", fromEmail, request.to(), e);
-            return MailSendResponse.failure(MailConstants.Messages.MAIL_SEND_ERROR + e.getMessage());
+            throw new MailException(MailConstants.Messages.MAIL_SEND_ERROR + e.getMessage(), e);
         }
     }
 
@@ -89,12 +93,12 @@ public class MailService implements IMailService {
                 request.to(), LocalDateTime.now().minusDays(1));
 
         if (todayCount >= MailConstants.MAX_CODES_PER_DAY) {
-            return MailSendResponse.failure(MailConstants.Messages.DAILY_LIMIT_EXCEEDED);
+            throw new MailRateLimitException(MailConstants.Messages.DAILY_LIMIT_EXCEEDED);
         }
 
         // Check if the code is blocked
         if (verificationCodeRepository.hasBlockedCodeForEmailAndType(request.to(), request.type(), LocalDateTime.now())) {
-            return MailSendResponse.failure(MailConstants.Messages.TOO_MANY_WRONG_ATTEMPTS);
+            throw new VerificationCodeException(MailConstants.Messages.TOO_MANY_WRONG_ATTEMPTS);
         }
 
         // Invalidate old codes
@@ -126,7 +130,7 @@ public class MailService implements IMailService {
 
         } catch (Exception e) {
             logger.error("Error sending verification code: {} -> {}", fromEmail, request.to(), e);
-            return MailSendResponse.failure(MailConstants.Messages.VERIFICATION_CODE_SEND_ERROR + e.getMessage());
+            throw new MailException(MailConstants.Messages.VERIFICATION_CODE_SEND_ERROR + e.getMessage(), e);
         }
     }
 
@@ -140,7 +144,7 @@ public class MailService implements IMailService {
 
         if (ipAttempts >= ipLimitPerHour) {
             logger.warn("IP-based attempt limit exceeded: {} (Attempts: {})", ipAddress, ipAttempts);
-            return VerifyCodeResponse.failure(MailConstants.Messages.IP_LIMIT_EXCEEDED);
+            throw new MailRateLimitException(MailConstants.Messages.IP_LIMIT_EXCEEDED);
         }
 
         // Find active verification code
@@ -149,7 +153,7 @@ public class MailService implements IMailService {
 
         if (activeCodeOpt.isEmpty()) {
             logger.warn("No active verification code found: {} (Type: {})", dto.email(), dto.type());
-            return VerifyCodeResponse.failure(MailConstants.Messages.ACTIVE_CODE_NOT_FOUND);
+            throw new VerificationCodeNotFoundException(MailConstants.Messages.ACTIVE_CODE_NOT_FOUND);
         }
 
         VerificationCode activeCode = activeCodeOpt.get();
@@ -165,16 +169,13 @@ public class MailService implements IMailService {
 
             if (activeCode.getBlocked()) {
                 logger.warn("Code blocked due to too many failed attempts: {} (Type: {})", dto.email(), dto.type());
-                return VerifyCodeResponse.blocked(
-                        MailConstants.Messages.CODE_BLOCKED,
-                        activeCode.getBlockedAt()
-                );
+                throw new VerificationCodeException(MailConstants.Messages.CODE_BLOCKED);
+
             } else {
                 logger.warn("Incorrect verification code: {} (Type: {}, Remaining: {})",
                         dto.email(), dto.type(), remainingAttempts);
-                return VerifyCodeResponse.failedAttempt(
-                        String.format(MailConstants.Messages.WRONG_CODE_FORMAT, remainingAttempts),
-                        remainingAttempts
+                throw new VerificationCodeException(
+                        String.format(MailConstants.Messages.WRONG_CODE_FORMAT, remainingAttempts)
                 );
             }
         }

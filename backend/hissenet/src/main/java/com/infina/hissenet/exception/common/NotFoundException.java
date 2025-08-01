@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.common;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

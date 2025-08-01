@@ -5,7 +5,7 @@ import com.infina.hissenet.dto.request.StockPriceUpdateRequest;
 import com.infina.hissenet.dto.response.StockPriceResponse;
 import com.infina.hissenet.entity.Stock;
 import com.infina.hissenet.entity.StockPrice;
-import com.infina.hissenet.exception.NotFoundException;
+import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.mapper.StockPriceMapper;
 import com.infina.hissenet.repository.StockPriceRepository;
 import com.infina.hissenet.repository.StockRepository;

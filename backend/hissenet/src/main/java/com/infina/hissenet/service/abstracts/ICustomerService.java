@@ -6,6 +6,7 @@ import com.infina.hissenet.dto.request.CorporateCustomerUpdateDto;
 import com.infina.hissenet.dto.request.IndividualCustomerCreateDto;
 import com.infina.hissenet.dto.request.IndividualCustomerUpdateDto;
 import com.infina.hissenet.entity.Customer;
+import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -55,7 +56,7 @@ public interface ICustomerService {
      *
      * @param id the customer identifier
      * @return the customer response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      */
     CustomerDto getCustomerById(Long id);
 
@@ -111,7 +112,7 @@ public interface ICustomerService {
      * @param id the customer identifier
      * @param updateDto the individual customer update data transfer object
      * @return the updated customer response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      * @throws IllegalArgumentException if customer is not individual type or email/TC number already exists
      */
     CustomerDto updateIndividualCustomer(Long id, IndividualCustomerUpdateDto updateDto);
@@ -123,7 +124,7 @@ public interface ICustomerService {
      * @param id the customer identifier
      * @param updateDto the corporate customer update data transfer object
      * @return the updated customer response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      * @throws IllegalArgumentException if customer is not corporate type or email/tax number already exists
      */
     CustomerDto updateCorporateCustomer(Long id, CorporateCustomerUpdateDto updateDto);
@@ -132,7 +133,7 @@ public interface ICustomerService {
      * Deletes a customer by its unique identifier.
      *
      * @param id the customer identifier
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      */
     void deleteCustomer(Long id);
 
@@ -158,7 +159,7 @@ public interface ICustomerService {
      *
      * @param customerId the customer identifier
      * @return the updated customer response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      */
     CustomerDto verifyKyc(Long customerId);
 
@@ -168,7 +169,7 @@ public interface ICustomerService {
      *
      * @param customerId the customer identifier
      * @return the updated customer response
-     * @throws com.infina.hissenet.exception.CustomerNotFoundException if the customer does not exist
+     * @throws CustomerNotFoundException if the customer does not exist
      */
     CustomerDto unverifyKyc(Long customerId);
 

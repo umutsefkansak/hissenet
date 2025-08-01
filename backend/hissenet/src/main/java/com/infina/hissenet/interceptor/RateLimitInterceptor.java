@@ -1,7 +1,7 @@
 package com.infina.hissenet.interceptor;
 
 import com.infina.hissenet.config.RateLimitConfig;
-import com.infina.hissenet.exception.RateLimitException;
+import com.infina.hissenet.exception.common.RateLimitException;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

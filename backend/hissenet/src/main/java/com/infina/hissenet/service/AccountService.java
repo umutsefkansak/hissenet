@@ -2,7 +2,6 @@ package com.infina.hissenet.service;
 
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.infina.hissenet.dto.request.AccountCreateRequest;
@@ -10,8 +9,8 @@ import com.infina.hissenet.dto.request.AccountUpdateRequest;
 import com.infina.hissenet.dto.response.AccountResponse;
 import com.infina.hissenet.entity.Account;
 import com.infina.hissenet.entity.Employee;
-import com.infina.hissenet.exception.AccountNotFoundException;
-import com.infina.hissenet.exception.EmployeeNotFoundException;
+import com.infina.hissenet.exception.account.AccountNotFoundException;
+import com.infina.hissenet.exception.employee.EmployeeNotFoundException;
 import com.infina.hissenet.mapper.AccountMapper;
 import com.infina.hissenet.repository.AccountRepository;
 import com.infina.hissenet.service.abstracts.IAccountService;

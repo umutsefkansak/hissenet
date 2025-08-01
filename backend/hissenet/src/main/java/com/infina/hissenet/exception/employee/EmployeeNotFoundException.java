@@ -1,6 +1,8 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.employee;
 
-public class EmployeeNotFoundException extends NotFoundException{
+import com.infina.hissenet.exception.common.NotFoundException;
+
+public class EmployeeNotFoundException extends NotFoundException {
 	public EmployeeNotFoundException(Long id) {
         super("Employee not found with id: " + id);
     }

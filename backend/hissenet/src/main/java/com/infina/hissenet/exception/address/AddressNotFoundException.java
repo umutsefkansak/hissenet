@@ -1,4 +1,6 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.address;
+
+import com.infina.hissenet.exception.NotFoundException;
 
 public class AddressNotFoundException extends NotFoundException {
     public AddressNotFoundException(Long id) {

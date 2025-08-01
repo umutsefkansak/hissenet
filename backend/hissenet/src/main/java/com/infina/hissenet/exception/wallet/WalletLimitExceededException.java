@@ -1,4 +1,4 @@
-package com.infina.hissenet.exception;
+package com.infina.hissenet.exception.wallet;
 
 
 public class WalletLimitExceededException extends RuntimeException {

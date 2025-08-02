@@ -1,7 +1,6 @@
 spring:
   application:
     name: hissenet
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -15,7 +14,6 @@ spring:
             enable: true
           ssl:
             trust: smtp.gmail.com
-
   data:
     redis:
       host: ${REDIS_HOST}
@@ -25,14 +23,11 @@ spring:
         enabled: true
       timeout: 6000ms
       database: 0
-
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -40,6 +35,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
+  cache:
+    type: caffeine
+    cache-names:
+      - ${stock.cache.default.name}
+    caffeine:
+      spec: maximumSize=${stock.cache.default.max-size},expireAfterWrite=${stock.cache.default.ttl}
 
 mail:
   from:
@@ -51,3 +52,20 @@ mail:
   templates:
     enabled: true
 
+stock:
+  cache:
+    default:
+      name: stockPrice
+      ttl: 5m
+      max-size: 1000
+  scheduler:
+    publish:
+      topic: /topic/prices
+      rate: 30s
+      initial-delay: 0s
+
+collectapi:
+  apikey: ${COLLECTAPI_APIKEY}
+  base-url: https://api.collectapi.com
+  endpoints:
+    stocks: /economy/hisseSenedi

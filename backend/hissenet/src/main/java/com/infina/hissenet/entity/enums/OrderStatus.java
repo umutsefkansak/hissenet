@@ -23,5 +23,10 @@ public enum OrderStatus {
     /**
      * Sipariş reddedildi (örn. geçersiz parametreler yüzünden).
      */
-    REJECTED
+    REJECTED,
+    
+    /**
+     * Sistem hataları için. 
+     */
+    FAILED
 }

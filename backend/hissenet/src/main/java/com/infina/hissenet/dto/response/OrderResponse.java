@@ -10,10 +10,10 @@ import com.infina.hissenet.entity.enums.OrderType;
 public record OrderResponse(
 		Long id,
 	    Long customerId,
-	    Long stockId,
 	    OrderCategory category,
 	    OrderType type,
 	    OrderStatus status,
+	    String stockCode,
 	    BigDecimal quantity,
 	    BigDecimal price,
 	    BigDecimal totalAmount,

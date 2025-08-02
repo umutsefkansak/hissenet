@@ -12,10 +12,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public WebMvcConfig(RateLimitInterceptor rateLimitInterceptor) {
         this.rateLimitInterceptor = rateLimitInterceptor;
     }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(rateLimitInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/error", "/swagger-ui/**");
+                .excludePathPatterns("/error", "/swagger-ui/**",
+                        "/ws/**", "/websocket/**", "/stomp/**", "/socket/**");
     }
 }

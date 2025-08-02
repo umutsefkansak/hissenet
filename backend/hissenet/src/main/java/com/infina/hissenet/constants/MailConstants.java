@@ -29,6 +29,15 @@ public final class MailConstants {
     public static final int BLOCKED_CODES_UNBLOCK_HOURS = 1;
 
 
+    public static final class Config {
+        private Config() {}
+
+        public static final String DEFAULT_MAIL_ENCODING = "UTF-8";
+        public static final String DEFAULT_NOTIFICATION_SUBJECT = "Bildirim";
+        public static final String DEFAULT_VERIFICATION_SUBJECT = "Doğrulama Kodu";
+        public static final String VERIFICATION_SUBJECT_WITH_DESC_FORMAT = "%s - Doğrulama Kodu";
+    }
+
     /**
      * Email subject lines for different email types.
      */

@@ -1,7 +1,6 @@
 package com.infina.hissenet.entity;
 
 import com.infina.hissenet.entity.base.BaseEntity;
-import com.infina.hissenet.entity.enums.EmailType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,8 +16,7 @@ import java.time.LocalDateTime;
 })
 public class VerificationCode extends BaseEntity {
 
-    @NotBlank
-    @Email
+    @NotBlank @Email
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
@@ -26,10 +24,8 @@ public class VerificationCode extends BaseEntity {
     @Column(name = "code", nullable = false, length = 10)
     private String code;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private EmailType type;
+    @Column(name = "description", length = 200)
+    private String description;
 
     @NotNull
     @Column(name = "expires_at", nullable = false)
@@ -43,7 +39,6 @@ public class VerificationCode extends BaseEntity {
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
-
 
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount = 0;
@@ -63,17 +58,11 @@ public class VerificationCode extends BaseEntity {
 
     public VerificationCode() {}
 
-    public VerificationCode(String email, String code, EmailType type, LocalDateTime expiresAt) {
+    public VerificationCode(String email, String code, String description,
+                            LocalDateTime expiresAt, int maxAttempts) {
         this.email = email;
         this.code = code;
-        this.type = type;
-        this.expiresAt = expiresAt;
-    }
-
-    public VerificationCode(String email, String code, EmailType type, LocalDateTime expiresAt, Integer maxAttempts) {
-        this.email = email;
-        this.code = code;
-        this.type = type;
+        this.description = description;
         this.expiresAt = expiresAt;
         this.maxAttempts = maxAttempts;
     }
@@ -85,8 +74,8 @@ public class VerificationCode extends BaseEntity {
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
 
-    public EmailType getType() { return type; }
-    public void setType(EmailType type) { this.type = type; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public LocalDateTime getExpiresAt() { return expiresAt; }
     public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }

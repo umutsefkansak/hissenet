@@ -8,35 +8,39 @@ import java.time.Duration;
 @Service
 public class RedisTokenService {
     private final RedisTemplate<String, String> redisTemplate;
+    private final JwtService jwtService;
 
-
-    public RedisTokenService(RedisTemplate<String, String> redisTemplate) {
+    public RedisTokenService(RedisTemplate<String, String> redisTemplate, JwtService jwtService) {
         this.redisTemplate = redisTemplate;
+        this.jwtService = jwtService;
     }
 
     // sesion id -> token olarak kullancaz save
-    public void saveSession(String sessionId, String token,long expirationSeconds) {
-        String key="session:"+sessionId;
-        redisTemplate.opsForValue().set(key,token, Duration.ofSeconds(expirationSeconds));
+    public void saveSession(String sessionId, String token, long expirationSeconds) {
+        String key = "session:" + sessionId;
+        redisTemplate.opsForValue().set(key, token, Duration.ofSeconds(expirationSeconds));
     }
+
     public String getTokenBySessionId(String sessionId) {
-        String key="session:"+sessionId;
+        String key = "session:" + sessionId;
         return redisTemplate.opsForValue().get(key);
     }
+
     public void deleteSession(String sessionId) {
-        String key="session:"+sessionId;
+        String key = "session:" + sessionId;
         redisTemplate.delete(key);
     }
 
     public void extendSession(String sessionId, long extensionSeconds) {
         String key = "session:" + sessionId;
-        String token = redisTemplate.opsForValue().get(key);
-        if (token != null) {
+        String oldToken = redisTemplate.opsForValue().get(key);
+        if (oldToken != null) {
+            String newToken = jwtService.refreshTokenExpiration(oldToken);
             Long currentTtl = redisTemplate.getExpire(key);
             if (currentTtl != null && currentTtl > 0) {
-                redisTemplate.expire(key, Duration.ofSeconds(currentTtl + extensionSeconds));
+                redisTemplate.opsForValue().set(key, newToken, Duration.ofSeconds(currentTtl + extensionSeconds));
             } else {
-                redisTemplate.expire(key, Duration.ofSeconds(extensionSeconds));
+                redisTemplate.opsForValue().set(key, newToken, Duration.ofSeconds(extensionSeconds));
             }
         }
     }

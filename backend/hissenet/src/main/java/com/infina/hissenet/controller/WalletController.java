@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/v1/wallet")
-public class WalletController implements WalletControllerDoc {
+public class WalletController {
 
     private final WalletService walletService;
 

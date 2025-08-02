@@ -20,6 +20,6 @@ public class StockPublishScheduler {
             initialDelayString = "${stock.scheduler.publish.initial-delay}"
     )
     public void runPublish() {
-        //publisher.publish(marketService.getAllStocks());
+        publisher.publish(marketService.getAllStocks());
     }
 }

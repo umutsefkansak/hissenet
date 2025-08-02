@@ -1,0 +1,41 @@
+package com.infina.hissenet.client;
+
+import com.infina.hissenet.dto.response.StockApiResponse;
+import com.infina.hissenet.properties.CollectApiProperties;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+
+@Component
+public class StockApiClient {
+    private final WebClient stockApiWebClient;
+    private final CollectApiProperties props;
+
+    public StockApiClient(WebClient stockApiWebClient, CollectApiProperties props) {
+        this.stockApiWebClient = stockApiWebClient;
+        this.props = props;
+    }
+
+    public Mono<StockApiResponse> fetchStocks() {
+        String uri = props.getEndpoints().getStocks();
+        System.out.println("uri" + uri);
+        return stockApiWebClient.get()
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, "apikey " + props.getApiKey())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.CONNECTION,     "close")
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        return response.bodyToMono(StockApiResponse.class);
+                    } else {
+                        System.err.println("API hata kodu: " + response.statusCode());
+                        return Mono.just(new StockApiResponse(false, Collections.emptyList()));
+                    }
+                })
+                .doOnError(e -> System.err.println("fetchStocks hatası: " + e.getMessage()));
+    }
+}

@@ -4,6 +4,9 @@ import com.infina.hissenet.exception.auth.LoginException;
 import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.common.RateLimitException;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
+import com.infina.hissenet.exception.customer.EmailAlreadyExistsException;
+import com.infina.hissenet.exception.customer.TaxNumberAlreadyExistsException;
+import com.infina.hissenet.exception.customer.TcNumberAlreadyExistsException;
 import com.infina.hissenet.exception.mail.MailException;
 import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
@@ -60,7 +63,7 @@ public class GlobalExceptionHandler {
     }
 
     // 409 - Conflict
-    @ExceptionHandler({RoleAlreadyExistsException.class, InsufficientBalanceException.class, TransactionAlreadyCancelledException.class, TransactionAlreadyCompletedException.class, WalletAlreadyExistsException.class, WalletNotActiveException.class})
+    @ExceptionHandler({RoleAlreadyExistsException.class, InsufficientBalanceException.class, TransactionAlreadyCancelledException.class, TransactionAlreadyCompletedException.class, WalletAlreadyExistsException.class, WalletNotActiveException.class, EmailAlreadyExistsException.class, TcNumberAlreadyExistsException.class, TaxNumberAlreadyExistsException.class})
     public ProblemDetail handleConflict(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Conflict Error");

@@ -63,7 +63,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/employees").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/ws/**", "/websocket/**", "/stomp/**").permitAll() // WebSocket endpoints
+                        .requestMatchers("/ws-stock/**","/ws/**", "/websocket/**", "/stomp/**").permitAll() // WebSocket endpoints
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)

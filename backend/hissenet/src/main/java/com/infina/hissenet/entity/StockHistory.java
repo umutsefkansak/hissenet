@@ -2,6 +2,8 @@ package com.infina.hissenet.entity;
 
 import com.infina.hissenet.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "stock_history",
         indexes = @Index(name = "idx_history_stock_date", columnList = "stock_id, data_date"))
+@SQLRestriction("is_deleted = false")
 public class StockHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

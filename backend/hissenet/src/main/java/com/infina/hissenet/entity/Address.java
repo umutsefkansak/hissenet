@@ -5,10 +5,12 @@ import com.infina.hissenet.entity.enums.AddressType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import org.hibernate.annotations.SQLRestriction;
 
 
 @Entity
 @Table(name = "addresses")
+@SQLRestriction("is_deleted = false")
 public class Address extends BaseEntity {
 
     @Enumerated(EnumType.STRING)

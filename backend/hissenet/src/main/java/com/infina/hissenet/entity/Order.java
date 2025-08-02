@@ -15,9 +15,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "orders")
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity{
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

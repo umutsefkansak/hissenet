@@ -7,12 +7,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wallet_transactions")
+@SQLRestriction("is_deleted = false")
 public class WalletTransaction extends BaseEntity {
 
     @NotNull(message = "Wallet cannot be null")

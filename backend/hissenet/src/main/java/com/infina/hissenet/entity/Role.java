@@ -4,6 +4,7 @@ package com.infina.hissenet.entity;
 import com.infina.hissenet.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 
 
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
+@SQLRestriction("is_deleted = false")
 public class Role extends BaseEntity implements GrantedAuthority {
 
     @NotBlank

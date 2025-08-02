@@ -19,18 +19,11 @@ public record CreateWalletTransactionRequest(
         @NotNull(message = "Transaction type cannot be null")
         TransactionType transactionType,
 
-        @Size(max = 300, message = "Description must be max 300 characters")
-        String description,
 
-        @NotNull(message = "Reference number cannot be null")
-        @Size(min = 1, max = 50, message = "Reference number must be between 1 and 50 characters")
-        String referenceNumber,
 
         @DecimalMin(value = "0.0", message = "Fee amount cannot be negative")
         BigDecimal feeAmount,
 
-        @DecimalMin(value = "0.0", message = "Tax amount cannot be negative")
-        BigDecimal taxAmount,
         String source,
         String destination
 

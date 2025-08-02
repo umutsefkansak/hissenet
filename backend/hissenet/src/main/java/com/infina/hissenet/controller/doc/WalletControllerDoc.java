@@ -211,21 +211,6 @@ public interface WalletControllerDoc {
             BigDecimal amount
     );
 
-    @Operation(
-            summary = "Temettü ödemesi işler",
-            description = "Hisse senedi temettü ödemesini cüzdana ekler.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Temettü ödemesi başarıyla işlendi",
-                            content = @Content(schema = @Schema(implementation = WalletResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı")
-            }
-    )
-    com.infina.hissenet.common.ApiResponse<WalletResponse> processDividendPayment(
-            @Parameter(description = "Müşteri ID'si", required = true, example = "101")
-            Long customerId,
-            @Parameter(description = "Temettü tutarı", required = true, example = "150.00")
-            BigDecimal amount
-    );
 
     @Operation(
             summary = "Cüzdanı kilitler",

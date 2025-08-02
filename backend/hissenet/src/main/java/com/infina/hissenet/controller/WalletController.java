@@ -68,10 +68,6 @@ public class WalletController implements WalletControllerDoc {
     public ApiResponse<WalletResponse> processWithdrawal(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){
         return ApiResponse.ok("Withdrawal processed successfully", walletService.processWithdrawal(customerId, amount));
     }
-    @PostMapping("/customer/{customerId}/dividend")
-    public ApiResponse<WalletResponse> processDividendPayment(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){
-        return ApiResponse.ok("Dividend payment processed successfully", walletService.processDividendPayment(customerId, amount));
-    }
     @PostMapping("/customer/{customerId}/lock")
     public ApiResponse<WalletResponse> lockWallet(@PathVariable Long customerId){
         return ApiResponse.ok("Wallet locked successfully", walletService.lockWallet(customerId));

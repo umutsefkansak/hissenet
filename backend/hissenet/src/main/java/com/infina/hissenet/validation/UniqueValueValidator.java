@@ -42,7 +42,7 @@ public class UniqueValueValidator implements ConstraintValidator<UniqueValue, St
         }
 
         boolean exists = switch (type) {
-            case EMAIL -> customerService.existsByEmail(value);
+            case CUSTOMER_EMAIL -> customerService.existsByEmail(value);
             case TAX_NUMBER -> corporateRepository.existsByTaxNumber(value);
             case TC_NUMBER -> individualRepository.existsByTcNumber(value);
             case EMPLOYEE_EMAIL -> employeeRepository.existsByEmail(value);

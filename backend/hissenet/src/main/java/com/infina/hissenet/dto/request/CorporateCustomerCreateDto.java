@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 public record CorporateCustomerCreateDto(
-        @UniqueValue(type = UniqueValueType.EMAIL)
+        @UniqueValue(type = UniqueValueType.CUSTOMER_EMAIL)
         @Email @NotBlank String email,
         @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
         String nationality,

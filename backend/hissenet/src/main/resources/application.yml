@@ -56,12 +56,12 @@ stock:
   cache:
     default:
       name: stockPrice
-      ttl: 5m
+      ttl: 30m
       max-size: 1000
   scheduler:
     publish:
       topic: /topic/prices
-      rate: 30s
+      rate: 10m
       initial-delay: 0s
 
 collectapi:

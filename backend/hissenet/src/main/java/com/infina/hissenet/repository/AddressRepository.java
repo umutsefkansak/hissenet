@@ -8,45 +8,78 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository interface for Address entity operations.
+ * Provides CRUD operations and custom queries for address management.
+ *
+ * @author Umut Sefkan SAK
+ * @version 1.0
+ */
 public interface AddressRepository extends JpaRepository<Address,Long> {
+
     /**
-     * Müşteri ID'sine göre adresleri getirir
+     * Finds all addresses for a specific customer.
+     *
+     * @param customerId the ID of the customer
+     * @return list of addresses belonging to the customer
      */
     List<Address> findByCustomerId(Long customerId);
 
+
     /**
-     * Müşterinin ana adresini getirir
+     * Finds the primary address for a customer.
+     *
+     * @param customerId the ID of the customer
+     * @return optional containing the primary address if exists
      */
     Optional<Address> findByCustomerIdAndIsPrimaryTrue(Long customerId);
 
+
     /**
-     * Müşterinin tüm ana adreslerini getirir (birden fazla ana adres varsa)
+     * Finds all primary addresses for a customer.
+     *
+     * @param customerId the ID of the customer
+     * @return list of primary addresses
      */
     List<Address> findAllByCustomerIdAndIsPrimaryTrue(Long customerId);
 
     /**
-     * Müşteri ID'sine göre adresleri siler
+     * Deletes all addresses for a specific customer.
+     *
+     * @param customerId the ID of the customer
      */
     void deleteByCustomerId(Long customerId);
 
     /**
-     * Müşterinin adres sayısını getirir
+     * Counts the number of addresses for a customer.
+     *
+     * @param customerId the ID of the customer
+     * @return total count of addresses
      */
     @Query("SELECT COUNT(a) FROM Address a WHERE a.customer.id = :customerId")
     long countByCustomerId(@Param("customerId") Long customerId);
 
     /**
-     * Şehir adına göre adresleri getirir
+     * Finds addresses by city name (case insensitive).
+     *
+     * @param city the city name
+     * @return list of addresses in the specified city
      */
     List<Address> findByCityIgnoreCase(String city);
 
     /**
-     * Eyalet adına göre adresleri getirir
+     * Finds addresses by state name (case insensitive).
+     *
+     * @param state the state name
+     * @return list of addresses in the specified state
      */
     List<Address> findByStateIgnoreCase(String state);
 
     /**
-     * Adres tipine göre adresleri getirir
+     * Finds addresses by address type.
+     *
+     * @param addressType the type of address
+     * @return list of addresses with the specified type
      */
     List<Address> findByAddressType(com.infina.hissenet.entity.enums.AddressType addressType);
 }

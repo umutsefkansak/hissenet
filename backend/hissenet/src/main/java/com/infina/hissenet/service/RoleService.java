@@ -35,14 +35,14 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
     }
 
     public RoleResponse createRole(RoleCreateDto createRoleDto) {
-        // Role name benzersizlik kontrolü
+
         if (roleRepository.existsByName(createRoleDto.name())) {
             throw new RoleAlreadyExistsException(createRoleDto.name());
         }
 
         Role role = roleMapper.toEntity(createRoleDto);
 
-        // isActive değeri null ise default olarak true yap
+
         if (role.getActive() == null) {
             role.setActive(true);
         }
@@ -114,7 +114,7 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
         Role existingRole = findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
-        // Eğer name değiştiriliyorsa, yeni name'in başka bir role'da kullanılmadığını kontrol et
+
         if (updateRoleDto.name() != null &&
                 !updateRoleDto.name().equals(existingRole.getName()) &&
                 roleRepository.existsByName(updateRoleDto.name())) {

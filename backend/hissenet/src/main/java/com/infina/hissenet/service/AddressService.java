@@ -50,11 +50,9 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
 
         address.setCustomer(customerService.getReferenceById(createAddressDto.customerId()));
 
-        // Eğer primary adres olarak işaretlendiyse, aynı müşteriye ait diğer adreslerin primary durumunu kaldır
         if (Boolean.TRUE.equals(createAddressDto.isPrimary())) {
             clearPrimaryAddresses(createAddressDto.customerId());
         } else if (createAddressDto.isPrimary() == null) {
-            // İlk adres otomatik olarak primary yapılır
             long addressCount = addressRepository.countByCustomerId(createAddressDto.customerId());
             if (addressCount == 0) {
                 address.setPrimary(true);
@@ -108,7 +106,6 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
         Address existingAddress = findById(id)
                 .orElseThrow(() -> new AddressNotFoundException(id));
 
-        // Müşteri değiştiriliyorsa kontrol et ve set et
         if (updateAddressDto.customerId() != null &&
                 !updateAddressDto.customerId().equals(existingAddress.getCustomer().getId())) {
             if (!customerService.existsById(updateAddressDto.customerId())) {
@@ -117,7 +114,6 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
             existingAddress.setCustomer(customerService.getReferenceById(updateAddressDto.customerId()));
         }
 
-        // Primary address kontrolü
         if (Boolean.TRUE.equals(updateAddressDto.isPrimary()) &&
                 !Boolean.TRUE.equals(existingAddress.getPrimary())) {
             clearPrimaryAddresses(existingAddress.getCustomer().getId());
@@ -148,9 +144,7 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
         List<Address> addresses = addressRepository.findByCustomerId(customerId);
         addresses.forEach(this::delete);
     }
-    /**
-     * Aynı müşteriye ait diğer adreslerin primary durumunu kaldırır
-     */
+
     private void clearPrimaryAddresses(Long customerId) {
         List<Address> primaryAddresses = addressRepository.findAllByCustomerIdAndIsPrimaryTrue(customerId);
         primaryAddresses.forEach(address -> address.setPrimary(false));

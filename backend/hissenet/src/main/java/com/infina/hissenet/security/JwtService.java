@@ -9,6 +9,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -18,7 +19,6 @@ public class JwtService implements IJwtService {
     private String JWT_SECRET;
     @Value("${jwt.expiration}")
     private long EXPIRATION_TIME;
-
 
     public JwtService(EmployeeService employeeService) {
         this.employeeService = employeeService;
@@ -31,6 +31,28 @@ public class JwtService implements IJwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
                 .compact();
+    }
+
+    // Mevcut token'ın süresini 1 saat uzat
+    protected String refreshTokenExpiration(String oldToken) {
+        try {
+            String email = getEmail(oldToken);
+            Claims claims = extractClaims(oldToken);
+            Date issuedAt = claims.getIssuedAt();
+            Date currentExpiration = claims.getExpiration();
+
+            // Mevcut expiration time'a 1 saat (3600 saniye) ekle
+            Date newExpiration = new Date(currentExpiration.getTime() + 3600000); // 3600000ms = 1 saat
+
+            return Jwts.builder()
+                    .setSubject(email)
+                    .setIssuedAt(new Date())
+                    .setExpiration(newExpiration)
+                    .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
+                    .compact();
+        } catch (Exception e) {
+            return oldToken;
+        }
     }
 
     // geçerlilik süresi
@@ -59,6 +81,4 @@ public class JwtService implements IJwtService {
     private String getEmail(String token) {
         return extractClaims(token).getSubject();
     }
-
 }
-

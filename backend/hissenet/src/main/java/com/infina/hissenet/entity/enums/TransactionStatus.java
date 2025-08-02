@@ -2,12 +2,10 @@ package com.infina.hissenet.entity.enums;
 
 public enum TransactionStatus {
 
-        PENDING, 
-        PROCESSING,
+        PENDING,
         COMPLETED,
         FAILED,
         CANCELLED,
-        REVERSED
 
 
 }

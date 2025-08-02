@@ -2,6 +2,8 @@ package com.infina.hissenet.dto.request;
 
 import java.util.Set;
 
+import com.infina.hissenet.validation.UniqueValue;
+import com.infina.hissenet.validation.UniqueValueType;
 import jakarta.validation.constraints.*;
 
 
@@ -17,6 +19,7 @@ public record EmployeeCreateRequest(
 
 		@NotBlank(message = "Email is required")
 		@Email(message = "Invalid email format")
+		@UniqueValue(type = UniqueValueType.EMPLOYEE_EMAIL)
 		String email,
 
 		@NotBlank(message = "Phone is required")

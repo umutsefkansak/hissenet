@@ -70,8 +70,8 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> impleme
     // portföy sil
     @Transactional
     public void deletePortfolio(Long id) {
-        Portfolio portfolio = getPortfolio(id);
-        delete(portfolio);
+Portfolio portfolio = getPortfolio(id);
+        deleteById(portfolio.getId());
     }
 
     // toplam değer hesapla

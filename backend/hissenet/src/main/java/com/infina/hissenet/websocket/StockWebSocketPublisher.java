@@ -20,6 +20,6 @@ public class StockWebSocketPublisher {
 
     public void publish(List<StockData> data) {
         String topic = props.getScheduler().getPublish().getTopic();
-        template.convertAndSend(topic, data);
+        //template.convertAndSend(topic, data);
     }
 }

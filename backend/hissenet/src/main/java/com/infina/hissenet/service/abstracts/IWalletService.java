@@ -71,14 +71,6 @@ public interface IWalletService {
      */
     WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax);
 
-    /**
-     * Processes a dividend payment to the wallet.
-     *
-     * @param customerId customer identifier
-     * @param dividendAmount dividend amount
-     * @return updated wallet details
-     */
-    WalletResponse processDividendPayment(Long customerId, BigDecimal dividendAmount);
 
     /**
      * Processes a withdrawal from the wallet.

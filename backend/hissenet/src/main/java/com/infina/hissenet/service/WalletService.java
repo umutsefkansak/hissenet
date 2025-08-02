@@ -86,9 +86,6 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         BigDecimal netAmount = totalAmount.subtract(commission).subtract(tax);
         return addBalance(customerId, netAmount, TransactionType.STOCK_SALE);
     }
-    public WalletResponse processDividendPayment(Long customerId, BigDecimal dividendAmount){
-        return addBalance(customerId, dividendAmount, TransactionType.DIVIDEND);
-    }
     public WalletResponse processWithdrawal(Long customerId, BigDecimal amount){
         return subtractBalance(customerId, amount, TransactionType.WITHDRAWAL);
     }

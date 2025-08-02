@@ -7,6 +7,8 @@ import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.Stock;
 import com.infina.hissenet.entity.StockTransaction;
 import com.infina.hissenet.exception.common.NotFoundException;
+import com.infina.hissenet.exception.order.OrderNotFoundException;
+import com.infina.hissenet.exception.stock.StockNotFoundException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.OrderRepository;
 import com.infina.hissenet.repository.StockRepository;
@@ -26,18 +28,19 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
 
     private final StockTransactionRepository stockTransactionRepository;
     private final PortfolioService portfolioService;
-    private final StockRepository stockRepository;
-    private final OrderRepository orderRepository;
+    private final StockService stockService;
+    private final OrderService orderService;
     private final StockTransactionMapper stockTransactionMapper;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockRepository stockRepository, OrderRepository orderRepository, StockTransactionMapper stockTransactionMapper) {
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockService stockService, OrderService orderService, StockTransactionMapper stockTransactionMapper) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
-        this.stockRepository = stockRepository;
-        this.orderRepository = orderRepository;
+        this.stockService = stockService;
+        this.orderService = orderService;
         this.stockTransactionMapper = stockTransactionMapper;
     }
+
     // order emri üzerine stocktransaction oluşturma
     @Transactional
     public StockTransactionResponse createTransactionFromOrder(StockTransactionCreateRequest request) {
@@ -55,6 +58,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         }
 
         save(transaction);
+        portfolioService.updatePortfolioValues(portfolio.getId());
 
         return stockTransactionMapper.toResponse(save(transaction));
     }
@@ -74,6 +78,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         }
 
         save(transaction);
+        portfolioService.updatePortfolioValues(portfolio.getId());
 
         return stockTransactionMapper.toResponse(stockTransactionRepository.save(transaction));
     }
@@ -115,12 +120,12 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
     /* Buralarda servise olması lazım hata da servisten dönmesi lazım */
     private Stock findStockOrThrow(Long id) {
-        return stockRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Stock bulunamadı: " + id));
+        return stockService.findById(id)
+                .orElseThrow(() -> new StockNotFoundException(id));
     }
 
     private Order findOrderOrThrow(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Order bulunamadı: " + id));
+        return orderService.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
     }
 }

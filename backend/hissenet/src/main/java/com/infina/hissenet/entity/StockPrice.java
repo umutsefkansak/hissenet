@@ -2,12 +2,14 @@ package com.infina.hissenet.entity;
 
 import com.infina.hissenet.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stock_prices")
+@SQLRestriction("is_deleted = false")
 public class StockPrice extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)

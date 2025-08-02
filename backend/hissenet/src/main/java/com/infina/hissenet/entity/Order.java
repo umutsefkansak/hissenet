@@ -12,21 +12,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "orders", indexes = @Index(name = "idx_order_status", columnList = "order_status"))
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity{
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
-
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "stock_id", nullable = false)
-	private Stock stock;
 
 	@Column(name = "order_category", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -40,6 +39,9 @@ public class Order extends BaseEntity{
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status; 
 	
+	@Column(name = "stock_code", nullable = false, length = 20)
+	private String stockCode;
+	
 	@Column(name = "quantity", nullable = false, precision = 20, scale = 4)
 	private BigDecimal quantity;
 
@@ -52,11 +54,11 @@ public class Order extends BaseEntity{
 	public Order() {
 	}
 
-	public Order(Customer customer, Stock stock, OrderCategory category, OrderType type, OrderStatus status,
+	public Order(Customer customer, String stockCode, OrderCategory category, OrderType type, OrderStatus status,
 			BigDecimal quantity, BigDecimal price, BigDecimal totalAmount) {
 		super();
 		this.customer = customer;
-		this.stock = stock;
+		this.stockCode = stockCode;
 		this.category = category;
 		this.type = type;
 		this.status = status;
@@ -73,12 +75,13 @@ public class Order extends BaseEntity{
 		this.customer = customer;
 	}
 
-	public Stock getStock() {
-		return stock;
+	
+	public String getStockCode() {
+		return stockCode;
 	}
 
-	public void setStock(Stock stock) {
-		this.stock = stock;
+	public void setStockCode(String stockCode) {
+		this.stockCode = stockCode;
 	}
 
 	public OrderCategory getCategory() {
@@ -134,7 +137,7 @@ public class Order extends BaseEntity{
 	    return "Order{" +
 	            "id=" + getId() +
 	            ", customer=" + (customer != null ? customer.getId() : null) +
-	            ", stock=" + (stock != null ? stock.getId() : null) +
+	            ", stockCode=" + stockCode +
 	            ", category=" + category +
 	            ", type=" + type +
 	            ", status=" + status +

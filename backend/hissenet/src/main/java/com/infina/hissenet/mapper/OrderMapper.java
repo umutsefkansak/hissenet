@@ -14,13 +14,11 @@ public interface OrderMapper {
 	OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
 	@Mapping(target = "customer", ignore = true)
-    @Mapping(target = "stock", ignore = true)
 	Order toEntity(OrderCreateRequest dto);
 	
 	Order toEntity(OrderUpdateRequest dto);
 
 	@Mapping(source = "customer.id", target = "customerId")
-    @Mapping(source = "stock.id", target = "stockId")
     @Mapping(source = "createdBy.id", target = "createdById")
     @Mapping(source = "updatedBy.id", target = "updatedById")
     OrderResponse toResponse(Order entity);

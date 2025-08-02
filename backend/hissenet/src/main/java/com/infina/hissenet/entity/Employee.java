@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,6 +21,7 @@ import java.util.Set;
         @Index(name = "idx_employee_email", columnList = "email"),
         @Index(name = "idx_employee_status", columnList = "status")
 })
+@SQLRestriction("is_deleted = false")
 public class Employee extends BaseEntity implements UserDetails {
 
     @NotBlank

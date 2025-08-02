@@ -48,18 +48,6 @@ public interface IMailService {
     void sendNotification(NotificationSendRequest request);
 
     /**
-     * Removes expired verification codes from the database.
-     * Should be called periodically for cleanup maintenance.
-     */
-    void cleanupExpiredCodes();
-
-    /**
-     * Unblocks verification codes that have been blocked for extended periods.
-     * Allows users to retry after the blocking period expires.
-     */
-    void unblockExpiredCodes();
-
-    /**
      * Checks if an email address has exceeded the daily verification code limit.
      *
      * @param email the email address to check

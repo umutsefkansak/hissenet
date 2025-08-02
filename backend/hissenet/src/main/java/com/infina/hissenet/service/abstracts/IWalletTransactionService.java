@@ -35,9 +35,8 @@ public interface IWalletTransactionService {
      * Completes a wallet transaction.
      *
      * @param transactionId transaction identifier
-     * @param finalBalance final balance after transaction
      */
-    void completeTransaction(Long transactionId, BigDecimal finalBalance);
+    void completeTransaction(Long transactionId);
 
     /**
      * Cancels a wallet transaction.

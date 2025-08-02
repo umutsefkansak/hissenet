@@ -53,7 +53,7 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
         WalletTransaction updatedTransaction = update(walletTransaction);
         return walletTransactionMapper.toResponse(updatedTransaction);
     }
-    public void completeTransaction(Long transactionId, BigDecimal finalBalance){
+    public void completeTransaction(Long transactionId){
         WalletTransaction walletTransaction = findById(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException(transactionId));
         walletTransaction.completeTransaction();

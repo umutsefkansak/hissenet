@@ -52,13 +52,13 @@ public class WalletController implements WalletControllerDoc {
         return ApiResponse.ok("Balance subtracted successfully", walletService.subtractBalance(customerId,amount, transactionType));
     }
     @PostMapping("/customer/{customerId}/stock/purchase")
-    public ApiResponse<WalletResponse> processStockPurchase(@PathVariable Long customerId, @RequestParam BigDecimal totalAmount, @RequestParam BigDecimal commission, @RequestParam BigDecimal tax){
+    public ApiResponse<WalletResponse> processStockPurchase(@PathVariable Long customerId, @RequestParam BigDecimal totalAmount, @RequestParam BigDecimal commission){
         return ApiResponse.ok("Stock purchase processed processed successfully",
-                walletService.processStockPurchase(customerId, totalAmount, commission, tax));
+                walletService.processStockPurchase(customerId, totalAmount, commission));
     }
     @PostMapping("/customer/{customerId}/stock/sale")
-    public ApiResponse<WalletResponse> processStockSale(@PathVariable Long customerId, @RequestParam BigDecimal totalAmount, @RequestParam BigDecimal commission, @RequestParam BigDecimal tax){
-        return ApiResponse.ok("Stock sale processed successfully", walletService.processStockSale(customerId, totalAmount, commission, tax));
+    public ApiResponse<WalletResponse> processStockSale(@PathVariable Long customerId, @RequestParam BigDecimal totalAmount, @RequestParam BigDecimal commission){
+        return ApiResponse.ok("Stock sale processed successfully", walletService.processStockSale(customerId, totalAmount, commission));
     }
     @PostMapping("/customer/{customerId}/deposit")
     public ApiResponse<WalletResponse> processDeposit(@PathVariable Long customerId, @RequestParam @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive") BigDecimal amount){

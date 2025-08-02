@@ -58,11 +58,16 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
         return roleMapper.toDto(role);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Optional<RoleResponse> getRoleByName(String name) {
-        return roleRepository.findByName(name)
-                .map(roleMapper::toDto);
+        Optional<Role> roleOpt = roleRepository.findByName(name);
+        if (roleOpt.isEmpty()) {
+            throw new RoleNotFoundException("Role not found with name: " + name);
+        }
+        return roleOpt.map(roleMapper::toDto);
     }
+
 
     @Transactional(readOnly = true)
     public List<RoleResponse> getAllRoles() {

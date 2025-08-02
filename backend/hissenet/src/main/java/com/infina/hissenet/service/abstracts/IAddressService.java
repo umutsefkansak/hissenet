@@ -75,7 +75,7 @@ public interface IAddressService {
      * @param customerId the customer identifier
      * @return optional containing the primary address response, empty if no primary address exists
      */
-    Optional<AddressResponse> getPrimaryAddressByCustomerId(Long customerId);
+    AddressResponse  getPrimaryAddressByCustomerId(Long customerId);
 
     /**
      * Updates an existing address with new information.

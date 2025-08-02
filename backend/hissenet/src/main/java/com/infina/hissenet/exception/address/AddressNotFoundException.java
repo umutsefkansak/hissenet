@@ -6,4 +6,9 @@ public class AddressNotFoundException extends NotFoundException {
     public AddressNotFoundException(Long id) {
         super("Address not found with id: " + id);
     }
+
+
+    public AddressNotFoundException(String message) {
+        super(message);
+    }
 }

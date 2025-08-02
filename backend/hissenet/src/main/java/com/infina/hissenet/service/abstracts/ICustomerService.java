@@ -81,7 +81,7 @@ public interface ICustomerService {
      * @param email the customer email address
      * @return optional containing the customer response, empty if not found
      */
-    Optional<CustomerDto> getCustomerByEmail(String email);
+    CustomerDto  getCustomerByEmail(String email);
 
     /**
      * Retrieves a customer by customer number.
@@ -89,7 +89,7 @@ public interface ICustomerService {
      * @param customerNumber the unique customer number
      * @return optional containing the customer response, empty if not found
      */
-    Optional<CustomerDto> getCustomerByCustomerNumber(String customerNumber);
+    CustomerDto getCustomerByCustomerNumber(String customerNumber);
 
     /**
      * Retrieves all individual customers.

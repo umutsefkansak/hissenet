@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.RoleControllerDoc;
 import com.infina.hissenet.dto.request.RoleCreateDto;
 import com.infina.hissenet.dto.request.RoleUpdateDto;
 import com.infina.hissenet.dto.response.RoleResponse;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/roles")
-public class RoleController {
+public class RoleController implements RoleControllerDoc{
 
     private final IRoleService roleService;
 
@@ -39,12 +40,7 @@ public class RoleController {
 
     @GetMapping("/name/{name}")
     public ApiResponse<RoleResponse> getRoleByName(@PathVariable String name) {
-        Optional<RoleResponse> role = roleService.getRoleByName(name);
-        if (role.isPresent()) {
-            return ApiResponse.ok("Role retrieved successfully", role.get());
-        } else {
-            return ApiResponse.ok("No role found with name: " + name);
-        }
+        return ApiResponse.ok("Role retrieved successfully", roleService.getRoleByName(name).get());
     }
 
     @GetMapping

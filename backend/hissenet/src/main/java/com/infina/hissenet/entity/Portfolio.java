@@ -5,6 +5,7 @@ import com.infina.hissenet.entity.enums.PortfolioType;
 import com.infina.hissenet.entity.enums.RiskProfile;
 import com.infina.hissenet.entity.enums.Status;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "portfolios")
+@SQLRestriction("is_deleted = false")
 public class Portfolio extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;

@@ -5,11 +5,13 @@ import com.infina.hissenet.entity.enums.Currency;
 import com.infina.hissenet.entity.enums.Exchange;
 import com.infina.hissenet.entity.enums.Status;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
 @Entity
 @Table(name = "stocks")
+@SQLRestriction("is_deleted = false")
 public class Stock extends BaseEntity {
 
     @Column(name = "ticker", nullable = false, unique = true, length = 20)

@@ -2,6 +2,7 @@ package com.infina.hissenet.controller;
 
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.CustomerControllerDoc;
 import com.infina.hissenet.dto.common.CustomerDto;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.service.abstracts.ICustomerService;
@@ -13,11 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/customers")
-public class CustomerController {
+public class CustomerController implements CustomerControllerDoc {
 
     private final ICustomerService customerService;
 
@@ -74,22 +75,13 @@ public class CustomerController {
 
     @GetMapping("/email/{email}")
     public ApiResponse<CustomerDto> getCustomerByEmail(@PathVariable String email) {
-        Optional<CustomerDto> customer = customerService.getCustomerByEmail(email);
-        if (customer.isPresent()) {
-            return ApiResponse.ok("Customer retrieved successfully", customer.get());
-        } else {
-            return ApiResponse.ok("No customer found with email: " + email);
-        }
+        return ApiResponse.ok("Customer retrieved successfully", customerService.getCustomerByEmail(email));
     }
 
     @GetMapping("/customer-number/{customerNumber}")
     public ApiResponse<CustomerDto> getCustomerByCustomerNumber(@PathVariable String customerNumber) {
-        Optional<CustomerDto> customer = customerService.getCustomerByCustomerNumber(customerNumber);
-        if (customer.isPresent()) {
-            return ApiResponse.ok("Customer retrieved successfully", customer.get());
-        } else {
-            return ApiResponse.ok("No customer found with customer number: " + customerNumber);
-        }
+        return ApiResponse.ok("Customer retrieved successfully",
+                customerService.getCustomerByCustomerNumber(customerNumber));
     }
 
 

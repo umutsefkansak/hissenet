@@ -6,6 +6,8 @@ import com.infina.hissenet.entity.base.BaseEntity;
 import com.infina.hissenet.entity.enums.AccountStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_account_username", columnList = "username"),
         @Index(name = "idx_account_status", columnList = "status")
 })
+@SQLRestriction("is_deleted = false")
 public class Account extends BaseEntity  {
 
     @NotBlank

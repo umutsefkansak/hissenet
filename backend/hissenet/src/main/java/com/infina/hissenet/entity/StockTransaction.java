@@ -6,12 +6,14 @@ import com.infina.hissenet.entity.enums.StockTransactionType;
 import com.infina.hissenet.entity.enums.TransactionStatus;
 import jakarta.persistence.*;
 import org.aspectj.weaver.ast.Or;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stock_transactions")
+@SQLRestriction("is_deleted = false")
 public class StockTransaction extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

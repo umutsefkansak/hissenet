@@ -95,10 +95,12 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
     }
 
 
+    @Override
     @Transactional(readOnly = true)
-    public Optional<AddressResponse> getPrimaryAddressByCustomerId(Long customerId) {
+    public AddressResponse getPrimaryAddressByCustomerId(Long customerId) {
         return addressRepository.findByCustomerIdAndIsPrimaryTrue(customerId)
-                .map(addressMapper::toDto);
+                .map(addressMapper::toDto)
+                .orElseThrow(() -> new AddressNotFoundException("No primary address found for customer ID: " + customerId));
     }
 
 

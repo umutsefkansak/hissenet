@@ -108,7 +108,6 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
         Address existingAddress = findById(id)
                 .orElseThrow(() -> new AddressNotFoundException(id));
 
-
         if (updateAddressDto.customerId() != null &&
                 !updateAddressDto.customerId().equals(existingAddress.getCustomer().getId())) {
             if (!customerService.existsById(updateAddressDto.customerId())) {
@@ -116,7 +115,6 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
             }
             existingAddress.setCustomer(customerService.getReferenceById(updateAddressDto.customerId()));
         }
-
 
         if (Boolean.TRUE.equals(updateAddressDto.isPrimary()) &&
                 !Boolean.TRUE.equals(existingAddress.getPrimary())) {

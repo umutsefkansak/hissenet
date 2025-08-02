@@ -55,12 +55,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
 
     public CustomerDto createIndividualCustomer(IndividualCustomerCreateDto createDto) {
-        // Email uniqueness kontrolü
+
         if (customerRepository.existsByEmail(createDto.email())) {
             throw new EmailAlreadyExistsException(createDto.email());
         }
 
-        // TC Number uniqueness kontrolü
+
         if (createDto.tcNumber() != null && individualCustomerRepository.existsByTcNumber(createDto.tcNumber())) {
             throw new TcNumberAlreadyExistsException(createDto.tcNumber());
         }
@@ -70,19 +70,19 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         IndividualCustomer savedCustomer = (IndividualCustomer) save(customer);
 
-        // Cuzdan ve Portfolio otomatik olusturulmasi icin event
+
         eventPublisher.publishEvent(new CustomerCreatedEvent(this, savedCustomer.getId(), "INDIVIDUAL"));
         return customerMapper.toDto(savedCustomer);
     }
 
 
     public CustomerDto createCorporateCustomer(CorporateCustomerCreateDto createDto) {
-        // Email uniqueness kontrolü
+
         if (customerRepository.existsByEmail(createDto.email())) {
             throw new EmailAlreadyExistsException(createDto.email());
         }
 
-        // Tax Number uniqueness kontrolü
+
         if (createDto.taxNumber() != null && corporateCustomerRepository.existsByTaxNumber(createDto.taxNumber())) {
             throw new TaxNumberAlreadyExistsException(createDto.taxNumber());
         }
@@ -92,7 +92,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         CorporateCustomer savedCustomer = (CorporateCustomer) save(customer);
 
-        // Cuzdan ve Portfolio otomatik olusturulmasi icin event
+
         eventPublisher.publishEvent(new CustomerCreatedEvent(this, savedCustomer.getId(), "CORPORATE"));
         return customerMapper.toDto(savedCustomer);
     }
@@ -160,14 +160,14 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         IndividualCustomer individualCustomer = (IndividualCustomer) existingCustomer;
 
-        // Email uniqueness kontrolü (kendisi hariç)
+
         if (updateDto.email() != null && !updateDto.email().equals(individualCustomer.getEmail())) {
             if (customerRepository.existsByEmailAndIdNot(updateDto.email(), id)) {
                 throw new EmailAlreadyExistsException(updateDto.email());
             }
         }
 
-        // TC Number uniqueness kontrolü (kendisi hariç)
+
         if (updateDto.tcNumber() != null && !updateDto.tcNumber().equals(individualCustomer.getTcNumber())) {
             if (individualCustomerRepository.existsByTcNumberAndIdNot(updateDto.tcNumber(), id)) {
                 throw new TcNumberAlreadyExistsException(updateDto.tcNumber());
@@ -189,14 +189,14 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         CorporateCustomer corporateCustomer = (CorporateCustomer) existingCustomer;
 
-        // Email uniqueness kontrolü (kendisi hariç)
+
         if (updateDto.email() != null && !updateDto.email().equals(corporateCustomer.getEmail())) {
             if (customerRepository.existsByEmailAndIdNot(updateDto.email(), id)) {
                 throw new EmailAlreadyExistsException(updateDto.email());
             }
         }
 
-        // Tax Number uniqueness kontrolü (kendisi hariç)
+
         if (updateDto.taxNumber() != null && !updateDto.taxNumber().equals(corporateCustomer.getTaxNumber())) {
             if (corporateCustomerRepository.existsByTaxNumberAndIdNot(updateDto.taxNumber(), id)) {
                 throw new TaxNumberAlreadyExistsException(updateDto.taxNumber());

@@ -14,20 +14,6 @@ public final class MailConstants {
     }
 
 
-    //Security attempt limits
-    public static final int HIGH_SECURITY_MAX_ATTEMPTS = 2;
-    public static final int STANDARD_SECURITY_MAX_ATTEMPTS = 3;
-    public static final int LOW_SECURITY_MAX_ATTEMPTS = 5;
-
-
-    /** Maximum verification codes per email address per day */
-    public static final int MAX_CODES_PER_DAY = 10;
-
-
-    // Cleanup and maintenance intervals
-    public static final int EXPIRED_CODES_CLEANUP_DAYS = 1;
-    public static final int BLOCKED_CODES_UNBLOCK_HOURS = 1;
-
 
     public static final class Config {
         private Config() {}
@@ -44,13 +30,13 @@ public final class MailConstants {
     public static final class Subjects {
         private Subjects() {}
 
-        public static final String VERIFICATION_CODE = "HisseNet - Doğrulama Kodu";
-        public static final String PASSWORD_RESET = "HisseNet - Şifre Sıfırlama";
-        public static final String LOGIN_NOTIFICATION = "HisseNet - Giriş Bildirimi";
-        public static final String TRADE_NOTIFICATION = "HisseNet - İşlem Bildirimi";
-        public static final String ACCOUNT_STATUS = "HisseNet - Hesap Durumu";
-        public static final String ERROR_NOTIFICATION = "HisseNet - Sistem Bildirimi";
-        public static final String DEFAULT = "HisseNet - Bilgilendirme";
+        public static final String VERIFICATION_CODE_FORMAT = "%s - Doğrulama Kodu";
+        public static final String PASSWORD_RESET_FORMAT = "%s - Şifre Sıfırlama";
+        public static final String LOGIN_NOTIFICATION_FORMAT = "%s - Giriş Bildirimi";
+        public static final String TRADE_NOTIFICATION_FORMAT = "%s - İşlem Bildirimi";
+        public static final String ACCOUNT_STATUS_FORMAT = "%s - Hesap Durumu";
+        public static final String ERROR_NOTIFICATION_FORMAT = "%s - Sistem Bildirimi";
+        public static final String DEFAULT_FORMAT = "%s - Bilgilendirme";
     }
 
 
@@ -123,12 +109,4 @@ public final class MailConstants {
         public static final String X_REAL_IP = "X-Real-IP";
     }
 
-    /**
-     * Company branding constants.
-     */
-    public static final class Company {
-        private Company() {}
-
-        public static final String NAME = "HisseNet Aracı Kurum";
-    }
 }

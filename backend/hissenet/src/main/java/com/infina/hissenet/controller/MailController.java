@@ -1,3 +1,4 @@
+
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
@@ -5,21 +6,22 @@ import com.infina.hissenet.controller.doc.MailControllerDoc;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.*;
 import com.infina.hissenet.service.abstracts.IMailService;
-import com.infina.hissenet.service.abstracts.IMailService;
+import com.infina.hissenet.service.abstracts.IVerificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/v1/mail")
 public class MailController implements MailControllerDoc {
 
     private final IMailService mailService;
+    private final IVerificationService verificationService;
 
-    public MailController(IMailService mailService) {
+    public MailController(IMailService mailService, IVerificationService verificationService) {
         this.mailService = mailService;
+        this.verificationService = verificationService;
     }
 
     @PostMapping("/send")
@@ -55,16 +57,9 @@ public class MailController implements MailControllerDoc {
         return ApiResponse.ok("Email limit status", exceeded);
     }
 
-    @PostMapping("/cleanup-expired")
-    public ApiResponse<String> cleanupExpiredCodes() {
-        mailService.cleanupExpiredCodes();
-        return ApiResponse.ok("Expired codes cleared");
-    }
-
-    @PostMapping("/unblock-expired")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<String> unblockExpiredCodes() {
-        mailService.unblockExpiredCodes();
-        return ApiResponse.ok("Expired blocked codes released");
+    @DeleteMapping("/clear-verification/{email}")
+    public ApiResponse<String> clearVerificationCode(@PathVariable String email) {
+        verificationService.clearVerificationCode(email);
+        return ApiResponse.ok("Verification code cleared for: " + email);
     }
 }

@@ -53,15 +53,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
     public CustomerDto createIndividualCustomer(IndividualCustomerCreateDto createDto) {
 
-        if (customerRepository.existsByEmail(createDto.email())) {
-            throw new IllegalArgumentException("Email already exists: " + createDto.email());
-        }
-
-
-        if (createDto.tcNumber() != null && individualCustomerRepository.existsByTcNumber(createDto.tcNumber())) {
-            throw new IllegalArgumentException("TC Number already exists: " + createDto.tcNumber());
-        }
-
         IndividualCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.INDIVIDUAL_CUSTOMER_PREFIX));
 
@@ -74,15 +65,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
 
     public CustomerDto createCorporateCustomer(CorporateCustomerCreateDto createDto) {
-
-        if (customerRepository.existsByEmail(createDto.email())) {
-            throw new IllegalArgumentException("Email already exists: " + createDto.email());
-        }
-
-
-        if (createDto.taxNumber() != null && corporateCustomerRepository.existsByTaxNumber(createDto.taxNumber())) {
-            throw new IllegalArgumentException("Tax Number already exists: " + createDto.taxNumber());
-        }
 
         CorporateCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.CORPORATE_CUSTOMER_PREFIX));
@@ -153,20 +135,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         IndividualCustomer individualCustomer = (IndividualCustomer) existingCustomer;
 
-
-        if (updateDto.email() != null && !updateDto.email().equals(individualCustomer.getEmail())) {
-            if (customerRepository.existsByEmailAndIdNot(updateDto.email(), id)) {
-                throw new IllegalArgumentException("Email already exists: " + updateDto.email());
-            }
-        }
-
-
-        if (updateDto.tcNumber() != null && !updateDto.tcNumber().equals(individualCustomer.getTcNumber())) {
-            if (individualCustomerRepository.existsByTcNumberAndIdNot(updateDto.tcNumber(), id)) {
-                throw new IllegalArgumentException("TC Number already exists: " + updateDto.tcNumber());
-            }
-        }
-
         customerMapper.updateIndividualCustomerFromDto(updateDto, individualCustomer);
         Customer updatedCustomer = update(individualCustomer);
         return customerMapper.toDto(updatedCustomer);
@@ -181,20 +149,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
         }
 
         CorporateCustomer corporateCustomer = (CorporateCustomer) existingCustomer;
-
-
-        if (updateDto.email() != null && !updateDto.email().equals(corporateCustomer.getEmail())) {
-            if (customerRepository.existsByEmailAndIdNot(updateDto.email(), id)) {
-                throw new IllegalArgumentException("Email already exists: " + updateDto.email());
-            }
-        }
-
-
-        if (updateDto.taxNumber() != null && !updateDto.taxNumber().equals(corporateCustomer.getTaxNumber())) {
-            if (corporateCustomerRepository.existsByTaxNumberAndIdNot(updateDto.taxNumber(), id)) {
-                throw new IllegalArgumentException("Tax Number already exists: " + updateDto.taxNumber());
-            }
-        }
 
         customerMapper.updateCorporateCustomerFromDto(updateDto, corporateCustomer);
         Customer updatedCustomer = update(corporateCustomer);

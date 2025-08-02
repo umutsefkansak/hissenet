@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.AddressControllerDoc;
 import com.infina.hissenet.dto.request.AddressCreateDto;
 import com.infina.hissenet.dto.request.AddressUpdateDto;
 import com.infina.hissenet.dto.response.AddressResponse;
@@ -18,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/addresses")
-public class AddressController {
+public class AddressController implements AddressControllerDoc {
 
     private final IAddressService addressService;
 
@@ -55,12 +56,8 @@ public class AddressController {
 
     @GetMapping("/customer/{customerId}/primary")
     public ApiResponse<AddressResponse> getPrimaryAddressByCustomerId(@PathVariable Long customerId) {
-        Optional<AddressResponse> primaryAddress = addressService.getPrimaryAddressByCustomerId(customerId);
-        if (primaryAddress.isPresent()) {
-            return ApiResponse.ok("Primary address retrieved successfully", primaryAddress.get());
-        } else {
-            return ApiResponse.ok("No primary address found");
-        }
+        return ApiResponse.ok("Primary address retrieved successfully",
+                addressService.getPrimaryAddressByCustomerId(customerId));
     }
 
     @PutMapping("/{id}")

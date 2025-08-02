@@ -40,12 +40,7 @@ public class RoleController implements RoleControllerDoc{
 
     @GetMapping("/name/{name}")
     public ApiResponse<RoleResponse> getRoleByName(@PathVariable String name) {
-        Optional<RoleResponse> role = roleService.getRoleByName(name);
-        if (role.isPresent()) {
-            return ApiResponse.ok("Role retrieved successfully", role.get());
-        } else {
-            return ApiResponse.ok("No role found with name: " + name);
-        }
+        return ApiResponse.ok("Role retrieved successfully", roleService.getRoleByName(name).get());
     }
 
     @GetMapping

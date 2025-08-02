@@ -92,7 +92,13 @@ public class Stock extends BaseEntity {
     }
 
     public void setCurrentPrice(StockPrice currentPrice) {
+        if (this.currentPrice != null) {
+            this.currentPrice.setStock(null);
+        }
         this.currentPrice = currentPrice;
+        if (currentPrice != null) {
+            currentPrice.setStock(this);
+        }
     }
 
     public List<StockHistory> getHistory() {
@@ -101,5 +107,13 @@ public class Stock extends BaseEntity {
 
     public void setHistory(List<StockHistory> history) {
         this.history = history;
+    }
+    public void addHistory(StockHistory h) {
+        history.add(h);
+        h.setStock(this);
+    }
+    public void removeHistory(StockHistory h) {
+        history.remove(h);
+        h.setStock(null);
     }
 }

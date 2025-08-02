@@ -3,11 +3,13 @@ package com.infina.hissenet.exception;
 import com.infina.hissenet.exception.auth.LoginException;
 import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.common.RateLimitException;
+import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.mail.MailException;
 import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
 import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
 import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
+import com.infina.hissenet.exception.role.RoleNotFoundException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCompletedException;
 import com.infina.hissenet.exception.wallet.*;
@@ -29,7 +31,9 @@ public class GlobalExceptionHandler {
     // 404 - Not Found
     @ExceptionHandler({
             NotFoundException.class,
-            VerificationCodeNotFoundException.class
+            VerificationCodeNotFoundException.class,
+            RoleNotFoundException.class,
+            CustomerNotFoundException.class
     })
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());

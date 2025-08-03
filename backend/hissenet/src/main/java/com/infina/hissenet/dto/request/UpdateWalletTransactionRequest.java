@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record UpdateWalletTransactionRequest(
         @NotNull(message = "Transaction status cannot be null")
-        TransactionStatus transactionStatus,
-        String description
+        TransactionStatus transactionStatus
 ) {
 }

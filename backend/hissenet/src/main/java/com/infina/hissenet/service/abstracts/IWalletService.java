@@ -55,10 +55,9 @@ public interface IWalletService {
      * @param customerId customer identifier
      * @param totalAmount total stock amount
      * @param commission commission amount
-     * @param tax tax amount
      * @return updated wallet details
      */
-    WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax);
+    WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission);
 
     /**
      * Processes a stock sale transaction.
@@ -66,19 +65,10 @@ public interface IWalletService {
      * @param customerId customer identifier
      * @param totalAmount total stock amount
      * @param commission commission amount
-     * @param tax tax amount
      * @return updated wallet details
      */
-    WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax);
+    WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission);
 
-    /**
-     * Processes a dividend payment to the wallet.
-     *
-     * @param customerId customer identifier
-     * @param dividendAmount dividend amount
-     * @return updated wallet details
-     */
-    WalletResponse processDividendPayment(Long customerId, BigDecimal dividendAmount);
 
     /**
      * Processes a withdrawal from the wallet.

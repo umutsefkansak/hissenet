@@ -13,14 +13,14 @@ public record OrderCreateRequest(
 		@NotNull(message = "Müşteri ID'si boş olamaz")
         Long customerId,
 
-        @NotNull(message = "Hisse ID'si boş olamaz")
-        Long stockId,
-
         @NotNull(message = "Emir türü (category) boş olamaz")
         OrderCategory category,
 
         @NotNull(message = "İşlem tipi (type) boş olamaz")
         OrderType type,
+        
+        @NotNull(message = "Hissenin kodu boş olamaz")
+        String stockCode,
 
         @NotNull(message = "Adet bilgisi boş olamaz")
         @DecimalMin(value = "0.0001", message = "Adet en az 0.0001 olmalıdır")

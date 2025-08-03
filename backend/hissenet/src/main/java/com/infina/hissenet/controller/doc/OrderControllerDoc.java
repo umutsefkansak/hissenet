@@ -42,9 +42,9 @@ public interface OrderControllerDoc {
 	                implementation = OrderCreateRequest.class,
 	                example = "{\n" +
 	                          "  \"customerId\": 101,\n" +
-	                          "  \"stockId\": 202,\n" +
 	                          "  \"category\": \"MARKET\",\n" +
 	                          "  \"type\": \"BUY\",\n" +
+	                          "  \"stockCode\": \"THYAO\",\n" +
 	                          "  \"quantity\": 100.0,\n" +
 	                          "  \"price\": 25.50\n" +
 	                          "}"

@@ -1,0 +1,32 @@
+services:
+
+  backend:
+    build:
+      context: ./backend/hissenet
+      dockerfile: Dockerfile
+    image: hissenet-backend-dev
+    container_name: hissenet-backend
+    volumes:
+      - ./backend/src:/app/src
+      - ~/.m2:/root/.m2
+      - ./backend/pom.xml:/app/pom.xml
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: hissenet-frontend-dev
+    container_name: hissenet-frontend
+    volumes:
+      - ./frontend/src:/usr/src/app/src
+      - ./frontend/public:/usr/src/app/public
+      - ./frontend/package.json:/usr/src/app/package.json
+      - ~/.npm:/home/node/.npm
+    ports:
+      - "3000:80"
+    env_file:
+      - .env

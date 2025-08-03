@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "Hisse, fiyat ve geçmiş verisi CRUD API’leri"
         ),
         servers = {
-                @Server(url="http://localhost:8080", description="Local"),
+                @Server(url = "/", description = "Same origin"),
                 @Server(url="https://api.hissenet.com", description="Prod")
         }
 )

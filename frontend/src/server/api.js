@@ -22,7 +22,7 @@ export const login = async (email, password) => {
     // If login successful, set isLogin to true and store in localStorage
     if (response.data) {
       localStorage.setItem('isLogin', 'true');
-      localStorage.setItem('user', JSON.stringify(response.data));
+      
       return { success: true, data: response.data };
     }
   } catch (error) {
@@ -34,7 +34,7 @@ export const login = async (email, password) => {
 // Get all employees (for testing)
 export const getAllEmployees = async () => {
   try {
-    const response = await api.get('/employee');
+    const response = await api.get('/employees');
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Get employees error:', error);
@@ -48,13 +48,13 @@ export const logout = async () => {
     const response = await api.delete('/auth/logout');
     // Clear localStorage
     localStorage.removeItem('isLogin');
-    localStorage.removeItem('user');
+    
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Logout error:', error);
     // Even if API call fails, clear localStorage
     localStorage.removeItem('isLogin');
-    localStorage.removeItem('user');
+    
     return { success: false, error: error.response?.data || 'Logout failed' };
   }
 };

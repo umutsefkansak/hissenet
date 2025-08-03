@@ -42,10 +42,7 @@ public interface WalletTransactionControllerDoc {
                                     "  \"walletId\": 101,\n" +
                                     "  \"amount\": 1000.00,\n" +
                                     "  \"transactionType\": \"DEPOSIT\",\n" +
-                                    "  \"description\": \"Para yatırma işlemi\",\n" +
-                                    "  \"referenceNumber\": \"TXN-2024-001\",\n" +
                                     "  \"feeAmount\": 5.00,\n" +
-                                    "  \"taxAmount\": 10.00,\n" +
                                     "  \"source\": \"BANK_TRANSFER\",\n" +
                                     "  \"destination\": \"WALLET\"\n" +
                                     "}"
@@ -126,8 +123,7 @@ public interface WalletTransactionControllerDoc {
                     schema = @Schema(
                             implementation = UpdateWalletTransactionRequest.class,
                             example = "{\n" +
-                                    "  \"transactionStatus\": \"COMPLETED\",\n" +
-                                    "  \"description\": \"İşlem tamamlandı\"\n" +
+                                    "  \"transactionStatus\": \"COMPLETED\"\n" +
                                     "}"
                     )
             )

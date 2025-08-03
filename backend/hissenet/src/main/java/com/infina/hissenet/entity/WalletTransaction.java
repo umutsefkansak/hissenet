@@ -55,12 +55,16 @@ public class WalletTransaction extends BaseEntity {
     
     public WalletTransaction(){}
 
-    public WalletTransaction(Wallet wallet, BigDecimal amount, TransactionType transactionType, TransactionStatus transactionStatus, LocalDateTime transactionDate) {
+    public WalletTransaction(Wallet wallet, BigDecimal amount, TransactionType transactionType,
+                             TransactionStatus transactionStatus, LocalDateTime transactionDate,
+                             String source, String destination) {
         this.wallet = wallet;
         this.amount = amount;
         this.transactionType = transactionType;
         this.transactionStatus = transactionStatus;
         this.transactionDate = transactionDate;
+        this.source = source;
+        this.destination = destination;
     }
     public void completeTransaction(){
         this.transactionStatus=TransactionStatus.COMPLETED;
@@ -83,6 +87,9 @@ public class WalletTransaction extends BaseEntity {
 
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
+        if(wallet != null && !wallet.getTransactions().contains(this)){
+            wallet.addTransaction(this);
+        }
     }
 
 

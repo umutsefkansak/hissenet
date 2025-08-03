@@ -43,6 +43,8 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
 
         WalletTransaction walletTransaction = walletTransactionMapper.toEntity(request);
         walletTransaction.setWallet(wallet);
+        wallet.addTransaction(walletTransaction);
+        walletRepository.save(wallet);
         WalletTransaction savedTransaction = save(walletTransaction);
         return walletTransactionMapper.toResponse(savedTransaction);
     }

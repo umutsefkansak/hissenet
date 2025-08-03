@@ -11,6 +11,8 @@ import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "wallets")
@@ -67,6 +69,9 @@ public class Wallet extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status walletStatus = Status.ACTIVE;
+
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<WalletTransaction> transactions = new ArrayList<>();
 
     public void addBalance(BigDecimal amount) {
         this.balance = this.balance.add(amount);
@@ -131,6 +136,13 @@ public class Wallet extends BaseEntity {
     public void unlockWallet() {
         this.isLocked = false;
     }
+    public void addTransaction(WalletTransaction transaction){
+        if (this.transactions == null){
+            this.transactions = new ArrayList<>();
+        }
+        else transactions.add(transaction);
+        transaction.setWallet(this);
+    }
 
     public Wallet(){}
 
@@ -151,6 +163,14 @@ public class Wallet extends BaseEntity {
 
     public void setMaxTransactionAmount(BigDecimal maxTransactionAmount) {
         this.maxTransactionAmount = maxTransactionAmount;
+    }
+
+    public List<WalletTransaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<WalletTransaction> transactions) {
+        this.transactions = transactions;
     }
 
     public BigDecimal getMinTransactionAmount() {

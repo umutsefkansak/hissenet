@@ -82,38 +82,48 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
 
         return stockTransactionMapper.toResponse(stockTransactionRepository.save(transaction));
     }
-    // Belirli bir portföye ait tüm işlemleri getirir.
+    
+    // Belirli bir portföye ait tüm işlemleri getirir - Join fetch ile
     public List<StockTransactionResponse> getTransactionsByPortfolioId(Long portfolioId) {
-        return stockTransactionRepository.findByPortfolioId(portfolioId).stream()
+        return stockTransactionRepository.findByPortfolioIdWithJoins(portfolioId).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-    // Belirli bir hisseye ait tüm işlemleri getirir.
+    
+    // Belirli bir hisseye ait tüm işlemleri getirir - Join fetch ile
     public List<StockTransactionResponse> getTransactionsByStockId(Long stockId) {
-        return stockTransactionRepository.findByStockId(stockId).stream()
+        return stockTransactionRepository.findByStockIdWithJoins(stockId).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-    // Belirli bir emire ait tüm işlemleri getirir.
+    
+    // Belirli bir emire ait tüm işlemleri getirir - Join fetch ile
     public List<StockTransactionResponse> getTransactionsByOrderId(Long orderId) {
-        return stockTransactionRepository.findByOrderId(orderId).stream()
+        return stockTransactionRepository.findByOrderIdWithJoins(orderId).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-    // Belirtilen tarih aralığındaki işlemleri getirir.
+    
+    // Belirtilen tarih aralığındaki işlemleri getirir - Join fetch ile
     public List<StockTransactionResponse> getTransactionsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return stockTransactionRepository.findByTransactionDateBetween(startDate, endDate).stream()
+        return stockTransactionRepository.findByTransactionDateBetweenWithJoins(startDate, endDate).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
-    // Belirli bir işlem türüne göre işlemleri getirir.
+    
+    // Belirli bir işlem türüne göre işlemleri getirir - Join fetch ile
     public List<StockTransactionResponse> getTransactionsByType(String transactionType) {
-        return stockTransactionRepository.findByTransactionType(transactionType).stream()
+        return stockTransactionRepository.findByTransactionTypeWithJoins(transactionType).stream()
                 .map(stockTransactionMapper::toResponse)
                 .toList();
     }
 
-
+    // Tüm işlemleri join fetch ile getir
+    public List<StockTransactionResponse> getAllTransactionsWithJoins() {
+        return stockTransactionRepository.findAllWithJoins().stream()
+                .map(stockTransactionMapper::toResponse)
+                .toList();
+    }
 
     private Portfolio findPortfolioOrThrow(Long id) {
         return portfolioService.getPortfolio(id);

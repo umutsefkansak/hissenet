@@ -13,6 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -57,6 +58,8 @@ public abstract class Customer extends BaseEntity {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
 
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Portfolio> portfolios;
 
     public String getCustomerNumber() {
         return customerNumber;
@@ -123,5 +126,11 @@ public abstract class Customer extends BaseEntity {
         this.addresses = addresses;
     }
 
+    public List<Portfolio> getPortfolios() {
+        return portfolios;
+    }
 
+    public void setPortfolios(List<Portfolio> portfolios) {
+        this.portfolios = portfolios;
+    }
 }

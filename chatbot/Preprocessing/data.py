@@ -1,7 +1,10 @@
 import uuid
 import json
+from dotenv import dotenv_values
 
-PATH: str = "<path>"
+secrets = dotenv_values(".SECRETS")
+
+PATH: str = secrets["pathPREPROCESS"]
 
 def readTxt() -> str:
     qaData: list = []
@@ -14,7 +17,7 @@ def readTxt() -> str:
     for i in range(len(textSplitted)):
         id       = str(uuid.uuid4())
         question = textSplitted[i].split(":")[0]
-        answer   = textSplitted[i].split(":")[-1]
+        answer   = textSplitted[i].split(":")[-1] 
         
         qaData.append({"id": id, "question": question, "answer": answer})
         
@@ -28,4 +31,3 @@ def createJsonFile(qaData: dict) -> None:
 
 qaData: str = readTxt()
 createJsonFile(qaData=qaData)
-

@@ -22,7 +22,7 @@ public class RiskAssessmentController implements RiskAssessmentControllerDoc {
     @Override
     @GetMapping("/questions")
     public ApiResponse<RiskQuestionsResponse> getQuestions() {
-        return ApiResponse.ok("Risk değerlendirme soruları başarıyla getirildi",
+        return ApiResponse.ok("Risk assessment questions retrieved successfully",
                 service.getQuestions());
     }
 
@@ -30,7 +30,7 @@ public class RiskAssessmentController implements RiskAssessmentControllerDoc {
     @PostMapping("/calculate")
     public ApiResponse<RiskAssessmentCalculateResponse> calculateRiskProfile(
             @Valid @RequestBody RiskAssessmentCalculateRequest request) {
-        return ApiResponse.ok("Risk profili başarıyla hesaplandı",
+        return ApiResponse.ok("Risk profile calculated successfully",
                 service.calculateRiskProfile(request));
     }
 }

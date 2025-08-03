@@ -5,6 +5,8 @@ import com.infina.hissenet.dto.request.UpdateWalletRequest;
 import com.infina.hissenet.dto.response.WalletResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Wallet;
+import com.infina.hissenet.entity.WalletTransaction;
+import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.entity.enums.TransactionType;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.wallet.*;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -63,6 +66,16 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
         validateWalletForTransaction(wallet);
         wallet.addBalance(amount);
+        WalletTransaction transaction = new WalletTransaction();
+        transaction.setWallet(wallet);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(transactionType);
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setSource("EXTERNAL");
+        transaction.setDestination("WALLET");
+
+        wallet.addTransaction(transaction);
         updateTransactionTracking(wallet, amount, true);
         Wallet updateWallet = update(wallet);
         return walletMapper.toResponse(updateWallet);
@@ -73,6 +86,16 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         validateSufficientBalance(wallet, amount);
         validateTransactionLimits(wallet, amount);
         wallet.subtractBalance(amount);
+        WalletTransaction transaction = new WalletTransaction();
+        transaction.setWallet(wallet);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(transactionType);
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setSource("WALLET");
+        transaction.setDestination("EXTERNAL");
+
+        wallet.addTransaction(transaction);
         updateTransactionTracking(wallet, amount, false);
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);

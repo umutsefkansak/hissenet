@@ -5,6 +5,8 @@ import com.infina.hissenet.dto.request.RiskAssessmentCalculateRequest;
 import com.infina.hissenet.dto.response.RiskAssessmentCalculateResponse;
 import com.infina.hissenet.dto.response.RiskQuestionsResponse;
 import com.infina.hissenet.entity.enums.RiskProfile;
+import com.infina.hissenet.exception.riskassessment.IncompleteAssessmentException;
+import com.infina.hissenet.exception.riskassessment.InvalidAnswerException;
 import com.infina.hissenet.service.abstracts.IRiskAssessmentService;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -22,7 +24,7 @@ public class RiskAssessmentService implements IRiskAssessmentService {
 
 
         if (selectedIndexes.size() != RiskAssessmentConfig.QUESTIONS.size()) {
-            throw new IllegalArgumentException("Tüm sorular cevaplanmalıdır");
+            throw new IncompleteAssessmentException(RiskAssessmentConfig.QUESTIONS.size(), selectedIndexes.size());
         }
 
         int totalScore = 0;
@@ -32,7 +34,7 @@ public class RiskAssessmentService implements IRiskAssessmentService {
 
 
             if (selectedIndex < 0 || selectedIndex >= options.size()) {
-                throw new IllegalArgumentException("Soru " + (i+1) + " için geçersiz seçenek: " + selectedIndex);
+                throw new InvalidAnswerException(i + 1, selectedIndex);
             }
 
             totalScore += options.get(selectedIndex).score();

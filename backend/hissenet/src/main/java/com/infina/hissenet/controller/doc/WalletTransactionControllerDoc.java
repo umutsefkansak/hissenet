@@ -148,9 +148,7 @@ public interface WalletTransactionControllerDoc {
     )
     com.infina.hissenet.common.ApiResponse<String> completeTransaction(
             @Parameter(description = "Tamamlanacak işlem ID'si", required = true, example = "101")
-            Long transactionId,
-            @Parameter(description = "İşlem sonrası final bakiye", required = true, example = "1500.00")
-            BigDecimal finalBalance
+            Long transactionId
     );
 
     @Operation(

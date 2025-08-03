@@ -14,19 +14,26 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 
-@Tag(name = "Wallets", description = "Cüzdan yönetimi API'si")
+@Tag(name = "Wallet Management", description = "Cüzdan yönetimi API'si - Müşteri cüzdanlarının oluşturulması, güncellenmesi ve finansal işlemlerin yönetimi")
 public interface WalletControllerDoc {
 
     @Operation(
             summary = "Yeni cüzdan oluşturur",
             description = """
-            Müşteri için yeni bir cüzdan oluşturur.
-            Cüzdan, müşterinin finansal işlemlerini yönetmek için kullanılır.
+            Müşteri için yeni bir cüzdan oluşturur. Cüzdan, müşterinin finansal işlemlerini yönetmek için kullanılır.
+            
+            **Özellikler:**
+            - Müşteri başına sadece bir cüzdan oluşturulabilir
+            - Varsayılan para birimi TRY'dir
+            - Günlük ve aylık limitler opsiyoneldir
+            - İşlem limitleri ayarlanabilir
             """,
             responses = {
                     @ApiResponse(responseCode = "201", description = "Cüzdan başarıyla oluşturuldu",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Geçersiz parametre"),
+                    @ApiResponse(responseCode = "400", description = "Geçersiz parametre - Validation hatası"),
+                    @ApiResponse(responseCode = "409", description = "Müşteri için cüzdan zaten mevcut"),
+                    @ApiResponse(responseCode = "404", description = "Müşteri bulunamadı"),
                     @ApiResponse(responseCode = "500", description = "Sunucu hatası")
             }
     )
@@ -36,9 +43,13 @@ public interface WalletControllerDoc {
                             implementation = CreateWalletRequest.class,
                             example = "{\n" +
                                     "  \"customerId\": 101,\n" +
+                                    "  \"balance\": 1000.00,\n" +
                                     "  \"currency\": \"TRY\",\n" +
                                     "  \"dailyLimit\": 10000.00,\n" +
-                                    "  \"monthlyLimit\": 100000.00\n" +
+                                    "  \"monthlyLimit\": 100000.00,\n" +
+                                    "  \"maxTransactionAmount\": 5000.00,\n" +
+                                    "  \"minTransactionAmount\": 10.00,\n" +
+                                    "  \"maxDailyTransactionCount\": 50\n" +
                                     "}"
                     )
             )
@@ -47,7 +58,7 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Müşteri ID'sine göre cüzdan getirir",
-            description = "Belirtilen müşteri ID'sine ait cüzdan bilgilerini getirir.",
+            description = "Belirtilen müşteri ID'sine ait cüzdan bilgilerini getirir. Cüzdan bulunamazsa 404 hatası döner.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Cüzdan başarıyla getirildi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -75,7 +86,16 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Cüzdan limitlerini günceller",
-            description = "Belirtilen müşteri ID'sine ait cüzdanın günlük ve aylık limitlerini günceller.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdanın günlük ve aylık limitlerini günceller.
+            
+            **Güncellenebilir alanlar:**
+            - Günlük limit (dailyLimit)
+            - Aylık limit (monthlyLimit)
+            - Maksimum işlem tutarı (maxTransactionAmount)
+            - Minimum işlem tutarı (minTransactionAmount)
+            - Maksimum günlük işlem sayısı (maxDailyTransactionCount)
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Limitler başarıyla güncellendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -91,7 +111,10 @@ public interface WalletControllerDoc {
                             implementation = UpdateWalletRequest.class,
                             example = "{\n" +
                                     "  \"dailyLimit\": 15000.00,\n" +
-                                    "  \"monthlyLimit\": 150000.00\n" +
+                                    "  \"monthlyLimit\": 150000.00,\n" +
+                                    "  \"maxTransactionAmount\": 7500.00,\n" +
+                                    "  \"minTransactionAmount\": 25.00,\n" +
+                                    "  \"maxDailyTransactionCount\": 75\n" +
                                     "}"
                     )
             )
@@ -100,26 +123,41 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Cüzdana bakiye ekler",
-            description = "Belirtilen müşteri ID'sine ait cüzdana belirtilen tutarda bakiye ekler.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdana belirtilen tutarda bakiye ekler.
+            
+            **İşlem tipleri:**
+            - DEPOSIT: Para yatırma
+            - STOCK_SALE: Hisse satışı geliri
+            - FEE: Komisyon geliri
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Bakiye başarıyla eklendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı"),
-                    @ApiResponse(responseCode = "400", description = "Geçersiz tutar")
+                    @ApiResponse(responseCode = "400", description = "Geçersiz tutar veya işlem tipi")
             }
     )
     com.infina.hissenet.common.ApiResponse<WalletResponse> addBalance(
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
-            @Parameter(description = "Eklenecek tutar", required = true, example = "1000.00")
+            @Parameter(description = "Eklenecek tutar (0'dan büyük olmalı)", required = true, example = "1000.00")
             BigDecimal amount,
-            @Parameter(description = "İşlem tipi", required = true, example = "DEPOSIT")
+            @Parameter(description = "İşlem tipi", required = true, example = "DEPOSIT",
+                    schema = @Schema(allowableValues = {"DEPOSIT", "STOCK_SALE", "FEE"}))
             TransactionType transactionType
     );
 
     @Operation(
             summary = "Cüzdandan bakiye çıkarır",
-            description = "Belirtilen müşteri ID'sine ait cüzdandan belirtilen tutarda bakiye çıkarır.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdandan belirtilen tutarda bakiye çıkarır.
+            
+            **İşlem tipleri:**
+            - WITHDRAWAL: Para çekme
+            - STOCK_PURCHASE: Hisse alımı
+            - FEE: Komisyon ödemesi
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Bakiye başarıyla çıkarıldı",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -130,20 +168,28 @@ public interface WalletControllerDoc {
     com.infina.hissenet.common.ApiResponse<WalletResponse> subtractBalance(
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
-            @Parameter(description = "Çıkarılacak tutar", required = true, example = "500.00")
+            @Parameter(description = "Çıkarılacak tutar (0'dan büyük olmalı)", required = true, example = "500.00")
             BigDecimal amount,
-            @Parameter(description = "İşlem tipi", required = true, example = "WITHDRAWAL")
+            @Parameter(description = "İşlem tipi", required = true, example = "WITHDRAWAL",
+                    schema = @Schema(allowableValues = {"WITHDRAWAL", "STOCK_PURCHASE", "FEE"}))
             TransactionType transactionType
     );
 
     @Operation(
             summary = "Hisse senedi alım işlemini işler",
-            description = "Hisse senedi alım işlemi için gerekli bakiye düzenlemelerini yapar.",
+            description = """
+            Hisse senedi alım işlemi için gerekli bakiye düzenlemelerini yapar.
+            
+            **Hesaplama:**
+            - Toplam maliyet = Toplam tutar + Komisyon
+            - Bakiye kontrolü yapılır
+            - Limit kontrolleri uygulanır
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Hisse alım işlemi başarıyla işlendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı"),
-                    @ApiResponse(responseCode = "400", description = "Yetersiz bakiye")
+                    @ApiResponse(responseCode = "400", description = "Yetersiz bakiye veya limit aşımı")
             }
     )
     com.infina.hissenet.common.ApiResponse<WalletResponse> processStockPurchase(
@@ -152,14 +198,18 @@ public interface WalletControllerDoc {
             @Parameter(description = "Toplam tutar", required = true, example = "2500.00")
             BigDecimal totalAmount,
             @Parameter(description = "Komisyon tutarı", required = true, example = "25.00")
-            BigDecimal commission,
-            @Parameter(description = "Vergi tutarı", required = true, example = "15.00")
-            BigDecimal tax
+            BigDecimal commission
     );
 
     @Operation(
             summary = "Hisse senedi satış işlemini işler",
-            description = "Hisse senedi satış işlemi için gerekli bakiye düzenlemelerini yapar.",
+            description = """
+            Hisse senedi satış işlemi için gerekli bakiye düzenlemelerini yapar.
+            
+            **Hesaplama:**
+            - Net gelir = Toplam tutar - Komisyon
+            - Bakiye otomatik artırılır
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Hisse satış işlemi başarıyla işlendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -172,64 +222,67 @@ public interface WalletControllerDoc {
             @Parameter(description = "Toplam tutar", required = true, example = "2500.00")
             BigDecimal totalAmount,
             @Parameter(description = "Komisyon tutarı", required = true, example = "25.00")
-            BigDecimal commission,
-            @Parameter(description = "Vergi tutarı", required = true, example = "15.00")
-            BigDecimal tax
+            BigDecimal commission
     );
 
     @Operation(
             summary = "Para yatırma işlemini işler",
-            description = "Cüzdana para yatırma işlemini gerçekleştirir.",
+            description = """
+            Cüzdana para yatırma işlemini gerçekleştirir.
+            
+            **Özellikler:**
+            - Bakiye otomatik artırılır
+            - İşlem geçmişi kaydedilir
+            - Limit kontrolleri uygulanır
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Para yatırma işlemi başarıyla işlendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı"),
-                    @ApiResponse(responseCode = "400", description = "Geçersiz tutar")
+                    @ApiResponse(responseCode = "400", description = "Geçersiz tutar veya limit aşımı")
             }
     )
     com.infina.hissenet.common.ApiResponse<WalletResponse> processDeposit(
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
-            @Parameter(description = "Yatırılacak tutar", required = true, example = "1000.00")
+            @Parameter(description = "Yatırılacak tutar (0'dan büyük olmalı)", required = true, example = "1000.00")
             BigDecimal amount
     );
 
     @Operation(
             summary = "Para çekme işlemini işler",
-            description = "Cüzdandan para çekme işlemini gerçekleştirir.",
+            description = """
+            Cüzdandan para çekme işlemini gerçekleştirir.
+            
+            **Kontroller:**
+            - Yeterli bakiye kontrolü
+            - Günlük/aylık limit kontrolü
+            - İşlem sayısı kontrolü
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Para çekme işlemi başarıyla işlendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı"),
-                    @ApiResponse(responseCode = "400", description = "Yetersiz bakiye")
+                    @ApiResponse(responseCode = "400", description = "Yetersiz bakiye veya limit aşımı")
             }
     )
     com.infina.hissenet.common.ApiResponse<WalletResponse> processWithdrawal(
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
-            @Parameter(description = "Çekilecek tutar", required = true, example = "500.00")
-            BigDecimal amount
-    );
-
-    @Operation(
-            summary = "Temettü ödemesi işler",
-            description = "Hisse senedi temettü ödemesini cüzdana ekler.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Temettü ödemesi başarıyla işlendi",
-                            content = @Content(schema = @Schema(implementation = WalletResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı")
-            }
-    )
-    com.infina.hissenet.common.ApiResponse<WalletResponse> processDividendPayment(
-            @Parameter(description = "Müşteri ID'si", required = true, example = "101")
-            Long customerId,
-            @Parameter(description = "Temettü tutarı", required = true, example = "150.00")
+            @Parameter(description = "Çekilecek tutar (0'dan büyük olmalı)", required = true, example = "500.00")
             BigDecimal amount
     );
 
     @Operation(
             summary = "Cüzdanı kilitler",
-            description = "Belirtilen müşteri ID'sine ait cüzdanı kilitler. Kilitli cüzdanlarda işlem yapılamaz.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdanı kilitler. Kilitli cüzdanlarda işlem yapılamaz.
+            
+            **Kilitli cüzdan özellikleri:**
+            - Para çekme işlemleri engellenir
+            - Para yatırma işlemleri devam eder
+            - Bakiye görüntüleme mümkün
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Cüzdan başarıyla kilitlendi",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -243,7 +296,13 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Cüzdan kilidini açar",
-            description = "Belirtilen müşteri ID'sine ait cüzdanın kilidini açar.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdanın kilidini açar.
+            
+            **Kilidi açılan cüzdan:**
+            - Tüm işlemler tekrar mümkün
+            - Normal cüzdan fonksiyonları aktif
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Cüzdan kilidi başarıyla açıldı",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -257,7 +316,14 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Günlük limitleri sıfırlar",
-            description = "Belirtilen müşteri ID'sine ait cüzdanın günlük kullanım limitlerini sıfırlar.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdanın günlük kullanım limitlerini sıfırlar.
+            
+            **Sıfırlanan değerler:**
+            - Günlük kullanılan tutar (dailyUsedAmount)
+            - Günlük işlem sayısı (dailyTransactionCount)
+            - Son sıfırlama tarihi güncellenir
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Günlük limitler başarıyla sıfırlandı",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -271,7 +337,13 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Aylık limitleri sıfırlar",
-            description = "Belirtilen müşteri ID'sine ait cüzdanın aylık kullanım limitlerini sıfırlar.",
+            description = """
+            Belirtilen müşteri ID'sine ait cüzdanın aylık kullanım limitlerini sıfırlar.
+            
+            **Sıfırlanan değerler:**
+            - Aylık kullanılan tutar (monthlyUsedAmount)
+            - Son sıfırlama tarihi güncellenir
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Aylık limitler başarıyla sıfırlandı",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
@@ -285,7 +357,11 @@ public interface WalletControllerDoc {
 
     @Operation(
             summary = "Cüzdanı siler",
-            description = "Belirtilen cüzdan ID'sine ait cüzdanı sistemden siler.",
+            description = """
+            Belirtilen cüzdan ID'sine ait cüzdanı sistemden siler.
+            
+            **Dikkat:** Bu işlem geri alınamaz ve cüzdandaki tüm veriler kaybolur.
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Cüzdan başarıyla silindi"),
                     @ApiResponse(responseCode = "404", description = "Cüzdan bulunamadı")

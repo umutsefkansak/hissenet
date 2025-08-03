@@ -78,16 +78,13 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         return walletMapper.toResponse(updatedWallet);
     }
 
-    public WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
-        BigDecimal totalCost = totalAmount.add(commission).add(tax);
+    public WalletResponse processStockPurchase(Long customerId, BigDecimal totalAmount, BigDecimal commission){
+        BigDecimal totalCost = totalAmount.add(commission);
         return subtractBalance(customerId, totalCost, TransactionType.STOCK_PURCHASE);
     }
-    public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax){
-        BigDecimal netAmount = totalAmount.subtract(commission).subtract(tax);
+    public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission){
+        BigDecimal netAmount = totalAmount.subtract(commission);
         return addBalance(customerId, netAmount, TransactionType.STOCK_SALE);
-    }
-    public WalletResponse processDividendPayment(Long customerId, BigDecimal dividendAmount){
-        return addBalance(customerId, dividendAmount, TransactionType.DIVIDEND);
     }
     public WalletResponse processWithdrawal(Long customerId, BigDecimal amount){
         return subtractBalance(customerId, amount, TransactionType.WITHDRAWAL);

@@ -43,7 +43,6 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
 
         WalletTransaction walletTransaction = walletTransactionMapper.toEntity(request);
         walletTransaction.setWallet(wallet);
-        walletTransaction.setBalanceBefore(wallet.getBalance());
         WalletTransaction savedTransaction = save(walletTransaction);
         return walletTransactionMapper.toResponse(savedTransaction);
     }
@@ -54,10 +53,10 @@ public class WalletTransactionService extends GenericServiceImpl<WalletTransacti
         WalletTransaction updatedTransaction = update(walletTransaction);
         return walletTransactionMapper.toResponse(updatedTransaction);
     }
-    public void completeTransaction(Long transactionId, BigDecimal finalBalance){
+    public void completeTransaction(Long transactionId){
         WalletTransaction walletTransaction = findById(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException(transactionId));
-        walletTransaction.completeTransaction(finalBalance);
+        walletTransaction.completeTransaction();
         update(walletTransaction);
     }
     public void cancelTransaction(Long transactionId){

@@ -53,9 +53,8 @@ public class WalletTransactionController implements WalletTransactionControllerD
         return ApiResponse.ok("Transaction updated successfully", walletTransactionService.updateWalletTransaction(transactionId, request));
     }
     @PostMapping("/{transactionId}/complete")
-    public ApiResponse<String> completeTransaction(@PathVariable Long transactionId,
-                                                   @RequestParam BigDecimal finalBalance){
-        walletTransactionService.completeTransaction(transactionId, finalBalance);
+    public ApiResponse<String> completeTransaction(@PathVariable Long transactionId){
+        walletTransactionService.completeTransaction(transactionId);
         return ApiResponse.ok("Transaction completed successfully");
     }
     @PostMapping("/{transactionId}/cancel")

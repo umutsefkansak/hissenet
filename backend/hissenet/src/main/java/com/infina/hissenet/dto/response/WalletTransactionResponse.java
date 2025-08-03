@@ -11,14 +11,9 @@ public record WalletTransactionResponse(
         Long walletId,
         BigDecimal amount,
         TransactionType transactionType,
-        String description,
         TransactionStatus transactionStatus,
         LocalDateTime transactionDate,
-        BigDecimal balanceBefore,
-        BigDecimal balanceAfter,
-        String referenceNumber,
         BigDecimal feeAmount,
-        BigDecimal taxAmount,
         String source,
         String destination
 ) {

@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 
-@Tag(name = "Wallet Management", description = "Cüzdan yönetimi API'si - Müşteri cüzdanlarının oluşturulması, güncellenmesi ve finansal işlemlerin yönetimi")
+@Tag(name = "Wallet Management", description = "Cüzdan yönetimi API'si")
 public interface WalletControllerDoc {
 
     @Operation(
@@ -31,9 +33,9 @@ public interface WalletControllerDoc {
             responses = {
                     @ApiResponse(responseCode = "201", description = "Cüzdan başarıyla oluşturuldu",
                             content = @Content(schema = @Schema(implementation = WalletResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Geçersiz parametre - Validation hatası"),
-                    @ApiResponse(responseCode = "409", description = "Müşteri için cüzdan zaten mevcut"),
+                    @ApiResponse(responseCode = "400", description = "Geçersiz parametre"),
                     @ApiResponse(responseCode = "404", description = "Müşteri bulunamadı"),
+                    @ApiResponse(responseCode = "409", description = "Müşteri için cüzdan zaten mevcut"),
                     @ApiResponse(responseCode = "500", description = "Sunucu hatası")
             }
     )
@@ -53,6 +55,7 @@ public interface WalletControllerDoc {
                                     "}"
                     )
             )
+            @Valid
             CreateWalletRequest request
     );
 
@@ -118,6 +121,7 @@ public interface WalletControllerDoc {
                                     "}"
                     )
             )
+            @Valid
             UpdateWalletRequest request
     );
 
@@ -142,6 +146,7 @@ public interface WalletControllerDoc {
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
             @Parameter(description = "Eklenecek tutar (0'dan büyük olmalı)", required = true, example = "1000.00")
+            @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive")
             BigDecimal amount,
             @Parameter(description = "İşlem tipi", required = true, example = "DEPOSIT",
                     schema = @Schema(allowableValues = {"DEPOSIT", "STOCK_SALE", "FEE"}))
@@ -169,6 +174,7 @@ public interface WalletControllerDoc {
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
             @Parameter(description = "Çıkarılacak tutar (0'dan büyük olmalı)", required = true, example = "500.00")
+            @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive")
             BigDecimal amount,
             @Parameter(description = "İşlem tipi", required = true, example = "WITHDRAWAL",
                     schema = @Schema(allowableValues = {"WITHDRAWAL", "STOCK_PURCHASE", "FEE"}))
@@ -246,6 +252,7 @@ public interface WalletControllerDoc {
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
             @Parameter(description = "Yatırılacak tutar (0'dan büyük olmalı)", required = true, example = "1000.00")
+            @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive")
             BigDecimal amount
     );
 
@@ -270,6 +277,7 @@ public interface WalletControllerDoc {
             @Parameter(description = "Müşteri ID'si", required = true, example = "101")
             Long customerId,
             @Parameter(description = "Çekilecek tutar (0'dan büyük olmalı)", required = true, example = "500.00")
+            @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive")
             BigDecimal amount
     );
 

@@ -69,5 +69,7 @@ public interface IEmployeeService extends UserDetailsService {
      * @return employee entity with roles loaded
      */
     Employee findByEmailWithRoles(String email);
+
+    Boolean existsByEmail(String email);
    
 }

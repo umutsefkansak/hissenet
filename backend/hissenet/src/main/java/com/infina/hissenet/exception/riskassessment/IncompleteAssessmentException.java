@@ -6,6 +6,6 @@ public class IncompleteAssessmentException extends RiskAssessmentException {
     }
 
     public IncompleteAssessmentException(int expectedQuestions, int providedAnswers) {
-        super("Tüm sorular cevaplanmalıdır. Beklenen: " + expectedQuestions + ", Verilen: " + providedAnswers);
+        super("All questions must be answered. Expected: " + expectedQuestions + ", Provided: " + providedAnswers);
     }
 }

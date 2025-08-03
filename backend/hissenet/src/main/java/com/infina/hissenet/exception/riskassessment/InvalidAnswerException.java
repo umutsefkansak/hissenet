@@ -6,6 +6,6 @@ public class InvalidAnswerException extends RiskAssessmentException {
     }
 
     public InvalidAnswerException(int questionNumber, int selectedIndex) {
-        super("Soru " + questionNumber + " için geçersiz seçenek: " + selectedIndex);
+        super("Invalid option for question " + questionNumber + ": " + selectedIndex);
     }
 }

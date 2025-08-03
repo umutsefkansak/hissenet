@@ -98,12 +98,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	private void handleWalletTransaction(OrderCreateRequest request, BigDecimal totalAmount) {
 		BigDecimal commission = totalAmount.multiply(COMMISSION_RATE);
-		BigDecimal tax = BigDecimal.ZERO;
 
 		if (request.type() == OrderType.BUY) {
-			walletService.processStockPurchase(request.customerId(), totalAmount, commission, tax);
+			walletService.processStockPurchase(request.customerId(), totalAmount, commission);
 		} else if (request.type() == OrderType.SELL) {
-			walletService.processStockSale(request.customerId(), totalAmount, commission, tax);
+			walletService.processStockSale(request.customerId(), totalAmount, commission);
 		}
 	}
 

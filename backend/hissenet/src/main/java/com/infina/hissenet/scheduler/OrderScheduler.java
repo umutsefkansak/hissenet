@@ -47,7 +47,6 @@ public class OrderScheduler {
                 BigDecimal limitPrice = order.getPrice();
                 BigDecimal totalAmount = limitPrice.multiply(order.getQuantity());
                 BigDecimal commission = totalAmount.multiply(COMMISSION_RATE);
-                BigDecimal tax = BigDecimal.ZERO;
 
                 boolean shouldFill = false;
 
@@ -60,9 +59,9 @@ public class OrderScheduler {
                 if (shouldFill) {
                     try {
                         if (order.getType() == OrderType.BUY) {
-                            walletService.processStockPurchase(order.getCustomer().getId(), totalAmount, commission, tax);
+                            walletService.processStockPurchase(order.getCustomer().getId(), totalAmount, commission);
                         } else {
-                            walletService.processStockSale(order.getCustomer().getId(), totalAmount, commission, tax);
+                            walletService.processStockSale(order.getCustomer().getId(), totalAmount, commission);
                         }
 
                         order.setStatus(OrderStatus.FILLED);

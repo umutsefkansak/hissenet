@@ -18,9 +18,9 @@ public interface CustomerMapper {
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "kycVerified", constant = "false")
     @Mapping(target = "kycVerifiedAt", ignore = true)
-    @Mapping(target = "riskProfile", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "nationality", defaultValue = "TR")
+    @Mapping(target = "riskProfile", source = "riskProfile")
     IndividualCustomer toEntity(IndividualCustomerCreateDto createDto);
 
     @Mapping(target = "id", ignore = true)
@@ -61,7 +61,8 @@ public interface CustomerMapper {
                     individual.getMotherName(),
                     individual.getFatherName(),
                     individual.getProfession(),
-                    individual.getEducationLevel()
+                    individual.getEducationLevel(),
+                    realCustomer.getRiskProfile()
             );
         }
 

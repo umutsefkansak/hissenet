@@ -4,19 +4,28 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from LLM.llm import makeEmbedding
-from Database.database import readDBUri, connectDB, getCollection, findMatch, getResults
+from LLM.llm import searchVector
+from Database.database import readDBUri, connectDB, getCollection
 
-# from your_chatbot_module import get_bot_response
+# <- İşlemler henüz tamamlanmadı -> 
+def get_bot_response(message):    
+    uri: str      = readDBUri()
+    db            = connectDB(uri=uri)
+    collection    = getCollection(db=db)
+    results       = asyncio.run(searchVector(query=message, collection=collection))
+    
+    return results
 
-def get_bot_response(message):
+    """
     uri: str      = readDBUri()
     db            = connectDB(uri=uri)
     collection    = getCollection(db=db)
     embeddedQuery = asyncio.run(makeEmbedding(query=message))
     results       = findMatch(collection=collection, embeddedQuery=embeddedQuery)
-    results=getResults(results=results)
-    return results[0]["answer"]
+    results       = getResults(results=results)
+
+    return results[0]["answer"], results[0]["score"], results[1]["answer"], results[1]["score"]
+    """
 
 def chat_page(request):
     return render(request, 'chat.html')

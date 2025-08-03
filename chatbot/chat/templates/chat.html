@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Chat aç/kapat butonu */
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chat kutusu */
+        #chat-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        #chatbox {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        #inputArea {
+            display: flex;
+            border-top: 1px solid #eee;
+            padding: 10px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button#sendBtn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            margin-left: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #chatbox div {
+            margin-bottom: 10px;
+        }
+
+        #chatbox strong {
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Chat aç/kapat butonu -->
+<button id="chat-toggle">💬</button>
+
+<!-- Chat paneli -->
+<div id="chat-container">
+    <div id="chatbox"></div>
+    <div id="inputArea">
+        <input type="text" id="userInput" placeholder="Chatbot'a sor" />
+        <button id="sendBtn" onclick="sendMessage()">Gönder</button>
+    </div>
+</div>
+
+<script>
+    // Aç/Kapat işlevi
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+        const container = document.getElementById('chat-container');
+        container.style.display = container.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    // Mesaj gönderme işlevi
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        if (!message) return;
+        input.value = '';
+
+        const chatbox = document.getElementById('chatbox');
+        chatbox.innerHTML += `<div><strong>Sen:</strong> ${message}</div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        try {
+            const response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            chatbox.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+        } catch (error) {
+            chatbox.innerHTML += `<div><strong>Bot:</strong> Bir hata oluştu.</div>`;
+        }
+    }
+</script>
+
+</body>
+</html>

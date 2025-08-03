@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllEmployees } from '../server/api';
-import logo from '../images/logo.png'
+import logo from '../images/logo3.jpeg'
 import './Home.css';
 
 const Home = () => {

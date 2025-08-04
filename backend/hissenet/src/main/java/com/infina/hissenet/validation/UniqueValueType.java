@@ -7,8 +7,6 @@ public enum UniqueValueType {
     TC_NUMBER("This ID number is already registered in the system");
 
 
-
-
     private final String defaultMessage;
 
     UniqueValueType(String defaultMessage) {

@@ -4,94 +4,58 @@ import './WithdrawForm.css';
 const WithdrawForm = ({ 
   amount, 
   setAmount, 
-  selectedBank, 
-  setSelectedBank,
-  iban,
-  setIban,
-  ibanConfirmed,
-  setIbanConfirmed,
-  walletBalance,
+  walletBalance, 
   loading 
 }) => {
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY'
-    }).format(value);
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || parseFloat(value) >= 0) {
+      setAmount(value);
+    }
   };
 
-  const banks = [
-    'Ziraat Bankası',
-    'Garanti BBVA',
-    'İş Bankası',
-    'Yapı Kredi',
-    'Akbank',
-    'VakıfBank',
-    'Halkbank',
-    'Denizbank',
-    'QNB Finansbank',
-    'Türkiye Finans'
-  ];
+  const calculateBlockedBalance = () => {
+    return walletBalance * 0.20; // %20 bloke bakiye
+  };
+
+  const getAvailableBalance = () => {
+    return walletBalance - calculateBlockedBalance();
+  };
 
   return (
     <div className="withdraw-form">
+      {/* Bakiye Bilgileri */}
+      <div className="balance-info">
+        <div className="balance-item">
+          <label>Toplam Bakiye:</label>
+          <span className="total-balance">{walletBalance.toLocaleString('tr-TR')} ₺</span>
+        </div>
+        <div className="balance-item">
+          <label>Bloke Bakiye (%20):</label>
+          <span className="blocked-balance">{calculateBlockedBalance().toLocaleString('tr-TR')} ₺</span>
+        </div>
+        <div className="balance-item">
+          <label>Kullanılabilir Bakiye:</label>
+          <span className="available-balance">{getAvailableBalance().toLocaleString('tr-TR')} ₺</span>
+        </div>
+      </div>
+
+      {/* Çekilecek Tutar */}
       <div className="form-section">
-        <label>Çekilecek Tutar (TL)</label>
+        <label htmlFor="amount">Çekilecek Tutar (TL):</label>
         <input
           type="number"
+          id="amount"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={handleAmountChange}
           placeholder="0.00"
+          disabled={loading}
+          max={getAvailableBalance()}
+          min="0"
           step="0.01"
-          min="0.01"
-          max={walletBalance}
-          required
-          disabled={loading}
         />
         <div className="form-note">
-          Maksimum: {formatCurrency(walletBalance)}
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Banka Seçimi</label>
-        <select
-          value={selectedBank}
-          onChange={(e) => setSelectedBank(e.target.value)}
-          required
-          disabled={loading}
-        >
-          <option value="">Bankanızı seçiniz</option>
-          {banks.map((bank) => (
-            <option key={bank} value={bank}>{bank}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-section">
-        <label>IBAN</label>
-        <input
-          type="text"
-          value={iban}
-          onChange={(e) => setIban(e.target.value)}
-          placeholder="TR00 0000 0000 0000 0000 0000 00"
-          required
-          disabled={loading}
-        />
-        <div className="form-note">
-          IBAN numaranızı boşluksuz ya da boşluklu girebilirsiniz
-        </div>
-        <div className="checkbox-group">
-          <input
-            type="checkbox"
-            id="ibanConfirm"
-            checked={ibanConfirmed}
-            onChange={(e) => setIbanConfirmed(e.target.checked)}
-            disabled={loading}
-          />
-          <label htmlFor="ibanConfirm">
-            IBAN bana aittir, onaylıyorum
-          </label>
+          Maksimum: {getAvailableBalance().toLocaleString('tr-TR')} ₺
         </div>
       </div>
     </div>

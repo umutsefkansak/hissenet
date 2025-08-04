@@ -6,16 +6,12 @@ import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.Stock;
 import com.infina.hissenet.entity.StockTransaction;
-import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.exception.stock.StockNotFoundException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
-import com.infina.hissenet.repository.OrderRepository;
-import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

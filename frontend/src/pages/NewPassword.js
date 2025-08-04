@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { changePassword } from '../server/api';
 import './NewPassword.css';
 
 const NewPassword = () => {
@@ -12,7 +13,20 @@ const NewPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const email = location.state?.email || 'akkoksinan@gmail.com';
+  const email = location.state?.email;
+
+  // Email yoksa login sayfasına yönlendir
+  React.useEffect(() => {
+    if (!email) {
+      window.showToast('Email bilgisi bulunamadı. Lütfen tekrar giriş yapın.', 'error', 3000);
+      navigate('/login');
+    }
+  }, [email, navigate]);
+
+  // Email yoksa sayfayı render etme
+  if (!email) {
+    return null;
+  }
 
   const validatePassword = (password) => {
     const requirements = {
@@ -45,12 +59,22 @@ const NewPassword = () => {
       return;
     }
 
-    // Simüle edilmiş API çağrısı
-    setTimeout(() => {
-      window.showToast('Şifre başarıyla güncellendi!', 'success', 2000);
-      navigate('/login');
+    try {
+      const result = await changePassword(email, password, confirmPassword);
+      
+      if (result.success) {
+        window.showToast('Şifre başarıyla güncellendi!', 'success', 2000);
+        setTimeout(() => {
+          navigate('/login');
+        }, 1000);
+      } else {
+        setError(result.error || 'Şifre güncellenirken bir hata oluştu.');
+      }
+    } catch (error) {
+      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (

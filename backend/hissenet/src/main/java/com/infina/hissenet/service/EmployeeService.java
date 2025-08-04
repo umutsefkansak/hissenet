@@ -115,6 +115,11 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
     }
 
     @Override
+    public Boolean existsByEmail(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findByEmail(username);
     }

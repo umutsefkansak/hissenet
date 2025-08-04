@@ -121,7 +121,7 @@ const Wallet = () => {
   return (
     <div className="wallet-page">
       <div className="wallet-modal">
-        {/* Header */}
+      
         <div className="modal-header">
           <div className="tab-buttons">
             <button 
@@ -140,11 +140,10 @@ const Wallet = () => {
           <button className="close-button">×</button>
         </div>
 
-        {/* Content */}
         <div className="modal-content">
       
 
-          {/* İşlem Formu */}
+   
           <form onSubmit={handleSubmit}>
             {activeTab === 'deposit' ? (
               <DepositForm 
@@ -167,14 +166,13 @@ const Wallet = () => {
               />
             )}
 
-            {/* Mesaj */}
+         
             {message && (
               <div className={`message ${messageType}`}>
                 {message}
               </div>
             )}
 
-            {/* Onay Butonu */}
             <button 
               type="submit" 
               className="confirm-button"

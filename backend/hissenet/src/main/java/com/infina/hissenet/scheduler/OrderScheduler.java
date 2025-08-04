@@ -31,7 +31,7 @@ public class OrderScheduler {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 32000)
+    @Scheduled(fixedDelay = 60000 * 5 + 1)
     public void processPendingLimitOrders() {
         List<Order> openOrders = orderRepository.findByStatus(OrderStatus.OPEN);
 

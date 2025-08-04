@@ -1,4 +1,4 @@
-const BASE_URL = '/api/v1/wallet'; // /v1 ekleyin
+const BASE_URL = '/api/v1/wallet'; 
 
 export const walletApi = {
   getCustomerWalletBalance: async (customerId) => {

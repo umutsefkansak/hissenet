@@ -142,8 +142,7 @@ const Wallet = () => {
 
         {/* Content */}
         <div className="modal-content">
-          {/* Bakiye Bilgileri */}
-          <WalletBalance balance={walletBalance} />
+      
 
           {/* İşlem Formu */}
           <form onSubmit={handleSubmit}>

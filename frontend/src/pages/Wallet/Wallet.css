@@ -13,11 +13,11 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); 
   width: 90%;
   max-width: 1000px; 
-  max-height: 96vh; /* Ekran yüksekliğinin %90'ı */
+  max-height: 96vh;
   min-height: 150px; 
   overflow: hidden;
   display: flex;
-  flex-direction: column; /* Dikey düzen */
+  flex-direction: column; 
 }
 
 .modal-header {
@@ -27,7 +27,7 @@
   padding: 30px 32px; 
   border-bottom: 1px solid #e0e0e0;
   background: #f8f9fa;
-  flex-shrink: 0; /* Header'ın küçülmesini engelle */
+  flex-shrink: 0; 
 }
 
 .tab-buttons {
@@ -78,8 +78,8 @@
 
 .modal-content {
   padding: 40px 32px; 
-  flex: 1; /* Kalan alanı kapla */
-  overflow-y: auto; /* İçerik fazlaysa scroll */
+  flex: 1; 
+  overflow-y: auto; 
   display: flex;
   flex-direction: column;
 }
@@ -89,10 +89,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Önemli: flex item'ın scroll çalışması için */
+  min-height: 0; 
 }
 
-/* Form içeriği */
+
 .modal-content form > div:not(:last-child) {
   flex: 1;
 }
@@ -260,8 +260,8 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 20px; 
-  flex-shrink: 0; /* Butonun küçülmesini engelle */
-  position: sticky; /* Buton her zaman görünür kalsın */
+  flex-shrink: 0; 
+  position: sticky; 
   bottom: 0;
   z-index: 10;
 }

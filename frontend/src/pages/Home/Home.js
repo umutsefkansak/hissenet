@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllEmployees } from '../../server/api';
+import { getAllEmployees } from '../../server/employees';
 import logo from '../../images/logo3.jpeg'
 import './Home.css';
 

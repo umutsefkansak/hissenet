@@ -1,0 +1,70 @@
+.deposit-form {
+ margin-bottom: 20px;
+}
+
+.form-section {
+ margin-bottom: 28px;
+}
+
+.form-section label {
+ display: block;
+ margin-bottom: 12px;
+ font-weight: 600;
+ color: #333;
+ font-size: 16px;
+}
+
+.form-section input,
+.form-section select {
+ width: 100%;
+ padding: 16px 20px;
+ border: 2px solid #e0e0e0;
+ border-radius: 8px;
+ font-size: 16px;
+ transition: border-color 0.3s ease;
+ box-sizing: border-box;
+}
+
+.form-section input:focus,
+.form-section select:focus {
+ outline: none;
+ border-color: #007bff;
+}
+
+.form-section input:disabled,
+.form-section select:disabled {
+ background: #f8f9fa;
+ cursor: not-allowed;
+}
+
+.form-note {
+ margin-top: 8px;
+ font-size: 14px;
+ color: #666;
+}
+
+.info-section {
+ margin-bottom: 28px;
+ padding: 24px;
+ background: #f8f9fa;
+ border-radius: 12px;
+}
+
+.info-section h4 {
+ margin: 0 0 16px 0;
+ font-size: 18px;
+ font-weight: 600;
+ color: #333;
+}
+
+.info-section ul {
+ margin: 0;
+ padding-left: 24px;
+ font-size: 15px;
+ color: #666;
+ line-height: 1.6;
+}
+
+.info-section li {
+ margin-bottom: 8px;
+}

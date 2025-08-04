@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { WalletBalance, DepositForm, WithdrawForm } from '../../components/wallet';
 import './Wallet.css';
 
 const Wallet = () => {
@@ -106,26 +107,6 @@ const Wallet = () => {
     }
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY'
-    }).format(value);
-  };
-
-  const banks = [
-    'Ziraat Bankası',
-    'Garanti BBVA',
-    'İş Bankası',
-    'Yapı Kredi',
-    'Akbank',
-    'VakıfBank',
-    'Halkbank',
-    'Denizbank',
-    'QNB Finansbank',
-    'Türkiye Finans'
-  ];
-
   if (!customerId) {
     return (
       <div className="wallet-page">
@@ -162,109 +143,29 @@ const Wallet = () => {
         {/* Content */}
         <div className="modal-content">
           {/* Bakiye Bilgileri */}
-          <div className="balance-info">
-            <h3>Bakiye Bilgileri</h3>
-            <div className="balance-row">
-              <span>Toplam Bakiye:</span>
-              <span className="balance-amount">{formatCurrency(walletBalance)}</span>
-            </div>
-          </div>
+          <WalletBalance balance={walletBalance} />
 
           {/* İşlem Formu */}
           <form onSubmit={handleSubmit}>
             {activeTab === 'deposit' ? (
-              // Para Yükleme Formu
-              <div className="deposit-form">
-                <div className="form-section">
-                  <label>Yüklenecek Tutar (TL)</label>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    step="0.01"
-                    min="10"
-                    required
-                    disabled={loading}
-                  />
-                  <div className="form-note">
-                    Minimum yükleme tutarı: 10.00 TL
-                  </div>
-                </div>
-
-                <div className="info-section">
-                  <h4>Bakiye Yükleme Bilgileri</h4>
-                  <ul>
-                    <li>Bakiye yükleme işlemi anında gerçekleşir</li>
-                    <li>Minimum yükleme tutarı 10 TL'dir</li>
-                    <li>Maksimum günlük yükleme limiti 50.000 TL'dir</li>
-                    <li>Yüklenen tutar hesabınıza hemen aktarılır</li>
-                  </ul>
-                </div>
-              </div>
+              <DepositForm 
+                amount={amount}
+                setAmount={setAmount}
+                loading={loading}
+              />
             ) : (
-              // Para Çekme Formu
-              <div className="withdraw-form">
-                <div className="form-section">
-                  <label>Çekilecek Tutar (TL)</label>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0.01"
-                    max={walletBalance}
-                    required
-                    disabled={loading}
-                  />
-                  <div className="form-note">
-                    Maksimum: {formatCurrency(walletBalance)}
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <label>Banka Seçimi</label>
-                  <select
-                    value={selectedBank}
-                    onChange={(e) => setSelectedBank(e.target.value)}
-                    required
-                    disabled={loading}
-                  >
-                    <option value="">Bankanızı seçiniz</option>
-                    {banks.map((bank) => (
-                      <option key={bank} value={bank}>{bank}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-section">
-                  <label>IBAN</label>
-                  <input
-                    type="text"
-                    value={iban}
-                    onChange={(e) => setIban(e.target.value)}
-                    placeholder="TR00 0000 0000 0000 0000 0000 00"
-                    required
-                    disabled={loading}
-                  />
-                  <div className="form-note">
-                    IBAN numaranızı boşluksuz ya da boşluklu girebilirsiniz
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="ibanConfirm"
-                      checked={ibanConfirmed}
-                      onChange={(e) => setIbanConfirmed(e.target.checked)}
-                      disabled={loading}
-                    />
-                    <label htmlFor="ibanConfirm">
-                      IBAN bana aittir, onaylıyorum
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <WithdrawForm 
+                amount={amount}
+                setAmount={setAmount}
+                selectedBank={selectedBank}
+                setSelectedBank={setSelectedBank}
+                iban={iban}
+                setIban={setIban}
+                ibanConfirmed={ibanConfirmed}
+                setIbanConfirmed={setIbanConfirmed}
+                walletBalance={walletBalance}
+                loading={loading}
+              />
             )}
 
             {/* Mesaj */}

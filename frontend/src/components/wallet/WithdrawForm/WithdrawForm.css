@@ -1,0 +1,64 @@
+.withdraw-form {
+ margin-bottom: 20px;
+}
+
+.form-section {
+ margin-bottom: 28px;
+}
+
+.form-section label {
+ display: block;
+ margin-bottom: 12px;
+ font-weight: 600;
+ color: #333;
+ font-size: 16px;
+}
+
+.form-section input,
+.form-section select {
+ width: 100%;
+ padding: 16px 20px;
+ border: 2px solid #e0e0e0;
+ border-radius: 8px;
+ font-size: 16px;
+ transition: border-color 0.3s ease;
+ box-sizing: border-box;
+}
+
+.form-section input:focus,
+.form-section select:focus {
+ outline: none;
+ border-color: #007bff;
+}
+
+.form-section input:disabled,
+.form-section select:disabled {
+ background: #f8f9fa;
+ cursor: not-allowed;
+}
+
+.form-note {
+ margin-top: 8px;
+ font-size: 14px;
+ color: #666;
+}
+
+.checkbox-group {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ margin-top: 16px;
+}
+
+.checkbox-group input[type="checkbox"] {
+ width: 20px;
+ height: 20px;
+ margin: 0;
+}
+
+.checkbox-group label {
+ margin: 0;
+ font-size: 16px;
+ color: #333;
+ cursor: pointer;
+}

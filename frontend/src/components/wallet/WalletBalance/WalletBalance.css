@@ -1,0 +1,36 @@
+.wallet-balance {
+ margin-bottom: 32px;
+ padding: 24px;
+ background: #f8f9fa;
+ border-radius: 12px;
+}
+
+.wallet-balance h3 {
+ margin: 0 0 16px 0;
+ font-size: 20px;
+ font-weight: 600;
+ color: #333;
+}
+
+.balance-row {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 12px;
+ padding: 8px 0;
+}
+
+.balance-row:last-child {
+ margin-bottom: 0;
+}
+
+.balance-row span:first-child {
+ color: #666;
+ font-size: 16px;
+}
+
+.balance-amount {
+ font-weight: 600;
+ color: #333;
+ font-size: 20px;
+}

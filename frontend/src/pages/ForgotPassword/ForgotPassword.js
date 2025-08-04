@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sendVerificationCode } from '../server/api';
+import { sendVerificationCode } from '../../server/api';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {

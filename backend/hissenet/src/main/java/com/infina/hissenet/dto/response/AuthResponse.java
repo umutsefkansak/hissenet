@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 public record AuthResponse(
-       EmployeeResponse employee,
+       UserResponse response,
        @JsonIgnore
        String sessionId,
        @JsonIgnore

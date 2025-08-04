@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sendVerificationCode } from '../../server/api';
+import { sendPasswordResetCode } from '../../server/mail';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -21,16 +21,16 @@ const ForgotPassword = () => {
     }
 
     try {
-      const result = await sendVerificationCode(email);
+      const result = await sendPasswordResetCode(email);
       
       if (result.success) {
-        window.showToast('Doğrulama kodu gönderildi!', 'success', 2000);
+        window.showToast('Şifre sıfırlama kodu gönderildi!', 'success', 2000);
         navigate('/verification-code', { state: { email } });
       } else {
         // API error response'u string'e çevir
         const errorMessage = typeof result.error === 'object' 
-          ? result.error.message || result.error.detail || 'Doğrulama kodu gönderilemedi.'
-          : result.error || 'Doğrulama kodu gönderilemedi.';
+          ? result.error.message || result.error.detail || 'Şifre sıfırlama kodu gönderilemedi.'
+          : result.error || 'Şifre sıfırlama kodu gönderilemedi.';
         setError(errorMessage);
       }
     } catch (error) {

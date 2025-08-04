@@ -27,7 +27,9 @@ export const login = async (email, password) => {
     }
   } catch (error) {
     console.error('Login error:', error);
-    return { success: false, error: error.response?.data || 'Login failed' };
+    
+    // Güvenlik için herhangi bir hatada genel mesaj döndür
+    return { success: false, error: 'Email veya şifre yanlış' };
   }
 };
 

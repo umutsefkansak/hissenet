@@ -1,12 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/Layout/Navbar';
+import Navbar from './components/Layout/Sidebar/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import VerificationCode from './pages/VerificationCode';
 import NewPassword from './pages/NewPassword';
 import ToastContainer from './components/Toast/ToastContainer';
+import Wallet from './pages/Wallet/Wallet';
 import './App.css';
 
 function AppContent() {
@@ -25,6 +26,7 @@ function AppContent() {
         <Route path="/customer-transactions" element={<div className="page-content">Müşteri İşlemleri Sayfası</div>} />
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
+        <Route path="/wallet" element={<Wallet />} />
       </Routes>
       <ToastContainer />
     </div>

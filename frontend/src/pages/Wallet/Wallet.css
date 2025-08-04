@@ -1,0 +1,260 @@
+.wallet-page {
+  min-height: 100vh;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.wallet-modal {
+  background: white;
+  border-radius: 16px; 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); 
+  width: 90%;
+  max-width: 600px; 
+  min-height: 150px; 
+  overflow: hidden;
+}
+
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 32px; 
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 0;
+}
+
+.tab-button {
+  padding: 16px 32px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 18px; 
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  color: #333;
+}
+
+.tab-button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 28px; 
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 40px; 
+  height: 40px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+}
+
+
+.modal-content {
+  padding: 40px 32px; 
+  min-height: 500px; 
+}
+
+
+.balance-info {
+  margin-bottom: 32px; 
+  padding: 24px; 
+  background: #f8f9fa;
+  border-radius: 12px; 
+}
+
+.balance-info h3 {
+  margin: 0 0 16px 0; 
+  font-size: 20px; 
+  font-weight: 600;
+  color: #333;
+}
+
+.balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px; 
+  padding: 8px 0; 
+}
+
+.balance-row:last-child {
+  margin-bottom: 0;
+}
+
+.balance-row span:first-child {
+  color: #666;
+  font-size: 16px; 
+}
+
+.balance-amount {
+  font-weight: 600;
+  color: #333;
+  font-size: 20px;
+}
+
+.available-balance {
+  font-weight: 600;
+  color: #28a745;
+  font-size: 20px; 
+}
+
+
+.form-section {
+  margin-bottom: 28px; 
+}
+
+.form-section label {
+  display: block;
+  margin-bottom: 12px; 
+  font-weight: 600;
+  color: #333;
+  font-size: 16px; 
+}
+
+.form-section input,
+.form-section select {
+  width: 100%;
+  padding: 16px 20px; 
+  border: 2px solid #e0e0e0;
+  border-radius: 8px; 
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-section input:focus,
+.form-section select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.form-section input:disabled,
+.form-section select:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.form-note {
+  margin-top: 8px;
+  font-size: 14px; 
+  color: #666;
+}
+
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+  margin-top: 16px; 
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px; 
+  height: 20px; 
+  margin: 0;
+}
+
+.checkbox-group label {
+  margin: 0;
+  font-size: 16px; 
+  color: #333;
+  cursor: pointer;
+}
+
+
+.info-section {
+  margin-bottom: 28px; 
+  padding: 24px; 
+  background: #f8f9fa;
+  border-radius: 12px; 
+}
+
+.info-section h4 {
+  margin: 0 0 16px 0; 
+  font-size: 18px; 
+  font-weight: 600;
+  color: #333;
+}
+
+.info-section ul {
+  margin: 0;
+  padding-left: 24px; 
+  font-size: 15px; 
+  color: #666;
+  line-height: 1.6; 
+}
+
+.info-section li {
+  margin-bottom: 8px; 
+}
+
+
+.message {
+  padding: 16px 20px; 
+  border-radius: 8px; 
+  margin-bottom: 20px; 
+  font-size: 16px; 
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+
+.confirm-button {
+  width: 100%;
+  padding: 18px 32px; 
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px; 
+  font-size: 18px; 
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px; 
+}
+
+.confirm-button:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.confirm-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

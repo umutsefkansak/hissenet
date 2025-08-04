@@ -40,7 +40,7 @@ const Login = () => {
           navigate('/');
         }, 1000);
       } else {
-        setError(result.error || 'Giriş başarısız');
+        setError(result.error || 'Email veya şifre yanlış');
       }
     } catch (error) {
       setError('Bir hata oluştu');

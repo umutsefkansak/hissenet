@@ -543,4 +543,77 @@ public interface MailControllerDoc {
                     in = ParameterIn.PATH, example = "kullanici@example.com")
             String email
     );
+
+    @Operation(
+            summary = "Şifre sıfırlama kodu gönderir",
+            description = """
+        Şifre sıfırlama için doğrulama kodu gönderir.
+        Güvenlik amacıyla e-posta sistemde kayıtlı olup olmadığına bakılmaksızın 
+        her zaman başarılı yanıt döndürür (timing attack ve email enumeration koruması).
+        Asenkron işlem ile tutarlı yanıt süresi sağlanır.
+        """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Şifre sıfırlama kodu işleme alındı",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                        {
+                          "status": 200,
+                          "path": null,
+                          "message": "Verification code sent",
+                          "localDateTime": "2025-08-03T14:30:15.123",
+                          "data": {
+                            "success": true,
+                            "message": "Doğrulama kodu başarıyla gönderildi",
+                            "maxAttempts": 3,
+                            "expiryMinutes": 10
+                          }
+                        }
+                        """
+                            ))),
+                    @ApiResponse(responseCode = "400", description = "Validation hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                        {
+                          "type": "https://www.hissenet.com/errors/validation",
+                          "title": "Validation Error",
+                          "status": 400,
+                          "detail": "Validation failed",
+                          "timestamp": "2025-08-03T14:30:15.123",
+                          "errors": {
+                            "email": "Geçerli bir e-posta adresi giriniz"
+                          }
+                        }
+                        """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                        {
+                          "type": "https://www.hissenet.com/errors/internal",
+                          "title": "Internal Server Error",
+                          "status": 500,
+                          "detail": "Internal server error occurred",
+                          "timestamp": "2025-08-03T14:30:15.123"
+                        }
+                        """
+                            )))
+            }
+    )
+    com.infina.hissenet.common.ApiResponse<CodeSendResponse> sendPasswordResetCode(
+            @Parameter(description = "Şifre sıfırlama kodu gönderim bilgileri", required = true,
+                    schema = @Schema(implementation = CodeSendRequest.class,
+                            example = """
+                {
+                  "email": "kullanici@example.com",
+                  "recipientName": "Ahmet Yılmaz",
+                  "description": "Şifre sıfırlama",
+                  "maxAttempts": 3,
+                  "expiryMinutes": 10,
+                  "additionalInfo": "Güvenlik amacıyla gönderilmiştir"
+                }
+                """
+                    )
+            )
+            CodeSendRequest request
+    );
 }

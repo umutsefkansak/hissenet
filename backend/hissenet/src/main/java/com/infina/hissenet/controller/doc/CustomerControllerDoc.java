@@ -52,7 +52,8 @@ public interface CustomerControllerDoc {
                                 "motherName": "Ayşe",
                                 "fatherName": "Mehmet",
                                 "profession": "Software Engineer",
-                                "educationLevel": "University"
+                                "educationLevel": "University",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -118,7 +119,8 @@ public interface CustomerControllerDoc {
                   "motherName": "Ayşe",
                   "fatherName": "Mehmet",
                   "profession": "Software Engineer",
-                  "educationLevel": "University"
+                  "educationLevel": "University",
+                  "commissionRate": 0.004
                 }
                 """
                     )
@@ -159,7 +161,8 @@ public interface CustomerControllerDoc {
                                 "motherName": "Jane Doe",
                                 "fatherName": "James Doe",
                                 "profession": "Senior Software Engineer",
-                                "educationLevel": "University"
+                                "educationLevel": "University",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -254,7 +257,8 @@ public interface CustomerControllerDoc {
                                 "sector": "Technology",
                                 "authorizedPersonName": "Ahmet Hakan YILMAZ",
                                 "authorizedPersonTitle": "CEO",
-                                "website": "https://www.acmecorp.com"
+                                "website": "https://www.acmecorp.com",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -316,7 +320,8 @@ public interface CustomerControllerDoc {
                   "sector": "Technology",
                   "authorizedPersonName": "Ahmet Hakan YILMAZ",
                   "authorizedPersonTitle": "CEO",
-                  "website": "https://www.acmecorp.com"
+                  "website": "https://www.acmecorp.com",
+                  "commissionRate": 0.004
                 }
                 """
                     )
@@ -354,7 +359,8 @@ public interface CustomerControllerDoc {
                                 "sector": "Technology",
                                 "authorizedPersonName": "Ahmet Hakan YILMAZ",
                                 "authorizedPersonTitle": "CEO",
-                                "website": "https://www.acmecorp.com"
+                                "website": "https://www.acmecorp.com",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -451,7 +457,8 @@ public interface CustomerControllerDoc {
                                 "motherName": "Ayşe",
                                 "fatherName": "Mehmet",
                                 "profession": "Software Engineer",
-                                "educationLevel": "University"
+                                "educationLevel": "University",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -632,7 +639,8 @@ public interface CustomerControllerDoc {
                                 "phone": "+905551234567",
                                 "nationality": "TR",
                                 "kycVerified": true,
-                                "customerType": "INDIVIDUAL"
+                                "customerType": "INDIVIDUAL",
+                                
                               }
                             }
                             """
@@ -762,7 +770,8 @@ public interface CustomerControllerDoc {
                                   "motherName": "Ayşe",
                                   "fatherName": "Mehmet",
                                   "profession": "Software Engineer",
-                                  "educationLevel": "University"
+                                  "educationLevel": "University",
+                                  "commissionRate": 0.004
                                 }
                               ]
                             }
@@ -815,7 +824,8 @@ public interface CustomerControllerDoc {
                                   "sector": "Technology",
                                   "authorizedPersonName": "Ahmet Hakan YILMAZ",
                                   "authorizedPersonTitle": "CEO",
-                                  "website": "https://www.acmecorp.com"
+                                  "website": "https://www.acmecorp.com",
+                                  "commissionRate": 0.004
                                 }
                               ]
                             }
@@ -859,7 +869,8 @@ public interface CustomerControllerDoc {
                                 "phone": "+905551234567",
                                 "nationality": "TR",
                                 "kycVerified": true,
-                                "customerType": "INDIVIDUAL"
+                                "customerType": "INDIVIDUAL",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -918,7 +929,8 @@ public interface CustomerControllerDoc {
                                 "phone": "+905551234567",
                                 "nationality": "TR",
                                 "kycVerified": false,
-                                "customerType": "INDIVIDUAL"
+                                "customerType": "INDIVIDUAL",
+                                "commissionRate": 0.004
                               }
                             }
                             """
@@ -978,7 +990,8 @@ public interface CustomerControllerDoc {
                                   "phone": "+905551234567",
                                   "nationality": "TR",
                                   "kycVerified": true,
-                                  "customerType": "INDIVIDUAL"
+                                  "customerType": "INDIVIDUAL",
+                                  "commissionRate": 0.004
                                 }
                               ]
                             }
@@ -1023,7 +1036,8 @@ public interface CustomerControllerDoc {
                                   "phone": "+902121234567",
                                   "nationality": "TR",
                                   "kycVerified": false,
-                                  "customerType": "CORPORATE"
+                                  "customerType": "CORPORATE",
+                                  "commissionRate": 0.004
                                 }
                               ]
                             }

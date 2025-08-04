@@ -82,7 +82,9 @@ public interface AddressMapper {
                     individual.getFatherName(),
                     individual.getProfession(),
                     individual.getEducationLevel(),
-                    individual.getRiskProfile()
+                    individual.getRiskProfile(),
+                    realCustomer.getCommissionRate(),
+                    individual.getIncomeRange()
             );
         }
 
@@ -103,11 +105,14 @@ public interface AddressMapper {
                     corporate.getSector(),
                     corporate.getAuthorizedPersonName(),
                     corporate.getAuthorizedPersonTitle(),
-                    corporate.getWebsite()
+                    corporate.getWebsite(),
+                    realCustomer.getCommissionRate(),
+                    corporate.getAuthorizedPersonPhone(),
+                    corporate.getAuthorizedPersonTcNumber(),
+                    corporate.getAuthorizedPersonEmail()
             );
         }
 
-        // Bu duruma normalde gelmemeli ama güvenlik için
         throw new IllegalArgumentException("Unknown customer type: " + realCustomer.getClass().getSimpleName());
     }
 

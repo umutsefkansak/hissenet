@@ -1,7 +1,9 @@
 package com.infina.hissenet.dto.common;
 
+import com.infina.hissenet.entity.enums.IncomeRange;
 import com.infina.hissenet.entity.enums.RiskProfile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record IndividualCustomerDto(
@@ -23,5 +25,7 @@ public record IndividualCustomerDto(
         String fatherName,
         String profession,
         String educationLevel,
-        RiskProfile riskProfile
+        RiskProfile riskProfile,
+        BigDecimal commissionRate,
+        IncomeRange incomeRange
 ) implements CustomerDto {}

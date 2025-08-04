@@ -2,6 +2,7 @@ package com.infina.hissenet.service;
 
 import com.infina.hissenet.dto.request.EmployeeCreateRequest;
 import com.infina.hissenet.dto.request.EmployeeUpdateRequest;
+import com.infina.hissenet.dto.request.ForgotPasswordRequest;
 import com.infina.hissenet.dto.response.EmployeeResponse;
 import com.infina.hissenet.entity.Employee;
 import com.infina.hissenet.entity.Role;
@@ -115,7 +116,19 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
     }
 
     @Override
+    public Boolean existsByEmail(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findByEmail(username);
+    }
+    public void changePassword(ForgotPasswordRequest request){
+       Employee employee=findByEmail(request.email());
+       if(request.password().equals(request.confirmNewPassword())){
+           employee.setPassword(encoder.encode(request.password()));
+       }
+       save(employee);
     }
 }

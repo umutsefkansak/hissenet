@@ -12,4 +12,5 @@ public interface IStockService {
     List<StockResponse> getAllStocks();
     StockResponse updateStock(Long id, StockUpdateRequest request);
     void deleteStock(Long id);
+    boolean existsByTicker(String ticker);
 }

@@ -2,6 +2,7 @@ package com.infina.hissenet.service.abstracts;
 
 import java.util.List;
 
+import com.infina.hissenet.dto.request.ForgotPasswordRequest;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.infina.hissenet.dto.request.EmployeeCreateRequest;
@@ -69,5 +70,9 @@ public interface IEmployeeService extends UserDetailsService {
      * @return employee entity with roles loaded
      */
     Employee findByEmailWithRoles(String email);
+
+    Boolean existsByEmail(String email);
+
+    void changePassword(ForgotPasswordRequest request);
    
 }

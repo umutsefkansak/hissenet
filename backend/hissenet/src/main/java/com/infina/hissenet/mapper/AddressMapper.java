@@ -81,7 +81,8 @@ public interface AddressMapper {
                     individual.getMotherName(),
                     individual.getFatherName(),
                     individual.getProfession(),
-                    individual.getEducationLevel()
+                    individual.getEducationLevel(),
+                    individual.getRiskProfile()
             );
         }
 

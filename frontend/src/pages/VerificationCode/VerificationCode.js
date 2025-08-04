@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { verifyCode, sendVerificationCode } from '../server/api';
 import './VerificationCode.css';
 
 const VerificationCode = () => {
@@ -11,7 +12,7 @@ const VerificationCode = () => {
   const [showWarning, setShowWarning] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
-  const email = location.state?.email || 'akkoksinan@gmail.com';
+  const email = location.state?.email || 'ornek@gmail.com';
 
   useEffect(() => {
     if (attempts > 0) {
@@ -24,26 +25,61 @@ const VerificationCode = () => {
     setLoading(true);
     setError('');
 
-    // Simüle edilmiş API çağrısı
-    setTimeout(() => {
-      if (code === '123456') {
-        // Başarılı - yeni şifre sayfasına yönlendir
+    if (!code || code.length !== 6) {
+      setError('6 haneli doğrulama kodunu giriniz.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await verifyCode(email, code);
+      
+      if (result.success && result.data?.data?.success) {
+        // Kod doğrulandı - yeni şifre sayfasına yönlendir
         window.showToast('Kod doğrulandı!', 'success', 2000);
         navigate('/new-password', { state: { email } });
       } else {
         setAttempts(attempts + 1);
-        setError('Doğrulama kodunu yanlış girdiniz');
+        const remainingAttempts = result.data?.data?.remainingAttempts || 0;
+        const isBlocked = result.data?.data?.blocked || false;
+        
+        if (isBlocked) {
+          setError('Çok fazla hatalı deneme yaptınız. Lütfen daha sonra tekrar deneyin.');
+        } else if (remainingAttempts === 0) {
+          setError('3 hatalı deneme yaptınız. Şifre sıfırlama işlemi engellendi.');
+        } else {
+          setError(`Doğrulama kodunu yanlış girdiniz. Kalan deneme: ${remainingAttempts}`);
+        }
       }
+    } catch (error) {
+      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleResendCode = () => {
+  const handleResendCode = async () => {
     setLoading(true);
-    setTimeout(() => {
-      window.showToast('Yeni kod gönderildi!', 'success', 2000);
+    setError('');
+    
+    try {
+      const result = await sendVerificationCode(email);
+      
+      if (result.success) {
+        window.showToast('Yeni kod gönderildi!', 'success', 2000);
+        setAttempts(0); // Deneme sayısını sıfırla
+             } else {
+         // API error response'u string'e çevir
+         const errorMessage = typeof result.error === 'object' 
+           ? result.error.message || result.error.detail || 'Kod gönderilemedi.'
+           : result.error || 'Kod gönderilemedi.';
+         setError(errorMessage);
+       }
+    } catch (error) {
+      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -82,8 +118,12 @@ const VerificationCode = () => {
             </div>
           )}
 
-          <button type="submit" className="verify-button" disabled={loading}>
-            {loading ? 'Doğrulanıyor...' : 'Kodu Doğrula'}
+          <button 
+            type="submit" 
+            className="verify-button" 
+            disabled={loading || attempts >= 3}
+          >
+            {loading ? 'Doğrulanıyor...' : attempts >= 3 ? 'Engellendi' : 'Kodu Doğrula'}
           </button>
 
           <button 

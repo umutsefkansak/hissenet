@@ -2,6 +2,7 @@ package com.infina.hissenet.dto.request;
 
 
 import com.infina.hissenet.entity.enums.Gender;
+import com.infina.hissenet.entity.enums.RiskProfile;
 import com.infina.hissenet.validation.UniqueValue;
 import com.infina.hissenet.validation.UniqueValueType;
 import jakarta.validation.constraints.Email;
@@ -24,5 +25,6 @@ public record IndividualCustomerUpdateDto(
         String motherName,
         String fatherName,
         String profession,
-        String educationLevel
+        String educationLevel,
+        RiskProfile riskProfile
 ) {}

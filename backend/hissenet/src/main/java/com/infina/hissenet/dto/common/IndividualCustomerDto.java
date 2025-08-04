@@ -1,5 +1,7 @@
 package com.infina.hissenet.dto.common;
 
+import com.infina.hissenet.entity.enums.RiskProfile;
+
 import java.time.LocalDate;
 
 public record IndividualCustomerDto(
@@ -20,5 +22,6 @@ public record IndividualCustomerDto(
         String motherName,
         String fatherName,
         String profession,
-        String educationLevel
+        String educationLevel,
+        RiskProfile riskProfile
 ) implements CustomerDto {}

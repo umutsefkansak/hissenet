@@ -57,6 +57,11 @@ public class StockService extends GenericServiceImpl<Stock, Long> implements ISt
         return stockMapper.toResponse(updated);
     }
 
+    public boolean existsByTicker(String ticker) {
+        return stockRepository.existsByTicker(ticker);
+    }
+
+
     @Transactional
     public void deleteStock(Long id) {
         if (!stockRepository.existsById(id)) {

@@ -12,11 +12,13 @@
   border-radius: 16px; 
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); 
   width: 90%;
-  max-width: 600px; 
+  max-width: 1000px; 
+  max-height: 96vh; /* Ekran yüksekliğinin %90'ı */
   min-height: 150px; 
   overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Dikey düzen */
 }
-
 
 .modal-header {
   display: flex;
@@ -25,6 +27,7 @@
   padding: 30px 32px; 
   border-bottom: 1px solid #e0e0e0;
   background: #f8f9fa;
+  flex-shrink: 0; /* Header'ın küçülmesini engelle */
 }
 
 .tab-buttons {
@@ -73,12 +76,26 @@
   background: #f0f0f0;
 }
 
-
 .modal-content {
   padding: 40px 32px; 
-  min-height: 500px; 
+  flex: 1; /* Kalan alanı kapla */
+  overflow-y: auto; /* İçerik fazlaysa scroll */
+  display: flex;
+  flex-direction: column;
 }
 
+/* Form container */
+.modal-content form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Önemli: flex item'ın scroll çalışması için */
+}
+
+/* Form içeriği */
+.modal-content form > div:not(:last-child) {
+  flex: 1;
+}
 
 .balance-info {
   margin-bottom: 32px; 
@@ -123,7 +140,6 @@
   font-size: 20px; 
 }
 
-
 .form-section {
   margin-bottom: 28px; 
 }
@@ -165,7 +181,6 @@
   color: #666;
 }
 
-
 .checkbox-group {
   display: flex;
   align-items: center;
@@ -185,7 +200,6 @@
   color: #333;
   cursor: pointer;
 }
-
 
 .info-section {
   margin-bottom: 28px; 
@@ -213,7 +227,6 @@
   margin-bottom: 8px; 
 }
 
-
 .message {
   padding: 16px 20px; 
   border-radius: 8px; 
@@ -235,7 +248,6 @@
   border: 1px solid #f5c6cb;
 }
 
-
 .confirm-button {
   width: 100%;
   padding: 18px 32px; 
@@ -248,6 +260,10 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 20px; 
+  flex-shrink: 0; /* Butonun küçülmesini engelle */
+  position: sticky; /* Buton her zaman görünür kalsın */
+  bottom: 0;
+  z-index: 10;
 }
 
 .confirm-button:hover:not(:disabled) {
@@ -257,4 +273,26 @@
 .confirm-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Responsive ayarlar */
+@media (max-height: 800px) {
+  .wallet-modal {
+    max-height: 95vh;
+  }
+  
+  .modal-content {
+    padding: 20px 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wallet-modal {
+    max-height: 100vh;
+    width: 95%;
+  }
+  
+  .modal-content {
+    padding: 20px 24px;
+  }
 }

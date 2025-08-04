@@ -4,7 +4,9 @@ import com.infina.hissenet.constants.MailConstants;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.*;
 import com.infina.hissenet.exception.mail.MailException;
+import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.service.abstracts.IEmailTemplateService;
+import com.infina.hissenet.service.abstracts.IEmployeeService;
 import com.infina.hissenet.service.abstracts.IMailService;
 import com.infina.hissenet.service.abstracts.IVerificationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +21,15 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class MailService implements IMailService {
 
     private static final Logger logger = LoggerFactory.getLogger(MailService.class);
+
+    private final IEmployeeService employeeService;
+
 
     private final JavaMailSender mailSender;
     private final IEmailTemplateService emailTemplateService;
@@ -44,9 +50,10 @@ public class MailService implements IMailService {
     @Value("${mail.company.name}")
     private String companyName;
 
-    public MailService(JavaMailSender mailSender,
+    public MailService(IEmployeeService employeeService, JavaMailSender mailSender,
                        IEmailTemplateService emailTemplateService,
                        IVerificationService verificationService) {
+        this.employeeService = employeeService;
         this.mailSender = mailSender;
         this.emailTemplateService = emailTemplateService;
         this.verificationService = verificationService;
@@ -110,6 +117,46 @@ public class MailService implements IMailService {
         }
     }
 
+    /*@Override
+    public CodeSendResponse sendPasswordResetCode(CodeSendRequest request) {
+        int maxAttempts = request.maxAttempts() != null ? request.maxAttempts() : defaultMaxAttempts;
+        int expiryMinutes = request.expiryMinutes() != null ? request.expiryMinutes() : defaultExpiryMinutes;
+
+        if(employeeService.existsByEmail(request.email())){
+            return sendVerificationCode(request);
+        }
+        return CodeSendResponse.success(
+                MailConstants.Messages.VERIFICATION_CODE_SENT,
+                maxAttempts,
+                expiryMinutes
+        );
+    }
+
+    */
+
+    @Override
+    public CodeSendResponse sendPasswordResetCode(CodeSendRequest request) {
+        int maxAttempts = request.maxAttempts() != null ? request.maxAttempts() : defaultMaxAttempts;
+        int expiryMinutes = request.expiryMinutes() != null ? request.expiryMinutes() : defaultExpiryMinutes;
+
+        // Async processing was used to prevent timing attacks - consistent response time regardless of email existence
+        CompletableFuture.runAsync(() -> {
+            if (employeeService.existsByEmail(request.email())) {
+                try {
+                    sendVerificationCode(request);
+                } catch (Exception e) {
+                    logger.error("Error sending password reset code to: {}", request.email(), e);
+                }
+            }
+        });
+
+        return CodeSendResponse.success(
+                MailConstants.Messages.VERIFICATION_CODE_SENT,
+                maxAttempts,
+                expiryMinutes
+        );
+    }
+
     @Override
     public CodeVerifyResponse verifyCode(CodeVerifyRequest request, HttpServletRequest httpRequest) {
         return verificationService.verifyCode(request, httpRequest);
@@ -138,6 +185,9 @@ public class MailService implements IMailService {
     public boolean isEmailLimitExceeded(String email) {
         return verificationService.isEmailLimitExceeded(email);
     }
+
+
+
 
 
     private MimeMessage createMimeMessage(String to, String subject, String content, String recipientName)

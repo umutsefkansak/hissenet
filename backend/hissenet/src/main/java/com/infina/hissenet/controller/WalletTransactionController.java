@@ -62,6 +62,11 @@ public class WalletTransactionController implements WalletTransactionControllerD
         walletTransactionService.cancelTransaction(transactionId);
         return ApiResponse.ok("Transaction canceled successfully");
     }
+    @DeleteMapping("{transactionId}")
+    public ApiResponse<String> deleteTransactionById(@PathVariable Long transactionId){
+        walletTransactionService.deleteById(transactionId);
+        return ApiResponse.ok("Transaction deleted successfully");
+    }
 
 
 

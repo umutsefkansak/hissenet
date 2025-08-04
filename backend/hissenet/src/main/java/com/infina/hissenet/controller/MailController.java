@@ -31,8 +31,15 @@ public class MailController implements MailControllerDoc {
     }
 
     @PostMapping("/send-verification")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ApiResponse<CodeSendResponse> sendVerificationCode(@Valid @RequestBody CodeSendRequest request) {
         CodeSendResponse response = mailService.sendVerificationCode(request);
+        return ApiResponse.ok("Verification code sent", response);
+    }
+
+    @PostMapping("/send-password-reset")
+    public ApiResponse<CodeSendResponse> sendPasswordResetCode(@Valid @RequestBody CodeSendRequest request) {
+        CodeSendResponse response = mailService.sendPasswordResetCode(request);
         return ApiResponse.ok("Verification code sent", response);
     }
 

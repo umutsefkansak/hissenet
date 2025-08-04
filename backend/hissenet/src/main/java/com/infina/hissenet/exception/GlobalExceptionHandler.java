@@ -11,6 +11,9 @@ import com.infina.hissenet.exception.mail.MailException;
 import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
 import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
+import com.infina.hissenet.exception.riskassessment.IncompleteAssessmentException;
+import com.infina.hissenet.exception.riskassessment.InvalidAnswerException;
+import com.infina.hissenet.exception.riskassessment.RiskAssessmentException;
 import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledException;
@@ -117,6 +120,20 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
         problem.setTitle("Mail Processing Error");
         problem.setType(URI.create("https://www.hissenet.com/errors/mail-processing"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
+
+    // 422 - Unprocessable Entity (Risk Assessment için)
+    @ExceptionHandler({
+            RiskAssessmentException.class,
+            InvalidAnswerException.class,
+            IncompleteAssessmentException.class
+    })
+    public ProblemDetail handleRiskAssessmentException(RiskAssessmentException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        problem.setTitle("Risk Assessment Error");
+        problem.setType(URI.create("https://www.hissenet.com/errors/risk-assessment"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }

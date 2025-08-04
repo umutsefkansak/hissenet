@@ -2,15 +2,10 @@ package com.infina.hissenet.controller;
 
 import java.util.List;
 
+import com.infina.hissenet.dto.request.ForgotPasswordRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.controller.doc.EmployeeControllerDoc;
@@ -19,7 +14,6 @@ import com.infina.hissenet.dto.request.EmployeeUpdateRequest;
 import com.infina.hissenet.dto.response.EmployeeResponse;
 import com.infina.hissenet.service.abstracts.IEmployeeService;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController
@@ -59,6 +53,11 @@ public class EmployeeController implements EmployeeControllerDoc {
 	public ApiResponse<Void> deleteEmployee(@PathVariable Long id) {
 		service.deleteEmployee(id);
 		return ApiResponse.ok("Employee deleted successfully");
+	}
+	@PatchMapping("/changePassword")
+	public ApiResponse<Void> changePassword(@Valid @RequestBody ForgotPasswordRequest request){
+		service.changePassword(request);
+		return ApiResponse.ok("Password changed successfully");
 	}
 
 }

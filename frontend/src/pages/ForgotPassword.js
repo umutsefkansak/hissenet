@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { sendVerificationCode } from '../server/api';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -13,17 +14,30 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
 
-    // Simüle edilmiş API çağrısı
-    setTimeout(() => {
-      if (email && email.includes('@')) {
-        // Başarılı - doğrulama kodu sayfasına yönlendir
+    if (!email || !email.includes('@')) {
+      setError('Geçerli bir e-posta adresi giriniz.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await sendVerificationCode(email);
+      
+      if (result.success) {
         window.showToast('Doğrulama kodu gönderildi!', 'success', 2000);
         navigate('/verification-code', { state: { email } });
       } else {
-        setError('Geçerli bir e-posta adresi giriniz.');
+        // API error response'u string'e çevir
+        const errorMessage = typeof result.error === 'object' 
+          ? result.error.message || result.error.detail || 'Doğrulama kodu gönderilemedi.'
+          : result.error || 'Doğrulama kodu gönderilemedi.';
+        setError(errorMessage);
       }
+    } catch (error) {
+      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (

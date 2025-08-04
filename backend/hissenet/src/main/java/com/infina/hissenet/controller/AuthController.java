@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.AuthControllerDoc;
 import com.infina.hissenet.dto.request.LoginRequest;
 import com.infina.hissenet.dto.response.AuthResponse;
 import com.infina.hissenet.service.AuthService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/auth")
-public class AuthController {
+public class AuthController implements AuthControllerDoc {
     private final AuthService authService;
 
 
@@ -35,7 +36,7 @@ public class AuthController {
      * @return Giriş sonucu ve token bilgisini içeren HTTP yanıtı.
      */
     @PostMapping("/login")
-    ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         ResponseCookie cookie = ResponseCookie.from("sessionId", response.sessionId()).path("/").maxAge(response.time())
                 .httpOnly(true).build();

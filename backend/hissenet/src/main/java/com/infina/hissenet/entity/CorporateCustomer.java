@@ -3,6 +3,7 @@ package com.infina.hissenet.entity;
 
 import com.infina.hissenet.entity.enums.CustomerType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -34,6 +35,18 @@ public class CorporateCustomer extends Customer {
 
     @Column(name = "authorized_person_title", length = 50)
     private String authorizedPersonTitle;
+
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$")
+    @Column(name = "authorized_person_phone", length = 20)
+    private String authorizedPersonPhone;
+
+    @Pattern(regexp = "^[1-9][0-9]{10}$")
+    @Column(name = "authorized_person_tc_number", length = 11)
+    private String authorizedPersonTcNumber;
+
+    @Email
+    @Column(name = "authorized_person_email", length = 100)
+    private String authorizedPersonEmail;
 
     @Column(name = "website", length = 200)
     private String website;
@@ -104,5 +117,29 @@ public class CorporateCustomer extends Customer {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public String getAuthorizedPersonPhone() {
+        return authorizedPersonPhone;
+    }
+
+    public void setAuthorizedPersonPhone(String authorizedPersonPhone) {
+        this.authorizedPersonPhone = authorizedPersonPhone;
+    }
+
+    public String getAuthorizedPersonTcNumber() {
+        return authorizedPersonTcNumber;
+    }
+
+    public void setAuthorizedPersonTcNumber(String authorizedPersonTcNumber) {
+        this.authorizedPersonTcNumber = authorizedPersonTcNumber;
+    }
+
+    public String getAuthorizedPersonEmail() {
+        return authorizedPersonEmail;
+    }
+
+    public void setAuthorizedPersonEmail(String authorizedPersonEmail) {
+        this.authorizedPersonEmail = authorizedPersonEmail;
     }
 }

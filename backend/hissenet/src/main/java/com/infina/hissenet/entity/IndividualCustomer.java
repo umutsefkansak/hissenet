@@ -4,6 +4,7 @@ package com.infina.hissenet.entity;
 import com.infina.hissenet.entity.enums.CustomerType;
 import com.infina.hissenet.entity.enums.Gender;
 import com.infina.hissenet.validation.MinAge;
+import com.infina.hissenet.entity.enums.IncomeRange;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -52,6 +53,10 @@ public class IndividualCustomer extends Customer {
 
     @Column(name = "education_level", length = 50)
     private String educationLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "income_range")
+    private IncomeRange incomeRange;
 
     public IndividualCustomer() {
     }
@@ -142,5 +147,13 @@ public class IndividualCustomer extends Customer {
 
     public void setEducationLevel(String educationLevel) {
         this.educationLevel = educationLevel;
+    }
+
+    public IncomeRange getIncomeRange() {
+        return incomeRange;
+    }
+
+    public void setIncomeRange(IncomeRange incomeRange) {
+        this.incomeRange = incomeRange;
     }
 }

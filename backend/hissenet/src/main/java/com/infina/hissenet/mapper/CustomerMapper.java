@@ -21,6 +21,7 @@ public interface CustomerMapper {
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "nationality", defaultValue = "TR")
     @Mapping(target = "riskProfile", source = "riskProfile")
+    @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
     IndividualCustomer toEntity(IndividualCustomerCreateDto createDto);
 
     @Mapping(target = "id", ignore = true)
@@ -32,6 +33,7 @@ public interface CustomerMapper {
     @Mapping(target = "riskProfile", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "nationality", defaultValue = "TR")
+    @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
     CorporateCustomer toEntity(CorporateCustomerCreateDto createDto);
 
     default CustomerDto toDto(Customer customer) {
@@ -62,7 +64,10 @@ public interface CustomerMapper {
                     individual.getFatherName(),
                     individual.getProfession(),
                     individual.getEducationLevel(),
-                    realCustomer.getRiskProfile()
+                    realCustomer.getRiskProfile(),
+                    realCustomer.getCommissionRate(),
+                    individual.getIncomeRange()
+
             );
         }
 
@@ -82,7 +87,12 @@ public interface CustomerMapper {
                     corporate.getSector(),
                     corporate.getAuthorizedPersonName(),
                     corporate.getAuthorizedPersonTitle(),
-                    corporate.getWebsite()
+                    corporate.getWebsite(),
+                    realCustomer.getCommissionRate(),
+                    corporate.getAuthorizedPersonPhone(),
+                    corporate.getAuthorizedPersonTcNumber(),
+                    corporate.getAuthorizedPersonEmail()
+
             );
         }
 
@@ -95,6 +105,7 @@ public interface CustomerMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
+    @Mapping(target = "commissionRate", source = "commissionRate")
     void updateIndividualCustomerFromDto(IndividualCustomerUpdateDto updateDto, @MappingTarget IndividualCustomer customer);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -103,5 +114,6 @@ public interface CustomerMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
+    @Mapping(target = "commissionRate", source = "commissionRate")
     void updateCorporateCustomerFromDto(CorporateCustomerUpdateDto updateDto, @MappingTarget CorporateCustomer customer);
 }

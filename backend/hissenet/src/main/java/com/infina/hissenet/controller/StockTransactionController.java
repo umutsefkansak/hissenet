@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.StockTransactionControllerDoc;
 import com.infina.hissenet.dto.request.StockTransactionCreateRequest;
 import com.infina.hissenet.dto.response.StockTransactionResponse;
 import com.infina.hissenet.service.StockTransactionService;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stock-transactions")
-public class StockTransactionController {
+public class StockTransactionController implements StockTransactionControllerDoc {
     private final StockTransactionService stockTransactionService;
 
     public StockTransactionController(StockTransactionService stockTransactionService) {

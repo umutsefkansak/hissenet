@@ -22,24 +22,25 @@ public class Stock extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", length = 3, nullable = false)
-    private Currency currency;
+    private Currency currency = Currency.TRY;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "exchange", length = 10, nullable = false)
-    private Exchange exchange;
+    private Exchange exchange = Exchange.BIST;
 
     @Column(name = "lot_size")
     private Integer lotSize;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
-    @OneToOne(mappedBy = "stock", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private StockPrice currentPrice;
 
-    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockHistory> history;
+    //@OneToOne(mappedBy = "stock", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    //private StockPrice currentPrice;
+
+    //@OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private List<StockHistory> history;
 
     public String getTicker() {
         return ticker;
@@ -89,33 +90,33 @@ public class Stock extends BaseEntity {
         this.status = status;
     }
 
-    public StockPrice getCurrentPrice() {
-        return currentPrice;
-    }
-
-    public void setCurrentPrice(StockPrice currentPrice) {
-        if (this.currentPrice != null) {
-            this.currentPrice.setStock(null);
-        }
-        this.currentPrice = currentPrice;
-        if (currentPrice != null) {
-            currentPrice.setStock(this);
-        }
-    }
-
-    public List<StockHistory> getHistory() {
-        return history;
-    }
-
-    public void setHistory(List<StockHistory> history) {
-        this.history = history;
-    }
-    public void addHistory(StockHistory h) {
-        history.add(h);
-        h.setStock(this);
-    }
-    public void removeHistory(StockHistory h) {
-        history.remove(h);
-        h.setStock(null);
-    }
+//    public StockPrice getCurrentPrice() {
+//        return currentPrice;
+//    }
+//
+//    public void setCurrentPrice(StockPrice currentPrice) {
+//        if (this.currentPrice != null) {
+//            this.currentPrice.setStock(null);
+//        }
+//        this.currentPrice = currentPrice;
+//        if (currentPrice != null) {
+//            currentPrice.setStock(this);
+//        }
+//    }
+//
+//    public List<StockHistory> getHistory() {
+//        return history;
+//    }
+//
+//    public void setHistory(List<StockHistory> history) {
+//        this.history = history;
+//    }
+//    public void addHistory(StockHistory h) {
+//        history.add(h);
+//        h.setStock(this);
+//    }
+//    public void removeHistory(StockHistory h) {
+//        history.remove(h);
+//        h.setStock(null);
+//    }
 }

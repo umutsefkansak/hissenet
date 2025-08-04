@@ -6,6 +6,8 @@ import com.infina.hissenet.dto.request.StockUpdateRequest;
 import com.infina.hissenet.dto.response.StockResponse;
 import com.infina.hissenet.service.abstracts.IStockService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +23,10 @@ public class StockController {
     }
 
     @PostMapping
-    public ApiResponse<StockResponse> createStock(@Valid @RequestBody StockCreateRequest request) {
+    public ResponseEntity<ApiResponse<StockResponse>> createStock(@Valid @RequestBody StockCreateRequest request) {
         StockResponse response = stockService.createStock(request);
-        return ApiResponse.created("Stock created successfully", response);
+        ApiResponse<StockResponse> apiResponse = ApiResponse.created("Stock created successfully", response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
     @GetMapping("/{id}")

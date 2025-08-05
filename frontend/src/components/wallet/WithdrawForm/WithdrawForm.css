@@ -2,6 +2,50 @@
  margin-bottom: 20px;
 }
 
+.balance-info {
+ background: #f8f9fa;
+ border-radius: 8px;
+ padding: 16px;
+ border: 1px solid #e9ecef;
+ margin-bottom: 20px;
+}
+
+.balance-item {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding: 8px 0;
+ border-bottom: 1px solid #e9ecef;
+}
+
+.balance-item:last-child {
+ border-bottom: none;
+}
+
+.balance-item label {
+ font-weight: 500;
+ color: #495057;
+ font-size: 14px;
+}
+
+.total-balance {
+ font-weight: 600;
+ color: #28a745;
+ font-size: 16px;
+}
+
+.blocked-balance {
+ font-weight: 600;
+ color: #dc3545;
+ font-size: 16px;
+}
+
+.available-balance {
+ font-weight: 600;
+ color: #007bff;
+ font-size: 16px;
+}
+
 .form-section {
  margin-bottom: 28px;
 }
@@ -43,22 +87,15 @@
  color: #666;
 }
 
-.checkbox-group {
- display: flex;
- align-items: center;
- gap: 12px;
- margin-top: 16px;
-}
-
-.checkbox-group input[type="checkbox"] {
- width: 20px;
- height: 20px;
- margin: 0;
-}
-
-.checkbox-group label {
- margin: 0;
- font-size: 16px;
- color: #333;
- cursor: pointer;
+/* Responsive */
+@media (max-width: 768px) {
+ .balance-item {
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 4px;
+ }
+ 
+ .balance-item span {
+   font-size: 14px;
+ }
 }

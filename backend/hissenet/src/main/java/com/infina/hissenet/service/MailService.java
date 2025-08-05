@@ -17,11 +17,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MailService implements IMailService {
@@ -29,11 +32,10 @@ public class MailService implements IMailService {
     private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
     private final IEmployeeService employeeService;
-
-
     private final JavaMailSender mailSender;
     private final IEmailTemplateService emailTemplateService;
     private final IVerificationService verificationService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${mail.from.email}")
     private String fromEmail;
@@ -52,11 +54,13 @@ public class MailService implements IMailService {
 
     public MailService(IEmployeeService employeeService, JavaMailSender mailSender,
                        IEmailTemplateService emailTemplateService,
-                       IVerificationService verificationService) {
+                       IVerificationService verificationService,
+                       RedisTemplate<String, String> redisTemplate) {
         this.employeeService = employeeService;
         this.mailSender = mailSender;
         this.emailTemplateService = emailTemplateService;
         this.verificationService = verificationService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Async
@@ -186,6 +190,64 @@ public class MailService implements IMailService {
         return verificationService.isEmailLimitExceeded(email);
     }
 
+    @Override
+    public PasswordChangeTokenResponse sendPasswordChangeToken(PasswordChangeTokenRequest request) {
+        try {
+
+            String token = UUID.randomUUID().toString();
+            
+
+            String redisKey = "password_change_token:" + token;
+            redisTemplate.opsForValue().set(redisKey, request.email(), 10, TimeUnit.MINUTES);
+            
+
+            String passwordChangeUrl = "http://localhost:3000/new-password?token=" + token;
+            
+
+            String subject = String.format(MailConstants.Subjects.PASSWORD_RESET_FORMAT, companyName);
+            String content = createPasswordChangeContent(request.email(), passwordChangeUrl);
+            
+
+            MimeMessage message = createMimeMessage(request.email(), subject, content, request.email());
+            mailSender.send(message);
+            
+            logger.info("Password change token sent: {} -> {} (Token: {})", 
+                    fromEmail, request.email(), token);
+            
+            return PasswordChangeTokenResponse.success(
+                    MailConstants.Messages.PASSWORD_CHANGE_TOKEN_SENT
+            );
+            
+        } catch (Exception e) {
+            logger.error("Error sending password change token: {} -> {}", fromEmail, request.email(), e);
+            throw new MailException(MailConstants.Messages.PASSWORD_CHANGE_TOKEN_SEND_ERROR + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request) {
+        try {
+            String redisKey = "password_change_token:" + request.token();
+            String email = redisTemplate.opsForValue().get(redisKey);
+            
+            if (email == null) {
+                logger.warn("Invalid or expired password change token: {}", request.token());
+                return VerifyPasswordChangeTokenResponse.failure(MailConstants.Messages.INVALID_PASSWORD_CHANGE_TOKEN);
+            }
+            
+
+            logger.info("Password change token verified successfully: {}", request.token());
+            return VerifyPasswordChangeTokenResponse.success(
+                    MailConstants.Messages.PASSWORD_CHANGE_TOKEN_VALID,
+                    email
+            );
+            
+        } catch (Exception e) {
+            logger.error("Error verifying password change token: {}", request.token(), e);
+            throw new MailException(MailConstants.Messages.PASSWORD_CHANGE_TOKEN_VERIFY_ERROR + e.getMessage(), e);
+        }
+    }
+
 
 
 
@@ -224,6 +286,10 @@ public class MailService implements IMailService {
 
     private String createNotificationContent(String recipientName, String message) {
         return emailTemplateService.renderNotificationTemplate(recipientName, message);
+    }
+
+    private String createPasswordChangeContent(String email, String passwordChangeUrl) {
+        return emailTemplateService.renderPasswordChangeTemplate(email, passwordChangeUrl);
     }
 
 }

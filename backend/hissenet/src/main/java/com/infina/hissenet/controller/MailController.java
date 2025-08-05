@@ -69,4 +69,16 @@ public class MailController implements MailControllerDoc {
         verificationService.clearVerificationCode(email);
         return ApiResponse.ok("Verification code cleared for: " + email);
     }
+
+    @PostMapping("/send-password-change-token")
+    public ApiResponse<PasswordChangeTokenResponse> sendPasswordChangeToken(@Valid @RequestBody PasswordChangeTokenRequest request) {
+        PasswordChangeTokenResponse response = mailService.sendPasswordChangeToken(request);
+        return ApiResponse.ok("Password change token sent", response);
+    }
+
+    @PostMapping("/verify-password-change-token")
+    public ApiResponse<VerifyPasswordChangeTokenResponse> verifyPasswordChangeToken(@Valid @RequestBody VerifyPasswordChangeTokenRequest request) {
+        VerifyPasswordChangeTokenResponse response = mailService.verifyPasswordChangeToken(request);
+        return ApiResponse.ok("Password change token verification completed", response);
+    }
 }

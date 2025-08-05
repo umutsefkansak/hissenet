@@ -1,14 +1,19 @@
 package com.infina.hissenet.service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.enums.OrderCategory;
@@ -43,6 +48,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.stockCacheService = stockCacheService;
 	}
 
+	@Transactional
 	public OrderResponse createOrder(OrderCreateRequest request) {
 		Customer customer = customerService.findById(request.customerId())
 				.orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
@@ -129,5 +135,60 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	public List<OrderResponse> getAllOrders() {
 		return findAll().stream().map(orderMapper::toResponse).toList();
 	}
+	
+	@Override
+    @Transactional(readOnly = true)
+    public BigDecimal getOwnedStockQuantity(Long customerId, String stockCode) {
+        List<Order> filledOrders = orderRepository
+                .findByCustomerIdAndStockCodeAndStatus(customerId, stockCode, OrderStatus.FILLED);
+
+        BigDecimal totalBuy = BigDecimal.ZERO;
+        BigDecimal totalSell = BigDecimal.ZERO;
+
+        for (Order order : filledOrders) {
+            if (order.getType() == OrderType.BUY) {
+                totalBuy = totalBuy.add(order.getQuantity());
+            } else if (order.getType() == OrderType.SELL) {
+                totalSell = totalSell.add(order.getQuantity());
+            }
+        }
+
+        return totalBuy.subtract(totalSell);
+    }
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<PortfolioStockQuantityResponse> getPortfolioByCustomerId(Long customerId) {
+	    List<Order> filledOrders = orderRepository.findByCustomerIdAndStatus(customerId, OrderStatus.FILLED);
+
+	    Map<String, BigDecimal> portfolioMap = new HashMap<>();
+
+	    for (Order order : filledOrders) {
+	        String stockCode = order.getStockCode();
+	        BigDecimal quantity = order.getQuantity();
+
+	        if (order.getType() == OrderType.BUY) {
+	            portfolioMap.merge(stockCode, quantity, BigDecimal::add);
+	        } else if (order.getType() == OrderType.SELL) {
+	            portfolioMap.merge(stockCode, quantity.negate(), BigDecimal::add);
+	        }
+	    }
+
+	    return portfolioMap.entrySet().stream()
+	            .filter(entry -> entry.getValue().compareTo(BigDecimal.ZERO) > 0) 
+	            .map(entry -> new PortfolioStockQuantityResponse(entry.getKey(), entry.getValue()))
+	            .collect(Collectors.toList());
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrderResponse> getOrdersByCustomerId(Long customerId) {
+	    List<Order> orders = orderRepository.findByCustomerId(customerId);
+
+	    return orders.stream()
+	            .map(order -> orderMapper.toResponse(order))
+	            .collect(Collectors.toList());
+	}
+
 
 }

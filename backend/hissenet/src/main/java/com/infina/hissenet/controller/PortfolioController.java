@@ -1,6 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
+import com.infina.hissenet.controller.doc.PortfolioControllerDoc;
 import com.infina.hissenet.dto.request.PortfolioCreateRequest;
 import com.infina.hissenet.dto.request.PortfolioUpdateRequest;
 import com.infina.hissenet.dto.response.PortfolioResponse;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/portfolio")
-public class PortfolioController {
+public class PortfolioController implements PortfolioControllerDoc {
     private final PortfolioService service;
 
     public PortfolioController(PortfolioService portfolioService) {

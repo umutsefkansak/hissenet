@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 public record PortfolioStockQuantityResponse(
 		String stockCode,
-		BigDecimal netQuantity
+		BigDecimal netQuantity,
+		BigDecimal averagePrice
 ) {
 
 }

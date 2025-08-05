@@ -6,6 +6,7 @@ import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
+import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.service.abstracts.IOrderService;
 
 import jakarta.validation.Valid;
@@ -72,4 +73,25 @@ public class OrderController implements OrderControllerDoc {
 				service.getPortfolioByCustomerId(customerId));
 	}
 	
+	@GetMapping("/recent")
+	public ApiResponse<List<RecentOrderResponse>> getLastFiveOrders() {
+	    return ApiResponse.ok("Last 5 filled orders retrieved successfully", service.getLastFiveOrders());
+	}
+	
+	@GetMapping("/filled")
+	public ApiResponse<List<OrderResponse>> getAllFilledOrders() {
+	    return ApiResponse.ok("All FILLED orders retrieved successfully", service.getAllFilledOrders());
+	}
+	
+	@GetMapping("/filled/today")
+	public ApiResponse<List<OrderResponse>> getTodayFilledOrders() {
+	    return ApiResponse.ok("Today's FILLED orders retrieved successfully", service.getTodayFilledOrders());
+	}
+	
+	@GetMapping("/filled/today/volume")
+	public ApiResponse<BigDecimal> getTodayTotalTradeVolume() {
+	    return ApiResponse.ok("Today's total trade volume calculated successfully",
+	            service.getTodayTotalTradeVolume());
+	}
+
 }

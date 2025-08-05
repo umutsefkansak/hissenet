@@ -3,6 +3,8 @@ package com.infina.hissenet.controller.doc;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
+import com.infina.hissenet.dto.response.RecentOrderResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -103,5 +106,99 @@ public interface OrderControllerDoc {
 	    )
 	    com.infina.hissenet.common.ApiResponse<List<OrderResponse>> getAllOrders();
 	    
+	    
+	    @Operation(
+	    	    summary = "Belirli bir müşteriye ait tüm emirleri getirir",
+	    	    responses = {
+	    	        @ApiResponse(responseCode = "200", description = "Müşteriye ait emirler getirildi",
+	    	            content = @Content(schema = @Schema(implementation = OrderResponse.class)))
+	    	    }
+	    	)
+	    	com.infina.hissenet.common.ApiResponse<List<OrderResponse>> getOrdersByCustomerId(
+	    	    @Parameter(description = "Müşteri ID", required = true, example = "101")
+	    	    Long customerId
+	    	);
+
+	    	@Operation(
+	    	    summary = "Belirli bir hisse için müşterinin sahip olduğu net miktarı getirir",
+	    	    responses = {
+	    	        @ApiResponse(responseCode = "200", description = "Net miktar başarıyla hesaplandı",
+	    	            content = @Content(schema = @Schema(implementation = BigDecimal.class)))
+	    	    }
+	    	)
+	    	com.infina.hissenet.common.ApiResponse<BigDecimal> getOwnedStockQuantity(
+	    	    @Parameter(description = "Müşteri ID", required = true, example = "101")
+	    	    Long customerId,
+	    	    @Parameter(description = "Hisse kodu", required = true, example = "THYAO")
+	    	    String stockCode
+	    	);
+
+	    	@Operation(
+	    	    summary = "Müşterinin sahip olduğu tüm hisseleri ve miktarlarını getirir",
+	    	    description = "Sadece 'FILLED' durumundaki işlemler dikkate alınır.",
+	    	    responses = {
+	    	        @ApiResponse(responseCode = "200", description = "Portföy başarıyla getirildi",
+	    	            content = @Content(schema = @Schema(implementation = PortfolioStockQuantityResponse.class)))
+	    	    }
+	    	)
+	    	com.infina.hissenet.common.ApiResponse<List<PortfolioStockQuantityResponse>> getPortfolio(
+	    	    @Parameter(description = "Müşteri ID", required = true, example = "101")
+	    	    Long customerId
+	    	);
+
+	    	@Operation(
+	    	    summary = "Son 5 FILLED emri getirir",
+	    	    description = """
+	    	        Tüm kullanıcılar arasından 'FILLED' durumundaki en son 5 işlem listelenir.
+	    	        Her işlem için sadece hisse kodu, emir tipi (BUY/SELL) ve toplam tutar döndürülür.
+	    	        """,
+	    	    responses = {
+	    	        @ApiResponse(responseCode = "200", description = "Son 5 işlem başarıyla getirildi",
+	    	            content = @Content(schema = @Schema(implementation = RecentOrderResponse.class)))
+	    	    }
+	    	)
+	    	com.infina.hissenet.common.ApiResponse<List<RecentOrderResponse>> getLastFiveOrders();
+	    
+	    	@Operation(
+	    		    summary = "Tüm FILLED durumundaki emirleri getirir",
+	    		    description = "Sistemdeki tüm başarıyla gerçekleşmiş (FILLED) emirleri listeler.",
+	    		    responses = {
+	    		        @ApiResponse(responseCode = "200", description = "Tüm FILLED emirler getirildi",
+	    		            content = @Content(schema = @Schema(implementation = OrderResponse.class)))
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<List<OrderResponse>> getAllFilledOrders();
+
+	    	@Operation(
+	    		    summary = "Bugün oluşturulan FILLED emirleri getirir",
+	    		    description = """
+	    		        Sistem tarihine göre (bugün) oluşturulmuş ve durumu 'FILLED' olan tüm emirleri listeler.
+	    		        Bu endpoint, yalnızca bugünkü işlenmiş (gerçekleşmiş) işlemleri döndürür.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Bugünkü FILLED emirler başarıyla getirildi",
+	    		            content = @Content(schema = @Schema(implementation = OrderResponse.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<List<OrderResponse>> getTodayFilledOrders();
+	    	
+	    	@Operation(
+	    		    summary = "Bugünkü toplam işlem hacmini getirir",
+	    		    description = """
+	    		        Sistem tarihine göre bugün oluşturulmuş ve durumu 'FILLED' olan tüm emirlerin
+	    		        toplam işlem hacmini (totalAmount) hesaplar. Hem alış hem satışlar dahildir.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Toplam işlem hacmi başarıyla hesaplandı",
+	    		            content = @Content(schema = @Schema(implementation = BigDecimal.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<BigDecimal> getTodayTotalTradeVolume();
+
 }
-	

@@ -1,8 +1,8 @@
 package com.infina.hissenet.service;
 
 
-import com.infina.hissenet.dto.request.RoleCreateDto;
-import com.infina.hissenet.dto.request.RoleUpdateDto;
+import com.infina.hissenet.dto.request.RoleCreateRequest;
+import com.infina.hissenet.dto.request.RoleUpdateRequest;
 import com.infina.hissenet.dto.response.RoleResponse;
 import com.infina.hissenet.entity.Role;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
@@ -34,7 +34,7 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
         this.roleMapper = roleMapper;
     }
 
-    public RoleResponse createRole(RoleCreateDto createRoleDto) {
+    public RoleResponse createRole(RoleCreateRequest createRoleDto) {
 
         if (roleRepository.existsByName(createRoleDto.name())) {
             throw new RoleAlreadyExistsException(createRoleDto.name());
@@ -115,7 +115,7 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
                 .toList();
     }
 
-    public RoleResponse updateRole(Long id, RoleUpdateDto updateRoleDto) {
+    public RoleResponse updateRole(Long id, RoleUpdateRequest updateRoleDto) {
         Role existingRole = findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 

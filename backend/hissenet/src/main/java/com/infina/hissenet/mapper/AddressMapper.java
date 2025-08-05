@@ -2,8 +2,8 @@ package com.infina.hissenet.mapper;
 import com.infina.hissenet.dto.common.CorporateCustomerDto;
 import com.infina.hissenet.dto.common.CustomerDto;
 import com.infina.hissenet.dto.common.IndividualCustomerDto;
-import com.infina.hissenet.dto.request.AddressCreateDto;
-import com.infina.hissenet.dto.request.AddressUpdateDto;
+import com.infina.hissenet.dto.request.AddressCreateRequest;
+import com.infina.hissenet.dto.request.AddressUpdateRequest;
 import com.infina.hissenet.dto.response.AddressResponse;
 import com.infina.hissenet.entity.Address;
 import com.infina.hissenet.entity.Customer;
@@ -19,7 +19,7 @@ public interface AddressMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "customer", source = "customerId", qualifiedByName = "mapCustomerReference")
-    Address toEntity(AddressCreateDto createAddressDto);
+    Address toEntity(AddressCreateRequest createAddressDto);
 
     @Mapping(target = "customer", source = "customer", qualifiedByName = "mapCustomerToDto")
     @Mapping(target = "fullAddress", source = ".", qualifiedByName = "getFullAddress")
@@ -30,7 +30,7 @@ public interface AddressMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromDto(AddressUpdateDto updateAddressDto, @MappingTarget Address address);
+    void updateEntityFromDto(AddressUpdateRequest updateAddressDto, @MappingTarget Address address);
 
     @Named("mapCustomerReference")
     default Customer mapCustomerReference(Long customerId) {
@@ -109,7 +109,8 @@ public interface AddressMapper {
                     realCustomer.getCommissionRate(),
                     corporate.getAuthorizedPersonPhone(),
                     corporate.getAuthorizedPersonTcNumber(),
-                    corporate.getAuthorizedPersonEmail()
+                    corporate.getAuthorizedPersonEmail(),
+                    corporate.getTaxOffice()
             );
         }
 

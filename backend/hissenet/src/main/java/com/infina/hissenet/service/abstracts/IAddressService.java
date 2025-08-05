@@ -1,7 +1,7 @@
 package com.infina.hissenet.service.abstracts;
 
-import com.infina.hissenet.dto.request.AddressCreateDto;
-import com.infina.hissenet.dto.request.AddressUpdateDto;
+import com.infina.hissenet.dto.request.AddressCreateRequest;
+import com.infina.hissenet.dto.request.AddressUpdateRequest;
 import com.infina.hissenet.dto.response.AddressResponse;
 import com.infina.hissenet.exception.address.AddressNotFoundException;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for Address entity operations.
@@ -35,7 +34,7 @@ public interface IAddressService {
      * @return the created address response
      * @throws CustomerNotFoundException if the customer does not exist
      */
-    AddressResponse createAddress(AddressCreateDto createAddressDto);
+    AddressResponse createAddress(AddressCreateRequest createAddressDto);
 
     /**
      * Retrieves an address by its unique identifier.
@@ -87,7 +86,7 @@ public interface IAddressService {
      * @throws AddressNotFoundException if the address does not exist
      * @throws CustomerNotFoundException if the new customer does not exist
      */
-    AddressResponse updateAddress(Long id, AddressUpdateDto updateAddressDto);
+    AddressResponse updateAddress(Long id, AddressUpdateRequest updateAddressDto);
 
     /**
      * Deletes an address by its unique identifier.

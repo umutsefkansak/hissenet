@@ -52,7 +52,8 @@ public class WalletTransaction extends BaseEntity {
     @Column(name = "destination")
     private String destination;
 
-    
+    @Column(name = "settlement_date")
+    private LocalDateTime settlementDate;
     public WalletTransaction(){}
 
     public WalletTransaction(Wallet wallet, BigDecimal amount, TransactionType transactionType,
@@ -128,6 +129,14 @@ public class WalletTransaction extends BaseEntity {
 
     public String getSource() {
         return source;
+    }
+
+    public LocalDateTime getSettlementDate() {
+        return settlementDate;
+    }
+
+    public void setSettlementDate(LocalDateTime settlementDate) {
+        this.settlementDate = settlementDate;
     }
 
     public void setSource(String source) {

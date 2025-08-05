@@ -62,6 +62,27 @@ export const mapFormDataToCustomerDto = (formData, riskAssessmentResult) => {
     };
 };
 
+export const mapCorporateFormDataToCustomerDto = (formData) => {
+    return {
+        email: formData.email,
+        phone: formatPhoneForBackend(formData.phoneNumber),
+        nationality: formData.nationality || 'TR',
+        companyName: formData.companyName,
+        taxNumber: formData.taxNumber,
+        tradeRegistryNumber: formData.tradeRegistryNumber || null,
+        establishmentDate: formData.establishmentDate || null,
+        sector: formData.sector || null,
+        authorizedPersonName: formData.authorizedPersonName,
+        website: formData.website || null,
+        commissionRate: formData.commissionRate ? parseFloat(formData.commissionRate) : null,
+        authorizedPersonPhone: formatPhoneForBackend(formData.authorizedPersonPhone),
+        authorizedPersonTcNumber: formData.authorizedPersonTcNumber,
+        authorizedPersonEmail: formData.authorizedPersonEmail,
+        taxOffice: formData.taxOffice
+    };
+};
+
+
 
 const parseFullName = (fullName) => {
     if (!fullName || !fullName.trim()) {
@@ -134,15 +155,15 @@ export const handleCustomerApiError = (error) => {
             }
             return 'Form verilerini kontrol edin';
 
-        case 409: // Conflict errors
+        case 409: 
             if (data.detail) {
                 if (data.detail.includes('email')) {
                     return 'Bu e-posta adresi zaten kullanılıyor';
                 }
-                if (data.detail.includes('tcNumber') || data.detail.includes('TC')) {
+                if (data.detail.includes('ID') || data.detail.includes('TC')) {
                     return 'Bu TC Kimlik No zaten kayıtlı';
                 }
-                if (data.detail.includes('taxNumber')) {
+                if (data.detail.includes('tax number')) {
                     return 'Bu vergi numarası zaten kayıtlı';
                 }
             }

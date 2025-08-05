@@ -82,7 +82,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setSource("EXTERNAL");
             transaction.setDestination("WALLET");
-            transaction.setSettlementDate(LocalDateTime.now().plusDays(2)); // T+2 gün
+            transaction.setSettlementDate(LocalDateTime.now().plusMinutes(1)); // T+2 gün
 
             wallet.addTransaction(transaction);
         } else {
@@ -120,7 +120,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setSource("WALLET");
             transaction.setDestination("EXTERNAL");
-            transaction.setSettlementDate(LocalDateTime.now().plusDays(2)); // T+2 gün
+            transaction.setSettlementDate(LocalDateTime.now().plusMinutes(1)); // T+2 gün
 
             wallet.addTransaction(transaction);
         } else {

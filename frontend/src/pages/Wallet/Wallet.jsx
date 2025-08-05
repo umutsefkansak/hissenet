@@ -19,8 +19,8 @@ const Wallet = () => {
     if (storedCustomerId) {
       setCustomerId(parseInt(storedCustomerId));
     } else {
-      setCustomerId(45);
-      localStorage.setItem('customerId', '45');
+      setCustomerId(68);
+      localStorage.setItem('customerId', '68');
     }
   }, []);
 

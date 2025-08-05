@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class T2SettlementScheduler {
-
     private final WalletService walletService;
 
     public T2SettlementScheduler(WalletService walletService) {
         this.walletService = walletService;
     }
 
-    @Scheduled(cron = "0 0 9 * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void processT2Settlements() {
         walletService.processT2Settlements();
     }

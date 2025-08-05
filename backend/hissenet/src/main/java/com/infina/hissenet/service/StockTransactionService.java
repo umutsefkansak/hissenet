@@ -1,137 +1,121 @@
 package com.infina.hissenet.service;
 
-import com.infina.hissenet.dto.request.StockTransactionCreateRequest;
-import com.infina.hissenet.dto.response.StockTransactionResponse;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
-import com.infina.hissenet.entity.Stock;
 import com.infina.hissenet.entity.StockTransaction;
-import com.infina.hissenet.exception.order.OrderNotFoundException;
-import com.infina.hissenet.exception.stock.StockNotFoundException;
-import com.infina.hissenet.mapper.StockTransactionMapper;
+import com.infina.hissenet.entity.enums.OrderType;
+import com.infina.hissenet.entity.enums.StockTransactionType;
+import com.infina.hissenet.entity.enums.TransactionStatus;
+import com.infina.hissenet.repository.PortfolioRepository;
 import com.infina.hissenet.repository.StockTransactionRepository;
-import com.infina.hissenet.service.abstracts.IStockTransactionService;
+import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
+public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> {
 
     private final StockTransactionRepository stockTransactionRepository;
     private final PortfolioService portfolioService;
-    private final StockService stockService;
-    private final OrderService orderService;
-    private final StockTransactionMapper stockTransactionMapper;
+    private final ICacheManagerService cacheManagerService;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, StockService stockService, OrderService orderService, StockTransactionMapper stockTransactionMapper) {
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, ICacheManagerService cacheManagerService) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
-        this.stockService = stockService;
-        this.orderService = orderService;
-        this.stockTransactionMapper = stockTransactionMapper;
+        this.cacheManagerService = cacheManagerService;
     }
 
-    // order emri üzerine stocktransaction oluşturma
+    // Order oluştuğunda otomatik StockTransaction oluştur
     @Transactional
-    public StockTransactionResponse createTransactionFromOrder(StockTransactionCreateRequest request) {
-        Portfolio portfolio = findPortfolioOrThrow(request.portfolioId());
-        Stock stock = findStockOrThrow(request.stockId());
-        Order order = findOrderOrThrow(request.orderId());
+    public void createTransactionFromOrder(Order order) {
 
-        StockTransaction transaction = stockTransactionMapper.toEntity(request, portfolio, stock, order);
+        Portfolio portfolio = portfolioService.getCustomerFirstPortfolio(order.getCustomer().getId());
 
-        if (transaction.getTransactionDate() == null) {
-            transaction.setTransactionDate(LocalDateTime.now());
+        // StockTransaction oluştur
+        StockTransaction transaction = new StockTransaction();
+        transaction.setPortfolio(portfolio);
+        transaction.setStockCode(order.getStockCode());
+        transaction.setTransactionType(order.getType() == OrderType.BUY?
+                StockTransactionType.BUY : StockTransactionType.SELL);
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setQuantity(order.getQuantity().intValue());
+
+
+
+
+        transaction.setPrice(order.getPrice());
+        transaction.setExecutionPrice(order.getPrice());
+        transaction.setTotalAmount(order.getTotalAmount());
+        System.out.println();
+        // Cache'den anlık fiyatı al
+        BigDecimal currentPrice = cacheManagerService.getCachedByCode(order.getStockCode()).lastPrice();
+
+        transaction.setCurrentPrice(currentPrice);
+        transaction.setOrder(order);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setSettlementDate(LocalDateTime.now().plusDays(2));
+        transaction.setNotes("Order üzerinden oluşturulan işlem");
+
+
+        BigDecimal commissionRate = portfolio.getCustomer().getCommissionRate();
+        if (commissionRate == null) {
+            commissionRate = BigDecimal.valueOf(0.001);
         }
-        if (transaction.getSettlementDate() == null) {
-            transaction.setSettlementDate(LocalDateTime.now().plusDays(2)); // T+2
-        }
+        BigDecimal commission = order.getTotalAmount().multiply(commissionRate);
+        transaction.setCommission(commission);
 
         save(transaction);
-        portfolioService.updatePortfolioValues(portfolio.getId());
-
-        return stockTransactionMapper.toResponse(save(transaction));
+        portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
     }
-    // temmettü işlemi
+
+
     @Transactional
-    public StockTransactionResponse createDividendTransaction(StockTransactionCreateRequest request) {
-        Portfolio portfolio = findPortfolioOrThrow(request.portfolioId());
-        Stock stock = findStockOrThrow(request.stockId());
-
-        StockTransaction transaction = stockTransactionMapper.toEntity(request, portfolio, stock, null);
-
-        if (transaction.getTransactionDate() == null) {
-            transaction.setTransactionDate(LocalDateTime.now());
+    public void updateAllCurrentPrices() {
+        List<StockTransaction> transactions = stockTransactionRepository.findAll();
+        
+        for (StockTransaction transaction : transactions) {
+            try {
+                var cachedStock = cacheManagerService.getCachedByCode(transaction.getStockCode());
+                if (cachedStock != null) {
+                    transaction.setCurrentPrice(cachedStock.lastPrice());
+                    save(transaction);
+                }
+            } catch (Exception e) {
+                System.err.println("Fiyat güncellenemedi: " + transaction.getStockCode() + " - " + e.getMessage());
+            }
         }
-        if (transaction.getSettlementDate() == null) {
-            transaction.setSettlementDate(LocalDateTime.now().plusDays(1)); // Temettü için T+1
+    }
+
+
+    @Transactional
+    public void updateCurrentPriceByStockCode(String stockCode) {
+        List<StockTransaction> transactions = stockTransactionRepository.findByStockCode(stockCode);
+        
+        BigDecimal currentPrice = BigDecimal.ZERO;
+        try {
+            var cachedStock = cacheManagerService.getCachedByCode(stockCode);
+            if (cachedStock != null) {
+                currentPrice = cachedStock.lastPrice();
+            }
+        } catch (Exception e) {
+            System.err.println("Cache'den fiyat alınamadı: " + stockCode + " - " + e.getMessage());
+            return;
         }
-
-        save(transaction);
-        portfolioService.updatePortfolioValues(portfolio.getId());
-
-        return stockTransactionMapper.toResponse(stockTransactionRepository.save(transaction));
-    }
-    
-    // Belirli bir portföye ait tüm işlemleri getirir - Join fetch ile
-    public List<StockTransactionResponse> getTransactionsByPortfolioId(Long portfolioId) {
-        return stockTransactionRepository.findByPortfolioIdWithJoins(portfolioId).stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
-    }
-    
-    // Belirli bir hisseye ait tüm işlemleri getirir - Join fetch ile
-    public List<StockTransactionResponse> getTransactionsByStockId(Long stockId) {
-        return stockTransactionRepository.findByStockIdWithJoins(stockId).stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
-    }
-    
-    // Belirli bir emire ait tüm işlemleri getirir - Join fetch ile
-    public List<StockTransactionResponse> getTransactionsByOrderId(Long orderId) {
-        return stockTransactionRepository.findByOrderIdWithJoins(orderId).stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
-    }
-    
-    // Belirtilen tarih aralığındaki işlemleri getirir - Join fetch ile
-    public List<StockTransactionResponse> getTransactionsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return stockTransactionRepository.findByTransactionDateBetweenWithJoins(startDate, endDate).stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
-    }
-    
-    // Belirli bir işlem türüne göre işlemleri getirir - Join fetch ile
-    public List<StockTransactionResponse> getTransactionsByType(String transactionType) {
-        return stockTransactionRepository.findByTransactionTypeWithJoins(transactionType).stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
+        
+        for (StockTransaction transaction : transactions) {
+            transaction.setCurrentPrice(currentPrice);
+            save(transaction);
+        }
     }
 
-    // Tüm işlemleri join fetch ile getir
-    public List<StockTransactionResponse> getAllTransactionsWithJoins() {
-        return stockTransactionRepository.findAllWithJoins().stream()
-                .map(stockTransactionMapper::toResponse)
-                .toList();
-    }
-
-    private Portfolio findPortfolioOrThrow(Long id) {
-        return portfolioService.getPortfolio(id);
-    }
-    /* Buralarda servise olması lazım hata da servisten dönmesi lazım */
-    private Stock findStockOrThrow(Long id) {
-        return stockService.findById(id)
-                .orElseThrow(() -> new StockNotFoundException(id));
-    }
-
-    private Order findOrderOrThrow(Long id) {
-        return orderService.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
+    public void saveAll(List<StockTransaction> stockTransactions) {
+        stockTransactionRepository.saveAll(stockTransactions);
     }
 }

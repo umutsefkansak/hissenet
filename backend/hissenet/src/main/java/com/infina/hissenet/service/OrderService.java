@@ -41,15 +41,17 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final OrderMapper orderMapper;
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
+	private final StockTransactionService stockTransactionService;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService) {
+			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService, StockTransactionService stockTransactionService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
 		this.orderMapper = orderMapper;
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
+		this.stockTransactionService = stockTransactionService;
 	}
 
 	@Transactional
@@ -102,6 +104,17 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		}
 
 		Order saved = save(order);
+
+		// Eğer order FILLED ise StockTransaction oluştur
+		if (saved.getStatus() == OrderStatus.FILLED) {
+			try {
+				stockTransactionService.createTransactionFromOrder(saved);
+			} catch (Exception e) {
+				// StockTransaction oluşturulamazsa log'la ama order'ı iptal etme
+				System.err.println("StockTransaction oluşturulamadı: " + e.getMessage());
+			}
+		}
+
 		return orderMapper.toResponse(saved);
 	}
 
@@ -230,5 +243,5 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.getTodayTotalVolume(startOfDay, endOfDay);
 	}
-	
+
 }

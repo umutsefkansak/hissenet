@@ -25,7 +25,6 @@ const CustomerDetailPage = () => {
         const balanceResult = await walletApi.getCustomerWalletBalance(id);
         setWalletBalance(balanceResult.data);
         
-        // Müşteri siparişlerini getir
         const ordersResult = await orderApi.getOrdersByCustomerId(id);
         setOrders(ordersResult.data || []);
         
@@ -161,7 +160,7 @@ const CustomerDetailPage = () => {
       </div>
 
       <div className="customer-detail-content">
-        {/* Genel Bilgiler */}
+        
         <div className="info-section">
           <h3>Genel Bilgiler</h3>
           <div className="info-grid">
@@ -254,7 +253,6 @@ const CustomerDetailPage = () => {
         </div>
       </div>
 
-      {/* Alt Butonlar */}
       <div className="action-buttons">
         <button className="btn-primary" onClick={handleUpdateInfo}>
           Bilgileri Güncelle

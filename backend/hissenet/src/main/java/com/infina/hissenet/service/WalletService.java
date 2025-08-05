@@ -13,6 +13,7 @@ import com.infina.hissenet.exception.wallet.*;
 import com.infina.hissenet.mapper.WalletMapper;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.WalletRepository;
+import com.infina.hissenet.repository.WalletTransactionRepository;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -31,11 +33,13 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
     private final CustomerRepository customerRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
 
-    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper,CustomerRepository customerRepository){
+    public WalletService(WalletRepository walletRepository,WalletMapper walletMapper, CustomerRepository customerRepository, WalletTransactionRepository walletTransactionRepository){
         super(walletRepository);
         this.walletRepository=walletRepository;
         this.walletMapper=walletMapper;
+        this.walletTransactionRepository = walletTransactionRepository;
         this.customerRepository=customerRepository;
     }
 
@@ -65,17 +69,37 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     public WalletResponse addBalance(Long customerId, BigDecimal amount, TransactionType transactionType){
         Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
         validateWalletForTransaction(wallet);
-        wallet.addBalance(amount);
-        WalletTransaction transaction = new WalletTransaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setTransactionType(transactionType);
-        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
-        transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setSource("EXTERNAL");
-        transaction.setDestination("WALLET");
 
-        wallet.addTransaction(transaction);
+        if (transactionType == TransactionType.STOCK_SALE) {
+            wallet.addBalance(amount);
+            wallet.blockBalance(amount);
+
+            WalletTransaction transaction = new WalletTransaction();
+            transaction.setWallet(wallet);
+            transaction.setAmount(amount);
+            transaction.setTransactionType(TransactionType.STOCK_SALE);
+            transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setSource("EXTERNAL");
+            transaction.setDestination("WALLET");
+            transaction.setSettlementDate(LocalDateTime.now().plusDays(2)); // T+2 gün
+
+            wallet.addTransaction(transaction);
+        } else {
+            // Normal işlem
+            wallet.addBalance(amount);
+            WalletTransaction transaction = new WalletTransaction();
+            transaction.setWallet(wallet);
+            transaction.setAmount(amount);
+            transaction.setTransactionType(transactionType);
+            transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setSource("EXTERNAL");
+            transaction.setDestination("WALLET");
+
+            wallet.addTransaction(transaction);
+        }
+
         updateTransactionTracking(wallet, amount, true);
         Wallet updateWallet = update(wallet);
         return walletMapper.toResponse(updateWallet);
@@ -85,17 +109,34 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         validateWalletForTransaction(wallet);
         validateSufficientBalance(wallet, amount);
         validateTransactionLimits(wallet, amount);
-        wallet.subtractBalance(amount);
-        WalletTransaction transaction = new WalletTransaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setTransactionType(transactionType);
-        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
-        transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setSource("WALLET");
-        transaction.setDestination("EXTERNAL");
+        if (transactionType == TransactionType.STOCK_PURCHASE) {
+            wallet.blockBalance(amount);
 
-        wallet.addTransaction(transaction);
+            WalletTransaction transaction = new WalletTransaction();
+            transaction.setWallet(wallet);
+            transaction.setAmount(amount);
+            transaction.setTransactionType(TransactionType.STOCK_PURCHASE);
+            transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setSource("WALLET");
+            transaction.setDestination("EXTERNAL");
+            transaction.setSettlementDate(LocalDateTime.now().plusDays(2)); // T+2 gün
+
+            wallet.addTransaction(transaction);
+        } else {
+            // Normal işlem
+            wallet.subtractBalance(amount);
+            WalletTransaction transaction = new WalletTransaction();
+            transaction.setWallet(wallet);
+            transaction.setAmount(amount);
+            transaction.setTransactionType(transactionType);
+            transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setSource("WALLET");
+            transaction.setDestination("EXTERNAL");
+
+            wallet.addTransaction(transaction);
+        }
         updateTransactionTracking(wallet, amount, false);
         Wallet updatedWallet = update(wallet);
         return walletMapper.toResponse(updatedWallet);
@@ -108,6 +149,43 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     public WalletResponse processStockSale(Long customerId, BigDecimal totalAmount, BigDecimal commission){
         BigDecimal netAmount = totalAmount.subtract(commission);
         return addBalance(customerId, netAmount, TransactionType.STOCK_SALE);
+    }
+    @Transactional
+    public void processT2Settlements() {
+        List<WalletTransaction> transactionsReadyForSettlement = walletTransactionRepository.findTransactionsReadyForSettlement(
+                LocalDateTime.now(), TransactionStatus.COMPLETED,
+                TransactionType.STOCK_PURCHASE, TransactionType.STOCK_SALE
+        );
+
+        for (WalletTransaction transaction : transactionsReadyForSettlement) {
+            processSettlement(transaction);
+        }
+    }
+
+    private void processSettlement(WalletTransaction transaction) {
+        Wallet wallet = transaction.getWallet();
+
+        if (transaction.getTransactionType() == TransactionType.STOCK_PURCHASE) {
+
+            wallet.transferBlockedToBalance(transaction.getAmount());
+        } else if (transaction.getTransactionType() == TransactionType.STOCK_SALE) {
+            wallet.unblockBalance(transaction.getAmount());
+        }
+
+        transaction.setTransactionStatus(TransactionStatus.SETTLED);
+        transaction.setSettlementDate(LocalDateTime.now());
+
+        walletTransactionRepository.save(transaction);
+        update(wallet);
+    }
+    public BigDecimal getAvailableBalance(Long customerId) {
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        return wallet.getAvailableBalance();
+    }
+
+    public BigDecimal getBlockedBalance(Long customerId) {
+        Wallet wallet = getWalletByCustomerIdOrThrow(customerId);
+        return wallet.getBlockedBalance();
     }
     public WalletResponse processWithdrawal(Long customerId, BigDecimal amount){
         return subtractBalance(customerId, amount, TransactionType.WITHDRAWAL);
@@ -196,7 +274,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
 
     private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
         if (!wallet.hasSufficientBalance(amount)){
-            throw new InsufficientBalanceException(amount, wallet.getBalance());
+            throw new InsufficientBalanceException(amount, wallet.getAvailableBalance());
         }
     }
 

@@ -10,10 +10,7 @@ const Wallet = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [customerId, setCustomerId] = useState(null);
-  const [selectedBank, setSelectedBank] = useState('');
-  const [iban, setIban] = useState('');
-  const [ibanConfirmed, setIbanConfirmed] = useState(false);
-
+  const [iban, setIban] = useState(''); 
   useEffect(() => {
     const storedCustomerId = localStorage.getItem('customerId');
     if (storedCustomerId) {
@@ -29,6 +26,11 @@ const Wallet = () => {
       fetchWalletBalance();
     }
   }, [customerId]);
+
+  useEffect(() => {
+    setMessage('');
+    setMessageType('');
+  }, [activeTab]);
 
   const fetchWalletBalance = async () => {
     try {
@@ -60,9 +62,19 @@ const Wallet = () => {
       return;
     }
 
+    // Bloke bakiye kontrolü
+    const blockedBalance = walletBalance * 0.20;
+    const availableBalance = walletBalance - blockedBalance;
+    
     if (activeTab === 'withdraw') {
-      if (!selectedBank || !iban || !ibanConfirmed) {
-        setMessage('Lütfen tüm alanları doldurun ve IBAN onayını verin');
+      if (!iban) {
+        setMessage('Lütfen IBAN bilgisini girin');
+        setMessageType('error');
+        return;
+      }
+      
+      if (parseFloat(amount) > availableBalance) {
+        setMessage(`Çekilebilir tutar ${availableBalance.toLocaleString('tr-TR')} ₺'yi aşamaz`);
         setMessageType('error');
         return;
       }
@@ -89,9 +101,7 @@ const Wallet = () => {
         setMessage(activeTab === 'deposit' ? 'Para başarıyla yüklendi!' : 'Para çekme talebi gönderildi!');
         setMessageType('success');
         setAmount('');
-        setSelectedBank('');
-        setIban('');
-        setIbanConfirmed(false);
+        setIban(''); // IBAN'ı da temizle
         fetchWalletBalance();
       } else {
         const errorData = await response.json();
@@ -117,7 +127,6 @@ const Wallet = () => {
       </div>
     );
   }
-
   return (
     <div className="wallet-page">
       <div className="wallet-modal">
@@ -157,12 +166,8 @@ const Wallet = () => {
               <WithdrawForm 
                 amount={amount}
                 setAmount={setAmount}
-                selectedBank={selectedBank}
-                setSelectedBank={setSelectedBank}
                 iban={iban}
                 setIban={setIban}
-                ibanConfirmed={ibanConfirmed}
-                setIbanConfirmed={setIbanConfirmed}
                 walletBalance={walletBalance}
                 loading={loading}
               />

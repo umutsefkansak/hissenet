@@ -1,36 +1,66 @@
 .wallet-balance {
- margin-bottom: 32px;
- padding: 24px;
  background: #f8f9fa;
- border-radius: 12px;
+ border-radius: 8px;
+ padding: 16px;
+ border: 1px solid #e9ecef;
+ margin-bottom: 20px;
 }
 
 .wallet-balance h3 {
  margin: 0 0 16px 0;
- font-size: 20px;
- font-weight: 600;
  color: #333;
+ font-size: 18px;
+ font-weight: 600;
+ text-align: center;
+ border-bottom: 2px solid #007bff;
+ padding-bottom: 8px;
 }
 
 .balance-row {
  display: flex;
  justify-content: space-between;
  align-items: center;
- margin-bottom: 12px;
  padding: 8px 0;
+ border-bottom: 1px solid #e9ecef;
 }
 
 .balance-row:last-child {
- margin-bottom: 0;
+ border-bottom: none;
 }
 
 .balance-row span:first-child {
- color: #666;
- font-size: 16px;
+ font-weight: 500;
+ color: #495057;
+ font-size: 14px;
 }
 
 .balance-amount {
  font-weight: 600;
- color: #333;
- font-size: 20px;
+ color: #28a745;
+ font-size: 16px;
+}
+
+.blocked-balance {
+ font-weight: 600;
+ color: #dc3545;
+ font-size: 16px;
+}
+
+.available-balance {
+ font-weight: 600;
+ color: #007bff;
+ font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+ .balance-row {
+   flex-direction: column;
+   align-items: flex-start;
+   gap: 4px;
+ }
+ 
+ .balance-row span {
+   font-size: 14px;
+ }
 }

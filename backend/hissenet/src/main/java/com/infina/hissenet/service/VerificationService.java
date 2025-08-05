@@ -6,7 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.infina.hissenet.constants.MailConstants;
 import com.infina.hissenet.dto.request.CodeSendRequest;
 import com.infina.hissenet.dto.request.CodeVerifyRequest;
+import com.infina.hissenet.dto.request.VerifyPasswordChangeTokenRequest;
 import com.infina.hissenet.dto.response.CodeVerifyResponse;
+import com.infina.hissenet.dto.response.VerifyPasswordChangeTokenResponse;
 import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
 import com.infina.hissenet.entity.VerificationData;
@@ -22,6 +24,7 @@ import com.infina.hissenet.constants.VerificationConstants;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -268,5 +271,51 @@ public class VerificationService implements IVerificationService {
         String key = String.format(VerificationConstants.RedisKeys.VERIFICATION_CODE_PATTERN, email);
         redisTemplate.delete(key);
         logger.info("Cleared verification code for: {}", email);
+    }
+
+    @Override
+    public String generateAndStorePasswordChangeToken(String email) {
+        try {
+            String token = UUID.randomUUID().toString();
+            String redisKey = "password_change_token:" + token;
+            redisTemplate.opsForValue().set(redisKey, email, 10, TimeUnit.MINUTES);
+
+            logger.info("Password change token generated and stored for: {}", email);
+            return token;
+
+        } catch (Exception e) {
+            logger.error("Error generating password change token for: {}", email, e);
+            throw new VerificationCodeException("Failed to generate password change token");
+        }
+    }
+
+    @Override
+    public VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request) {
+        try {
+            String redisKey = "password_change_token:" + request.token();
+            String email = redisTemplate.opsForValue().get(redisKey);
+
+            if (email == null) {
+                logger.warn("Invalid or expired password change token: {}", request.token());
+                return VerifyPasswordChangeTokenResponse.failure(MailConstants.Messages.INVALID_PASSWORD_CHANGE_TOKEN);
+            }
+
+            logger.info("Password change token verified successfully: {}", request.token());
+            return VerifyPasswordChangeTokenResponse.success(
+                    MailConstants.Messages.PASSWORD_CHANGE_TOKEN_VALID,
+                    email
+            );
+
+        } catch (Exception e) {
+            logger.error("Error verifying password change token: {}", request.token(), e);
+            throw new VerificationCodeException("Failed to verify password change token");
+        }
+    }
+
+    @Override
+    public void clearPasswordChangeToken(String token) {
+        String key = "password_change_token:" + token;
+        redisTemplate.delete(key);
+        logger.info("Cleared password change token: {}", token);
     }
 }

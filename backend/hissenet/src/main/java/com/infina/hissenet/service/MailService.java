@@ -35,7 +35,7 @@ public class MailService implements IMailService {
     private final JavaMailSender mailSender;
     private final IEmailTemplateService emailTemplateService;
     private final IVerificationService verificationService;
-    private final RedisTemplate<String, String> redisTemplate;
+
 
     @Value("${mail.from.email}")
     private String fromEmail;
@@ -54,13 +54,12 @@ public class MailService implements IMailService {
 
     public MailService(IEmployeeService employeeService, JavaMailSender mailSender,
                        IEmailTemplateService emailTemplateService,
-                       IVerificationService verificationService,
-                       RedisTemplate<String, String> redisTemplate) {
+                       IVerificationService verificationService) {
         this.employeeService = employeeService;
         this.mailSender = mailSender;
         this.emailTemplateService = emailTemplateService;
         this.verificationService = verificationService;
-        this.redisTemplate = redisTemplate;
+
     }
 
     @Async
@@ -121,22 +120,6 @@ public class MailService implements IMailService {
         }
     }
 
-    /*@Override
-    public CodeSendResponse sendPasswordResetCode(CodeSendRequest request) {
-        int maxAttempts = request.maxAttempts() != null ? request.maxAttempts() : defaultMaxAttempts;
-        int expiryMinutes = request.expiryMinutes() != null ? request.expiryMinutes() : defaultExpiryMinutes;
-
-        if(employeeService.existsByEmail(request.email())){
-            return sendVerificationCode(request);
-        }
-        return CodeSendResponse.success(
-                MailConstants.Messages.VERIFICATION_CODE_SENT,
-                maxAttempts,
-                expiryMinutes
-        );
-    }
-
-    */
 
     @Override
     public CodeSendResponse sendPasswordResetCode(CodeSendRequest request) {
@@ -194,19 +177,11 @@ public class MailService implements IMailService {
     public PasswordChangeTokenResponse sendPasswordChangeToken(PasswordChangeTokenRequest request) {
         try {
 
-            String token = UUID.randomUUID().toString();
-            
-
-            String redisKey = "password_change_token:" + token;
-            redisTemplate.opsForValue().set(redisKey, request.email(), 10, TimeUnit.MINUTES);
-            
+            String token = verificationService.generateAndStorePasswordChangeToken(request.email());
 
             String passwordChangeUrl = "http://localhost:3000/new-password?token=" + token;
-            
-
             String subject = String.format(MailConstants.Subjects.PASSWORD_RESET_FORMAT, companyName);
             String content = createPasswordChangeContent(request.email(), passwordChangeUrl);
-            
 
             MimeMessage message = createMimeMessage(request.email(), subject, content, request.email());
             mailSender.send(message);
@@ -224,29 +199,7 @@ public class MailService implements IMailService {
         }
     }
 
-    @Override
-    public VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request) {
-        try {
-            String redisKey = "password_change_token:" + request.token();
-            String email = redisTemplate.opsForValue().get(redisKey);
-            
-            if (email == null) {
-                logger.warn("Invalid or expired password change token: {}", request.token());
-                return VerifyPasswordChangeTokenResponse.failure(MailConstants.Messages.INVALID_PASSWORD_CHANGE_TOKEN);
-            }
-            
 
-            logger.info("Password change token verified successfully: {}", request.token());
-            return VerifyPasswordChangeTokenResponse.success(
-                    MailConstants.Messages.PASSWORD_CHANGE_TOKEN_VALID,
-                    email
-            );
-            
-        } catch (Exception e) {
-            logger.error("Error verifying password change token: {}", request.token(), e);
-            throw new MailException(MailConstants.Messages.PASSWORD_CHANGE_TOKEN_VERIFY_ERROR + e.getMessage(), e);
-        }
-    }
 
 
 

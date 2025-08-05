@@ -75,12 +75,6 @@ public interface IMailService {
      */
     PasswordChangeTokenResponse sendPasswordChangeToken(PasswordChangeTokenRequest request);
 
-    /**
-     * Verifies a password change token and returns the associated email.
-     * Checks if the token exists in Redis and is still valid.
-     *
-     * @param request the token verification request containing the token
-     * @return response with email if token is valid, failure message otherwise
-     */
-    VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request);
+
+
 }

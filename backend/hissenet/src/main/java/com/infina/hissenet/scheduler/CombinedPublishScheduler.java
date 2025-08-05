@@ -37,8 +37,8 @@ public class CombinedPublishScheduler {
         List<CombinedStockData> combinedList = combinedCacheService.getAllCombined();
 
         // 2) Opsiyonel log
-        System.out.println("\n===== Pushing combinedList =====");
-        combinedList.forEach(System.out::println);
+        //System.out.println("\n===== Pushing combinedList =====");
+        //combinedList.forEach(System.out::println);
 
         // 3) WebSocket ile yayınla
         ws.convertAndSend(topic, combinedList);

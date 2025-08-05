@@ -9,7 +9,6 @@ export const customerApi = {
     return response.json();
   },
 
-  // ID ile müşteri getir (YENİ)
   getCustomerById: async (id) => {
     const response = await fetch(`${BASE_URL}/${id}`);
     if (!response.ok) {

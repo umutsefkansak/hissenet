@@ -84,7 +84,7 @@
   flex-direction: column;
 }
 
-/* Form container */
+
 .modal-content form {
   flex: 1;
   display: flex;
@@ -275,7 +275,7 @@
   cursor: not-allowed;
 }
 
-/* Responsive ayarlar */
+
 @media (max-height: 800px) {
   .wallet-modal {
     max-height: 95vh;

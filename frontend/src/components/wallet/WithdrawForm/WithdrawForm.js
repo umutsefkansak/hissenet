@@ -4,14 +4,16 @@ import './WithdrawForm.css';
 const WithdrawForm = ({ 
   amount, 
   setAmount, 
-  walletBalance, 
+  iban,
+  setIban,
+  walletBalance,
   loading 
 }) => {
-  const handleAmountChange = (e) => {
-    const value = e.target.value;
-    if (value === '' || parseFloat(value) >= 0) {
-      setAmount(value);
-    }
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY'
+    }).format(value);
   };
 
   const calculateBlockedBalance = () => {
@@ -24,38 +26,36 @@ const WithdrawForm = ({
 
   return (
     <div className="withdraw-form">
-      {/* Bakiye Bilgileri */}
-      <div className="balance-info">
-        <div className="balance-item">
-          <label>Toplam Bakiye:</label>
-          <span className="total-balance">{walletBalance.toLocaleString('tr-TR')} ₺</span>
-        </div>
-        <div className="balance-item">
-          <label>Bloke Bakiye (%20):</label>
-          <span className="blocked-balance">{calculateBlockedBalance().toLocaleString('tr-TR')} ₺</span>
-        </div>
-        <div className="balance-item">
-          <label>Kullanılabilir Bakiye:</label>
-          <span className="available-balance">{getAvailableBalance().toLocaleString('tr-TR')} ₺</span>
+      <div className="form-section">
+        <label>Çekilecek Tutar (TL)</label>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="0.00"
+          step="0.01"
+          min="0.01"
+          max={getAvailableBalance()}
+          required
+          disabled={loading}
+        />
+        <div className="form-note">
+          Maksimum: {formatCurrency(getAvailableBalance())}
         </div>
       </div>
 
-      {/* Çekilecek Tutar */}
       <div className="form-section">
-        <label htmlFor="amount">Çekilecek Tutar (TL):</label>
+        <label>IBAN</label>
         <input
-          type="number"
-          id="amount"
-          value={amount}
-          onChange={handleAmountChange}
-          placeholder="0.00"
+          type="text"
+          value={iban}
+          onChange={(e) => setIban(e.target.value)}
+          placeholder="TR00 0000 0000 0000 0000 0000 00"
+          required
           disabled={loading}
-          max={getAvailableBalance()}
-          min="0"
-          step="0.01"
         />
         <div className="form-note">
-          Maksimum: {getAvailableBalance().toLocaleString('tr-TR')} ₺
+          IBAN numaranızı boşluksuz ya da boşluklu girebilirsiniz
         </div>
       </div>
     </div>

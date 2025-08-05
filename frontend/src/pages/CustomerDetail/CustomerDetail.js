@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { customerApi } from '../../services/api/customerApi';
-import { walletApi } from '../../services/api/walletApi'; // YENİ
+import { walletApi } from '../../services/api/walletApi'; 
 import './CustomerDetail.css';
 
 const CustomerDetailPage = () => {
@@ -17,11 +17,9 @@ const CustomerDetailPage = () => {
       try {
         setLoading(true);
         
-        // Customer bilgilerini getir
         const customerResult = await customerApi.getCustomerById(id);
         setCustomer(customerResult.data);
         
-        // Wallet balance'ını getir (walletApi kullan)
         const balanceResult = await walletApi.getCustomerWalletBalance(id);
         setWalletBalance(balanceResult.data);
         
@@ -52,17 +50,15 @@ const CustomerDetailPage = () => {
   };
 
   const getRiskProfile = () => {
-    // Risk profili hesaplama (örnek)
+
     return 'Düşük';
   };
 
   const getPortfolioValue = () => {
-    // Portföy değeri hesaplama (örnek)
     return 180000;
   };
 
   const getCurrentBalance = () => {
-    // Mevcut bakiye (örnek)
     return walletBalance;
   };
 
@@ -123,7 +119,6 @@ const CustomerDetailPage = () => {
     );
   }
 
-  // Örnek işlem geçmişi
   const transactionHistory = [
     {
       id: 1,

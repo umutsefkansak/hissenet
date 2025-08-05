@@ -277,8 +277,7 @@ public class VerificationService implements IVerificationService {
     public String generateAndStorePasswordChangeToken(String email) {
         try {
             String token = UUID.randomUUID().toString();
-            String redisKey = "password_change_token:" + token;
-            redisTemplate.opsForValue().set(redisKey, email, 10, TimeUnit.MINUTES);
+            String redisKey = String.format(VerificationConstants.RedisKeys.PASSWORD_CHANGE_TOKEN_PATTERN, token);            redisTemplate.opsForValue().set(redisKey, email, 10, TimeUnit.MINUTES);
 
             logger.info("Password change token generated and stored for: {}", email);
             return token;
@@ -292,8 +291,7 @@ public class VerificationService implements IVerificationService {
     @Override
     public VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request) {
         try {
-            String redisKey = "password_change_token:" + request.token();
-            String email = redisTemplate.opsForValue().get(redisKey);
+            String redisKey = String.format(VerificationConstants.RedisKeys.PASSWORD_CHANGE_TOKEN_PATTERN, request.token());            String email = redisTemplate.opsForValue().get(redisKey);
 
             if (email == null) {
                 logger.warn("Invalid or expired password change token: {}", request.token());
@@ -314,7 +312,7 @@ public class VerificationService implements IVerificationService {
 
     @Override
     public void clearPasswordChangeToken(String token) {
-        String key = "password_change_token:" + token;
+        String key = String.format(VerificationConstants.RedisKeys.PASSWORD_CHANGE_TOKEN_PATTERN, token);
         redisTemplate.delete(key);
         logger.info("Cleared password change token: {}", token);
     }

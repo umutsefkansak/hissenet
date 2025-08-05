@@ -37,11 +37,6 @@ public class MailController implements MailControllerDoc {
         return ApiResponse.ok("Verification code sent", response);
     }
 
-    @PostMapping("/send-password-reset")
-    public ApiResponse<CodeSendResponse> sendPasswordResetCode(@Valid @RequestBody CodeSendRequest request) {
-        CodeSendResponse response = mailService.sendPasswordResetCode(request);
-        return ApiResponse.ok("Verification code sent", response);
-    }
 
     @PostMapping("/verify")
     public ApiResponse<CodeVerifyResponse> verifyCode(@Valid @RequestBody CodeVerifyRequest request,
@@ -78,7 +73,7 @@ public class MailController implements MailControllerDoc {
 
     @PostMapping("/verify-password-change-token")
     public ApiResponse<VerifyPasswordChangeTokenResponse> verifyPasswordChangeToken(@Valid @RequestBody VerifyPasswordChangeTokenRequest request) {
-        VerifyPasswordChangeTokenResponse response = mailService.verifyPasswordChangeToken(request);
+        VerifyPasswordChangeTokenResponse response = verificationService.verifyPasswordChangeToken(request);
         return ApiResponse.ok("Password change token verification completed", response);
     }
 }

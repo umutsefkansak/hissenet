@@ -55,15 +55,6 @@ public interface IMailService {
      */
     boolean isEmailLimitExceeded(String email);
 
-    /**
-     * Sends a password reset verification code with security protections.
-     * Uses asynchronous processing to prevent timing attacks and email enumeration.
-     * Always returns success response regardless of email existence in system.
-     *
-     * @param request the password reset code request containing email and options
-     * @return response indicating code was processed (always success for security)
-     */
-    CodeSendResponse sendPasswordResetCode(CodeSendRequest request);
 
     /**
      * Generates and sends a password change token via email.
@@ -75,12 +66,6 @@ public interface IMailService {
      */
     PasswordChangeTokenResponse sendPasswordChangeToken(PasswordChangeTokenRequest request);
 
-    /**
-     * Verifies a password change token and returns the associated email.
-     * Checks if the token exists in Redis and is still valid.
-     *
-     * @param request the token verification request containing the token
-     * @return response with email if token is valid, failure message otherwise
-     */
-    VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request);
+
+
 }

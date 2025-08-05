@@ -13,6 +13,8 @@ public final class VerificationConstants {
         public static final String VERIFICATION_CODE_PATTERN = "verification:code:%s";
         public static final String RATE_LIMIT_IP_PATTERN = "rate_limit:ip:%s";
         public static final String RATE_LIMIT_EMAIL_PATTERN = "rate_limit:email:%s";
+
+        public static final String PASSWORD_CHANGE_TOKEN_PATTERN = "password_change_token:%s";
     }
 
 }

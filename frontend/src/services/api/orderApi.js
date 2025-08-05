@@ -1,8 +1,6 @@
-const BASE_URL = 'api/v1/orders';
+const BASE_URL = '/api/v1/orders';
 
 export const orderApi = {
-  
-
   getOrdersByCustomerId: async (customerId) => {
     const response = await fetch(`${BASE_URL}/by-customer?customerId=${customerId}`);
     if (!response.ok) {
@@ -10,6 +8,4 @@ export const orderApi = {
     }
     return response.json();
   },
-
-
 };

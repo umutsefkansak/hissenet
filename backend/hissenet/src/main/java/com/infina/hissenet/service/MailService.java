@@ -121,6 +121,9 @@ public class MailService implements IMailService {
     }
 
 
+    /*
+    // DEPRECATED: This method is deprecated in favor of token-based password reset.
+    // Use sendPasswordChangeToken() instead for secure link-based password reset.
     @Override
     public CodeSendResponse sendPasswordResetCode(CodeSendRequest request) {
         int maxAttempts = request.maxAttempts() != null ? request.maxAttempts() : defaultMaxAttempts;
@@ -142,7 +145,7 @@ public class MailService implements IMailService {
                 maxAttempts,
                 expiryMinutes
         );
-    }
+    }*/
 
     @Override
     public CodeVerifyResponse verifyCode(CodeVerifyRequest request, HttpServletRequest httpRequest) {

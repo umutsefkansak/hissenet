@@ -37,11 +37,6 @@ public class MailController implements MailControllerDoc {
         return ApiResponse.ok("Verification code sent", response);
     }
 
-    @PostMapping("/send-password-reset")
-    public ApiResponse<CodeSendResponse> sendPasswordResetCode(@Valid @RequestBody CodeSendRequest request) {
-        CodeSendResponse response = mailService.sendPasswordResetCode(request);
-        return ApiResponse.ok("Verification code sent", response);
-    }
 
     @PostMapping("/verify")
     public ApiResponse<CodeVerifyResponse> verifyCode(@Valid @RequestBody CodeVerifyRequest request,

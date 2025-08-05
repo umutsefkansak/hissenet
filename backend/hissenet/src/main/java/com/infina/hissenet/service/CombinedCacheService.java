@@ -8,10 +8,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CombinedCacheService implements ICombinedCacheService {
@@ -48,61 +50,62 @@ public class CombinedCacheService implements ICombinedCacheService {
                 : Collections.<StockData>emptyList();
 
         LocalDate todayDate = LocalDate.now();
-        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        System.out.println("today: " + today);
+        String todayStr = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String yesterdayStr = todayDate.minusDays(1).format(DateTimeFormatter.ISO_DATE);
+
 
         // 2) Her bir StockData için Infina’dan fiyat al ve dto oluştur
         return stocks.stream()
-                .map(s -> {
-                    String code = s.code().toUpperCase();
-                    String assetCode = code + ".E";
-
-//                    HisseApiResponse infinResp = infinaClient
-//                            .fetchPriceByCodeAndDate(assetCode, today)
-//                            .onErrorReturn(new HisseApiResponse(null))
-//                            .block();
-//                    System.out.println("infinResp: " + infinResp);
-//
-//                    HisseFiyatEntry entry = (infinResp != null && infinResp.result() != null)
-//                            ? infinResp.result().data().HisseFiyat().stream().findFirst().orElse(null)
-//                            : null;
-//
-//                    // Fiyatları al
-                    BigDecimal openPrice = null ;
-
-
-                    String prevDate = todayDate.minusDays(1).format(DateTimeFormatter.ISO_DATE);
-                    System.out.println("Fiyat boş, önceki gün sorgulanıyor: " + prevDate);
-
-                    HisseApiResponse prevResp = infinaClient
-                            .fetchPriceByCodeAndDate(assetCode, prevDate)
-                            .onErrorReturn(new HisseApiResponse(null))
-                            .block();
-                    HisseFiyatEntry prevEntry = (prevResp != null && prevResp.result() != null)
-                            ? prevResp.result().data().HisseFiyat().stream().findFirst().orElse(null)
-                            : null;
-
-                    if (prevEntry != null && prevEntry.closePrice() != null) {
-                        openPrice = prevEntry.closePrice();
-                        System.out.println("Önceki gün kapanışı openPrice olarak atandı: " + openPrice);
-                    }
-
-                    return new CombinedStockData(
-                            code,
-                            null,
-                            openPrice,
-                            s.rate(),
-                            s.lastprice(),
-                            s.hacim(),
-                            s.hacimstr(),
-                            s.min(),
-                            s.max(),
-                            s.time(),
-                            s.text(),
-                            s.icon()
-                    );
-                })
+                .map(s -> buildCombined(s, todayStr, yesterdayStr))
                 .toList();
+    }
+
+    private CombinedStockData buildCombined(StockData s, String todayStr, String yesterdayStr) {
+        String code      = s.code().toUpperCase();
+        String assetCode = code + ".E";
+
+        // önce bugün ara, yoksa dünün kapanışını openPrice olarak al
+        HisseFiyatEntry todayEntry     = fetchEntry(assetCode, todayStr);
+        BigDecimal   closePrice        = Optional.ofNullable(todayEntry).map(HisseFiyatEntry::closePrice).orElse(null);
+        BigDecimal   openPrice         = Optional.ofNullable(todayEntry).map(HisseFiyatEntry::openPrice)
+                .orElseGet(() -> Optional.ofNullable(fetchEntry(assetCode, yesterdayStr))
+                        .map(HisseFiyatEntry::closePrice)
+                        .orElse(null));
+
+        BigDecimal lastPrice   = s.lastprice();
+        BigDecimal changePrice = (openPrice != null && lastPrice != null)
+                ? lastPrice.subtract(openPrice).setScale(2, RoundingMode.HALF_UP)
+                : null;
+
+        return new CombinedStockData(
+                code,
+                closePrice,
+                openPrice,
+                changePrice,
+                s.rate(),
+                lastPrice,
+                s.hacim(),
+                s.hacimstr(),
+                s.min(),
+                s.max(),
+                s.time(),
+                s.text(),
+                s.icon()
+        );
+    }
+
+    private HisseFiyatEntry fetchEntry(String assetCode, String date) {
+        try {
+            HisseApiResponse resp = infinaClient
+                    .fetchPriceByCodeAndDate(assetCode, date)
+                    .onErrorReturn(new HisseApiResponse(null))
+                    .block();
+            return (resp != null && resp.result() != null)
+                    ? resp.result().data().HisseFiyat().stream().findFirst().orElse(null)
+                    : null;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
 }

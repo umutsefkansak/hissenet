@@ -1,6 +1,8 @@
 package com.infina.hissenet.constants;
 
 
+import java.math.BigDecimal;
+
 public final class CustomerConstants {
 
     private CustomerConstants() {
@@ -17,4 +19,6 @@ public final class CustomerConstants {
 
     // Customer Number Generation
     public static final int CUSTOMER_NUMBER_UUID_LENGTH = 12;
+
+    public static final BigDecimal DEFAULT_COMMISSION_RATE = new BigDecimal("0.0010"); // %0.1
 }

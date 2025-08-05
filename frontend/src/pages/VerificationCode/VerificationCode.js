@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { verifyCode, sendVerificationCode } from '../../server/api';
+import { verifyCode, sendVerificationCode } from '../../server/mail';
 import './VerificationCode.css';
 
 const VerificationCode = () => {

@@ -1,12 +1,13 @@
 package com.infina.hissenet.security;
 
+import com.infina.hissenet.security.abstracts.IRedisTokenService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
 @Service
-public class RedisTokenService {
+public class RedisTokenService implements IRedisTokenService {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtService jwtService;
 

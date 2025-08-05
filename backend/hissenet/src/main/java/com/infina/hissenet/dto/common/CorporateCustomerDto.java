@@ -1,6 +1,7 @@
 package com.infina.hissenet.dto.common;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CorporateCustomerDto(
@@ -18,5 +19,9 @@ public record CorporateCustomerDto(
         String sector,
         String authorizedPersonName,
         String authorizedPersonTitle,
-        String website
+        String website,
+        BigDecimal commissionRate,
+        String authorizedPersonPhone,
+        String authorizedPersonTcNumber,
+        String authorizedPersonEmail
 ) implements CustomerDto {}

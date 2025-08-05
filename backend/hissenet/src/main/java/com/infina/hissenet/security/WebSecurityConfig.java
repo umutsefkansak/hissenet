@@ -63,7 +63,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/employees").permitAll()
                         .requestMatchers(HttpMethod.PATCH,"/api/v1/employees/changePassword").permitAll()
-                        .requestMatchers("/api/v1/mail/verify","/api/v1/mail/send-verification","/api/v1/mail/send-password-reset").permitAll()
+                        .requestMatchers("/api/v1/mail/verify","/api/v1/mail/send-verification","/api/v1/mail/send-password-reset","/api/v1/mail/send-password-change-token","/api/v1/mail/verify-password-change-token").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/ws-stock/**","/ws/**", "/websocket/**", "/stomp/**").permitAll() // WebSocket endpoints
                         .anyRequest().authenticated()

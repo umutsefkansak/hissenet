@@ -7,6 +7,7 @@ import org.mapstruct.factory.Mappers;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.entity.Order;
 
 @Mapper(componentModel = "spring")
@@ -23,4 +24,5 @@ public interface OrderMapper {
     @Mapping(source = "updatedBy.id", target = "updatedById")
     OrderResponse toResponse(Order entity);
 	
+	RecentOrderResponse toRecentResponse(Order order);
 }

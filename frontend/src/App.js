@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import VerificationCode from './pages/VerificationCode/VerificationCode';
 import NewPassword from './pages/NewPassword/NewPassword';
 import Wallet from './pages/Wallet';
+import Portfolio from './pages/Portfolio/Portfolio';
 import ToastContainer from './components/Toast/ToastContainer';
 import IndividualCustomer from './pages/NewCustomer/IndividualCustomer';
 import CorporateCustomer from './pages/NewCustomer/CorporateCustomer';
@@ -33,6 +34,7 @@ function AppContent() {
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
         <Route path="/wallet" element={<Wallet />} />
+        <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
       </Routes>

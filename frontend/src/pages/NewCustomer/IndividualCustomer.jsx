@@ -170,7 +170,7 @@ const IndividualCustomer = () => {
 
     return (
         <div className="new-customer">
-            <div className="page-header">
+            <div className="create-individual-page-header">
                 <h1>YENİ BİREYSEL YATIRIMCI KAYIT EKRANI</h1>
                 <p>Yeni bireysel yatırımcı kaydı oluşturmak için aşağıdaki tüm gerekli alanların doldurulması gerekir</p>
             </div>

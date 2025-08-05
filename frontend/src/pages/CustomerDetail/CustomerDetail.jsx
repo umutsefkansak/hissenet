@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { customerApi } from '../../services/api/customerApi';
-import { walletApi } from '../../services/api/walletApi'; 
+import { walletApi } from '../../services/api/walletApi';
+import { orderApi } from '../../services/api/orderApi';
 import './CustomerDetail.css';
 
 const CustomerDetailPage = () => {
@@ -9,6 +10,7 @@ const CustomerDetailPage = () => {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,6 +25,10 @@ const CustomerDetailPage = () => {
         const balanceResult = await walletApi.getCustomerWalletBalance(id);
         setWalletBalance(balanceResult.data);
         
+        // Müşteri siparişlerini getir
+        const ordersResult = await orderApi.getOrdersByCustomerId(id);
+        setOrders(ordersResult.data || []);
+        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -34,7 +40,6 @@ const CustomerDetailPage = () => {
       fetchCustomerData();
     }
   }, [id]);
-
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Belirtilmemiş';
@@ -50,7 +55,6 @@ const CustomerDetailPage = () => {
   };
 
   const getRiskProfile = () => {
-
     return 'Düşük';
   };
 
@@ -60,6 +64,32 @@ const CustomerDetailPage = () => {
 
   const getCurrentBalance = () => {
     return walletBalance;
+  };
+
+  const getOrderTypeText = (type) => {
+    switch (type) {
+      case 'BUY':
+        return 'Alım';
+      case 'SELL':
+        return 'Satım';
+      default:
+        return type;
+    }
+  };
+
+  const getOrderStatusText = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'Beklemede';
+      case 'COMPLETED':
+        return 'Tamamlandı';
+      case 'CANCELLED':
+        return 'İptal Edildi';
+      case 'REJECTED':
+        return 'Reddedildi';
+      default:
+        return status;
+    }
   };
 
   const handleBack = () => {
@@ -118,45 +148,6 @@ const CustomerDetailPage = () => {
       </div>
     );
   }
-
-  const transactionHistory = [
-    {
-      id: 1,
-      date: '2024-04-24',
-      stock: 'THYAO',
-      type: 'Alım',
-      quantity: 100,
-      price: 120,
-      totalAmount: 12000
-    },
-    {
-      id: 2,
-      date: '2024-04-20',
-      stock: 'KCHOL',
-      type: 'Satım',
-      quantity: 50,
-      price: 180,
-      totalAmount: 9000
-    },
-    {
-      id: 3,
-      date: '2024-04-15',
-      stock: 'SISE',
-      type: 'Alım',
-      quantity: 200,
-      price: 50,
-      totalAmount: 10000
-    },
-    {
-      id: 4,
-      date: '2024-04-18',
-      stock: 'GHI',
-      type: 'Alım',
-      quantity: 200,
-      price: 1000,
-      totalAmount: 5000
-    }
-  ];
 
   return (
     <div className="customer-detail-page">
@@ -223,26 +214,40 @@ const CustomerDetailPage = () => {
                   <th>Tarih</th>
                   <th>Hisse</th>
                   <th>Emir Türü</th>
+                  <th>Durum</th>
                   <th>Adet</th>
                   <th>Fiyat</th>
                   <th>Toplam Tutar</th>
                 </tr>
               </thead>
               <tbody>
-                {transactionHistory.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>{formatDate(transaction.date)}</td>
-                    <td>{transaction.stock}</td>
-                    <td>
-                      <span className={`transaction-type ${transaction.type.toLowerCase()}`}>
-                        {transaction.type}
-                      </span>
+                {orders.length > 0 ? (
+                  orders.map((order) => (
+                    <tr key={order.id}>
+                      <td>{formatDate(order.createdAt)}</td>
+                      <td>{order.stockCode}</td>
+                      <td>
+                        <span className={`transaction-type ${order.type.toLowerCase()}`}>
+                          {getOrderTypeText(order.type)}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`order-status ${order.status.toLowerCase()}`}>
+                          {getOrderStatusText(order.status)}
+                        </span>
+                      </td>
+                      <td>{order.quantity}</td>
+                      <td>{order.price} ₺</td>
+                      <td>{order.totalAmount.toLocaleString('tr-TR')} ₺</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                      Henüz işlem geçmişi bulunmuyor.
                     </td>
-                    <td>{transaction.quantity}</td>
-                    <td>{transaction.price} ₺</td>
-                    <td>{transaction.totalAmount.toLocaleString('tr-TR')} ₺</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

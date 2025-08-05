@@ -1,21 +1,14 @@
 package com.infina.hissenet.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.infina.hissenet.entity.base.BaseEntity;
 import com.infina.hissenet.entity.enums.OrderCategory;
 import com.infina.hissenet.entity.enums.OrderStatus;
 import com.infina.hissenet.entity.enums.OrderType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -50,6 +43,17 @@ public class Order extends BaseEntity{
 
 	@Column(name = "total_amount", precision = 20, scale = 4)
 	private BigDecimal totalAmount;
+
+	@OneToMany(mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
+	List<StockTransaction> stockTransactionList;
+
+	public List<StockTransaction> getStockTransactionList() {
+		return stockTransactionList;
+	}
+
+	public void setStockTransactionList(List<StockTransaction> stockTransactionList) {
+		this.stockTransactionList = stockTransactionList;
+	}
 
 	public Order() {
 	}

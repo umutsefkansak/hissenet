@@ -19,9 +19,9 @@ public class StockTransaction extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Portfolio portfolio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Stock stock;
-    
+    @Column(name = "stock_code", nullable = false, length = 20)
+    private String stockCode;
+
     @Enumerated(EnumType.STRING)
     private StockTransactionType transactionType;
     
@@ -57,6 +57,9 @@ public class StockTransaction extends BaseEntity {
     @Column(name = "execution_price", precision = 19, scale = 4)
     private BigDecimal executionPrice;
     
+    @Column(name = "current_price", precision = 19, scale = 4)
+    private BigDecimal currentPrice;
+    
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate = LocalDateTime.now();
     
@@ -66,9 +69,12 @@ public class StockTransaction extends BaseEntity {
     @Column(name = "notes", length = 500)
     private String notes;
 
-    public StockTransaction(Portfolio portfolio, Stock stock, StockTransactionType transactionType, TransactionStatus transactionStatus, Integer quantity, BigDecimal price, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax, BigDecimal otherFees, Order order, MarketOrderType marketOrderType, BigDecimal limitPrice, BigDecimal executionPrice, LocalDateTime transactionDate, LocalDateTime settlementDate, String notes) {
+    public StockTransaction() {
+    }
+
+    public StockTransaction(Portfolio portfolio, String stockCode, StockTransactionType transactionType, TransactionStatus transactionStatus, Integer quantity, BigDecimal price, BigDecimal totalAmount, BigDecimal commission, BigDecimal tax, BigDecimal otherFees, Order order, MarketOrderType marketOrderType, BigDecimal limitPrice, BigDecimal executionPrice, BigDecimal currentPrice, LocalDateTime transactionDate, LocalDateTime settlementDate, String notes) {
         this.portfolio = portfolio;
-        this.stock = stock;
+        this.stockCode = stockCode;
         this.transactionType = transactionType;
         this.transactionStatus = transactionStatus;
         this.quantity = quantity;
@@ -81,12 +87,18 @@ public class StockTransaction extends BaseEntity {
         this.marketOrderType = marketOrderType;
         this.limitPrice = limitPrice;
         this.executionPrice = executionPrice;
+        this.currentPrice = currentPrice;
         this.transactionDate = transactionDate;
         this.settlementDate = settlementDate;
         this.notes = notes;
     }
 
-    public StockTransaction() {
+    public String getStockCode() {
+        return stockCode;
+    }
+
+    public void setStockCode(String stockCode) {
+        this.stockCode = stockCode;
     }
 
     public Portfolio getPortfolio() {
@@ -95,14 +107,6 @@ public class StockTransaction extends BaseEntity {
 
     public void setPortfolio(Portfolio portfolio) {
         this.portfolio = portfolio;
-    }
-
-    public Stock getStock() {
-        return stock;
-    }
-
-    public void setStock(Stock stock) {
-        this.stock = stock;
     }
 
     public StockTransactionType getTransactionType() {
@@ -127,14 +131,6 @@ public class StockTransaction extends BaseEntity {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public LocalDateTime getTransactionDate() {
-        return transactionDate;
-    }
-
-    public void setTransactionDate(LocalDateTime transactionDate) {
-        this.transactionDate = transactionDate;
     }
 
     public BigDecimal getPrice() {
@@ -207,6 +203,22 @@ public class StockTransaction extends BaseEntity {
 
     public void setExecutionPrice(BigDecimal executionPrice) {
         this.executionPrice = executionPrice;
+    }
+
+    public BigDecimal getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(BigDecimal currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
     }
 
     public LocalDateTime getSettlementDate() {

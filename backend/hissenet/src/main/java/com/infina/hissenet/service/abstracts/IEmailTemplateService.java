@@ -33,4 +33,14 @@ public interface IEmailTemplateService {
      * @return rendered HTML content for the notification email
      */
     String renderNotificationTemplate(String recipientName, String message);
+
+    /**
+     * Renders the password change email template with the password change link.
+     * Processes a template with email and password change URL variables.
+     *
+     * @param email the email address of the recipient
+     * @param passwordChangeUrl the URL for password change
+     * @return rendered HTML content for the password change email
+     */
+    String renderPasswordChangeTemplate(String email, String passwordChangeUrl);
 }

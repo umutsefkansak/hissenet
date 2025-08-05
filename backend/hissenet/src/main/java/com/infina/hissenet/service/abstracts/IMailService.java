@@ -64,4 +64,23 @@ public interface IMailService {
      * @return response indicating code was processed (always success for security)
      */
     CodeSendResponse sendPasswordResetCode(CodeSendRequest request);
+
+    /**
+     * Generates and sends a password change token via email.
+     * Creates a UUID token, stores it in Redis with email as value for 10 minutes,
+     * and sends an email with the password change link.
+     *
+     * @param request the password change token request containing email
+     * @return response with token and expiry information
+     */
+    PasswordChangeTokenResponse sendPasswordChangeToken(PasswordChangeTokenRequest request);
+
+    /**
+     * Verifies a password change token and returns the associated email.
+     * Checks if the token exists in Redis and is still valid.
+     *
+     * @param request the token verification request containing the token
+     * @return response with email if token is valid, failure message otherwise
+     */
+    VerifyPasswordChangeTokenResponse verifyPasswordChangeToken(VerifyPasswordChangeTokenRequest request);
 }

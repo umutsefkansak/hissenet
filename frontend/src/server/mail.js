@@ -47,4 +47,36 @@ export const verifyCode = async (email, code) => {
     const errorMessage = errorData?.message || errorData?.detail || 'Kod doğrulanamadı';
     return { success: false, error: errorMessage };
   }
+};
+
+// Send password change token
+export const sendPasswordChangeToken = async (email) => {
+  try {
+    const response = await api.post('/mail/send-password-change-token', {
+      email
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Send password change token error:', error);
+    // Error response'u daha iyi handle et
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.detail || 'Şifre değiştirme linki gönderilemedi';
+    return { success: false, error: errorMessage };
+  }
+};
+
+// Verify password change token
+export const verifyPasswordChangeToken = async (token) => {
+  try {
+    const response = await api.post('/mail/verify-password-change-token', {
+      token
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Verify password change token error:', error);
+    // Error response'u daha iyi handle et
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.detail || 'Şifre değiştirme linki doğrulanamadı';
+    return { success: false, error: errorMessage };
+  }
 }; 

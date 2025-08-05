@@ -1,5 +1,6 @@
 package com.infina.hissenet.client;
 
+
 import com.infina.hissenet.dto.response.StockApiResponse;
 import com.infina.hissenet.properties.CollectApiProperties;
 import org.springframework.http.HttpHeaders;
@@ -11,19 +12,19 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 
 @Component
-public class StockApiClient {
-    private final WebClient stockApiWebClient;
+public class CollectApiClient {
+    private final WebClient collectApiWebClient;
     private final CollectApiProperties props;
 
-    public StockApiClient(WebClient stockApiWebClient, CollectApiProperties props) {
-        this.stockApiWebClient = stockApiWebClient;
+    public CollectApiClient(WebClient collectApiWebClient, CollectApiProperties props) {
+        this.collectApiWebClient = collectApiWebClient;
         this.props = props;
     }
 
     public Mono<StockApiResponse> fetchStocks() {
         String uri = props.getEndpoints().getStocks();
         System.out.println("uri" + uri);
-        return stockApiWebClient.get()
+        return collectApiWebClient.get()
                 .uri(uri)
                 .header(HttpHeaders.AUTHORIZATION, "apikey " + props.getApiKey())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

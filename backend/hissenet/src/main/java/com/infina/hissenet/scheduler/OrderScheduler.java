@@ -3,6 +3,7 @@ package com.infina.hissenet.scheduler;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,6 @@ import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.enums.OrderStatus;
 import com.infina.hissenet.entity.enums.OrderType;
 import com.infina.hissenet.repository.OrderRepository;
-import com.infina.hissenet.service.abstracts.IStockCacheService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 
 import static com.infina.hissenet.constants.OrderConstants.COMMISSION_RATE;
@@ -21,10 +21,10 @@ public class OrderScheduler {
 
     private final OrderRepository orderRepository;
     private final IWalletService walletService;
-    private final IStockCacheService stockCacheService;
+    private final ICacheManagerService stockCacheService;
 
     public OrderScheduler(OrderRepository orderRepository, IWalletService walletService,
-            IStockCacheService stockCacheService) {
+                          ICacheManagerService stockCacheService) {
         this.orderRepository = orderRepository;
         this.walletService = walletService;
         this.stockCacheService = stockCacheService;
@@ -38,7 +38,7 @@ public class OrderScheduler {
         for (Order order : openOrders) {
             try {
                 String stockCode = order.getStockCode();
-                BigDecimal marketPrice = stockCacheService.getPriceByCodeOrNull(stockCode);
+                BigDecimal marketPrice = stockCacheService.getCachedByCode(stockCode).lastPrice();
 
                 if (marketPrice == null) {
                     continue;

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,6 @@ import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
-import com.infina.hissenet.service.abstracts.IStockCacheService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 
@@ -36,10 +36,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final CustomerService customerService;
 	private final OrderMapper orderMapper;
 	private final IWalletService walletService;
-	private final IStockCacheService stockCacheService;
+	private final ICacheManagerService stockCacheService;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, IStockCacheService stockCacheService) {
+			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -75,7 +75,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 				if (request.price() == null || request.type() == null || request.quantity() == null) {
 					order.setStatus(OrderStatus.REJECTED);
 				} else {
-					BigDecimal marketPrice = stockCacheService.getPriceByCodeOrNull(request.stockCode());
+					BigDecimal marketPrice = stockCacheService.getCachedByCode(request.stockCode()).lastPrice();
 					boolean isValid = false;
 
 					if (request.type() == OrderType.BUY && marketPrice.compareTo(request.price()) <= 0) {

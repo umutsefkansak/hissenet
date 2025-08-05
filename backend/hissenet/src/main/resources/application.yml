@@ -47,7 +47,7 @@ mail:
     email: ${MAIL_FROM:noreply@hissenet.com}
     name: ${MAIL_FROM_NAME:HisseNet Aracı Kurum}
   company:
-    name: ${COMPANY_NAME:UMUT LTD ŞTİ}
+    name: ${COMPANY_NAME:HİSSENET}
   verification:
     code-length: 6
     default-expiry-minutes: 10
@@ -61,12 +61,12 @@ stock:
   cache:
     default:
       name: stockPrice
-      ttl: 30m
+      ttl: 5m
       max-size: 1000
   scheduler:
     publish:
       topic: /topic/prices
-      rate: 10m
+      rate: 30s
       initial-delay: 0s
 
 collectapi:
@@ -74,3 +74,20 @@ collectapi:
   base-url: https://api.collectapi.com
   endpoints:
     stocks: /economy/hisseSenedi
+
+infina:
+  api:
+    base-url: https://apitest.infina.com.tr/infina-services/rest/srv/v1.1
+    api-key: ${INFINA_API_KEY}
+    endpoint: /HisseFiyat
+  cache:
+    name: infinaPrice
+    ttl: 5m
+    max-size: 1000
+  scheduler:
+    publish:
+      topic: /topic/infina-prices
+      rate: 30s
+      initial-delay: 0s
+      error-topic: /topic/infina-prices-error
+

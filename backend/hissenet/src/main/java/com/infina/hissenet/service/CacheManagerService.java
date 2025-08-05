@@ -39,7 +39,8 @@ public class CacheManagerService implements ICacheManagerService {
     public List<CombinedStockData> getAllCached() {
         Cache cache = cacheManager.getCache(CombinedCacheService.CACHE_NAME);
         if (cache == null) return List.of();
-        // “ALL” anahtarıyla tuttuğumuz listeyi döner
-        return cache.get(CACHE_KEY, List.class);
+        List<CombinedStockData> all =
+                cache.get(CACHE_KEY, List.class);
+        return all != null ? all : List.of();
     }
 }

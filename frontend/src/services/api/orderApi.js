@@ -8,4 +8,23 @@ export const orderApi = {
     }
     return response.json();
   },
+
+   createOrder: async (orderData) => {
+    const response = await fetch(`${BASE_URL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || 'Emir oluşturulamadı');
+    }
+
+    return response.json(); 
+  },
+
 };
+

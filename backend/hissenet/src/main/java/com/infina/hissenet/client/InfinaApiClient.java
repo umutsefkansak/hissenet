@@ -27,9 +27,9 @@ public class InfinaApiClient {
                 )
                 .retrieve()
                 .bodyToMono(HisseApiResponse.class)
-                .doOnNext(response ->
-                        System.out.println("Infina API response for " + assetCode + "@" + date + " -> " + response)
-                )
+//                .doOnNext(response ->
+//                        System.out.println("Infina API response for " + assetCode + "@" + date + " -> " + response)
+//                )
                 .doOnError(err ->
                         System.err.println("Error fetching Infina price: " + err.getMessage())
                 );

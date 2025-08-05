@@ -8,6 +8,7 @@ public record CombinedStockData(
         // Infina API
         BigDecimal closePrice,
         BigDecimal openPrice,
+        BigDecimal changePrice,
 
         // Collect API
         BigDecimal rate,

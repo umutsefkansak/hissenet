@@ -34,4 +34,12 @@ public class EmailTemplateService implements IEmailTemplateService{
 
         return templateEngine.process("email/notification", context);
     }
+
+    public String renderPasswordChangeTemplate(String email, String passwordChangeUrl) {
+        Context context = new Context();
+        context.setVariable("email", email);
+        context.setVariable("passwordChangeUrl", passwordChangeUrl);
+
+        return templateEngine.process("email/password-change", context);
+    }
 }

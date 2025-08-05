@@ -73,8 +73,14 @@ public class Wallet extends BaseEntity {
     @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WalletTransaction> transactions = new ArrayList<>();
 
+    @Column(name = "blocked_balance", precision = 19, nullable = false, scale = 2, columnDefinition = "DECIMAL(19,2) DEFAULT 0.00")
+    private BigDecimal blockedBalance = BigDecimal.ZERO;
+
+    @Column(name = "available_balance", precision = 19, nullable = false, scale = 2, columnDefinition = "DECIMAL(19,2) DEFAULT 0.00")
+    private BigDecimal availableBalance = BigDecimal.ZERO;
     public void addBalance(BigDecimal amount) {
         this.balance = this.balance.add(amount);
+        this.availableBalance=this.availableBalance.add(amount);
         this.lastTransactionDate = LocalDateTime.now();
     }
     public void subtractBalance(BigDecimal amount) {
@@ -82,6 +88,7 @@ public class Wallet extends BaseEntity {
             throw new RuntimeException("Insufficient balance. Required: " + amount + ", Available: " + this.balance);
         }
         this.balance = this.balance.subtract(amount);
+        this.availableBalance=this.availableBalance.subtract(amount);
         this.lastTransactionDate = LocalDateTime.now();
     }
     public boolean hasSufficientBalance(BigDecimal amount) {
@@ -124,9 +131,54 @@ public class Wallet extends BaseEntity {
         this.lastResetDate = LocalDate.now();
     }
 
+    public BigDecimal getBlockedBalance() {
+        return blockedBalance;
+    }
+
+    public void setBlockedBalance(BigDecimal blockedBalance) {
+        this.blockedBalance = blockedBalance;
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+
+    public void setAvailableBalance(BigDecimal availableBalance) {
+        this.availableBalance = availableBalance;
+    }
+
     public void resetMonthlyLimits() {
         this.monthlyUsedAmount = BigDecimal.ZERO;
         this.lastResetDate = LocalDate.now();
+    }
+    public void blockBalance(BigDecimal amount) {
+        if (!hasSufficientAvailableBalance(amount)) {
+            throw new RuntimeException("Insufficient available balance. Required: " + amount + ", Available: " + this.availableBalance);
+        }
+        this.blockedBalance = this.blockedBalance.add(amount);
+        this.availableBalance = this.availableBalance.subtract(amount);
+        this.lastTransactionDate = LocalDateTime.now();
+    }
+
+    public void unblockBalance(BigDecimal amount) {
+        if (this.blockedBalance.compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient blocked balance to unblock. Required: " + amount + ", Blocked: " + this.blockedBalance);
+        }
+        this.blockedBalance = this.blockedBalance.subtract(amount);
+        this.availableBalance = this.availableBalance.add(amount);
+        this.lastTransactionDate = LocalDateTime.now();
+    }
+    public void transferBlockedToBalance(BigDecimal amount) {
+        if (this.blockedBalance.compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient blocked balance to transfer. Required: " + amount + ", Blocked: " + this.blockedBalance);
+        }
+        this.blockedBalance = this.blockedBalance.subtract(amount);
+        this.balance = this.balance.subtract(amount);
+        this.lastTransactionDate = LocalDateTime.now();
+    }
+
+    public boolean hasSufficientAvailableBalance(BigDecimal amount) {
+        return this.availableBalance.compareTo(amount) >= 0;
     }
 
     public void lockWallet() {

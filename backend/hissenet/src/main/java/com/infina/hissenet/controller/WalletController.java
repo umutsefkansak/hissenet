@@ -89,4 +89,13 @@ public class WalletController implements WalletControllerDoc{
         walletService.deleteById(walletId);
         return ApiResponse.ok("Wallet deleted successfully");
     }
+    @GetMapping("/customer/{customerId}/available-balance")
+    public ApiResponse<BigDecimal> getAvailableBalance(@PathVariable Long customerId){
+        return ApiResponse.ok("Available balance retrieved successfully", walletService.getAvailableBalance(customerId));
+    }
+
+    @GetMapping("/customer/{customerId}/blocked-balance")
+    public ApiResponse<BigDecimal> getBlockedBalance(@PathVariable Long customerId){
+        return ApiResponse.ok("Blocked balance retrieved successfully", walletService.getBlockedBalance(customerId));
+    }
 }

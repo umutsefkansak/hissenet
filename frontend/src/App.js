@@ -8,10 +8,12 @@ import VerificationCode from './pages/VerificationCode/VerificationCode';
 import NewPassword from './pages/NewPassword/NewPassword';
 import Wallet from './pages/Wallet';
 import ToastContainer from './components/Toast/ToastContainer';
-import IndividualCustomer from './pages/NewCustomer/IndividualCustomer';
-import CorporateCustomer from './pages/NewCustomer/CorporateCustomer';
+import IndividualCustomer from './pages/CreateCustomer/Individual/IndividualCustomer';
+import CorporateCustomer from './pages/CreateCustomer/Corporate/CorporateCustomer';
 import CustomerList from './pages/CustomerList/CustomerList';
 import CustomerDetail from './pages/CustomerDetail/CustomerDetail';
+import StocksPage from './pages/StocksPage/StocksPage';
+
 import './App.css';
 
 function AppContent() {
@@ -35,6 +37,7 @@ function AppContent() {
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
+        <Route path="/stocks" element={<StocksPage/>} />
       </Routes>
       <ToastContainer />
     </div>

@@ -14,6 +14,8 @@ WalletResponse(
         Long customerId,
         BigDecimal balance,
         String currency,
+        BigDecimal availableBalance,
+        BigDecimal blockedBalance,
         BigDecimal dailyLimit,
         BigDecimal monthlyLimit,
         BigDecimal dailyUsedAmount,

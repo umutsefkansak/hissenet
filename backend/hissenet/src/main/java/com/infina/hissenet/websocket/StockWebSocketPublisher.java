@@ -1,6 +1,7 @@
 package com.infina.hissenet.websocket;
 
-import com.infina.hissenet.dto.request.StockData;
+
+import com.infina.hissenet.dto.response.StockData;
 import com.infina.hissenet.properties.StockProperties;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;

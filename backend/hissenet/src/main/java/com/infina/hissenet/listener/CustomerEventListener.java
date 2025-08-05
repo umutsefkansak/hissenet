@@ -54,7 +54,9 @@ public class CustomerEventListener {
                 WalletConstants.DEFAULT_MONTHLY_LIMIT,
                 WalletConstants.DEFAULT_MAX_TRANSACTION_AMOUNT,
                 WalletConstants.DEFAULT_MIN_TRANSACTION_AMOUNT,
-                WalletConstants.DEFAULT_MAX_DAILY_TRANSACTION_COUNT
+                WalletConstants.DEFAULT_MAX_DAILY_TRANSACTION_COUNT,
+                WalletConstants.DEFAULT_BLOCKED_BALANCE,
+                WalletConstants.DEFAULT_AVAILABLE_BALANCE
         );
 
         walletService.createWallet(walletRequest);

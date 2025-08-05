@@ -2,10 +2,9 @@ package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.controller.doc.AddressControllerDoc;
-import com.infina.hissenet.dto.request.AddressCreateDto;
-import com.infina.hissenet.dto.request.AddressUpdateDto;
+import com.infina.hissenet.dto.request.AddressCreateRequest;
+import com.infina.hissenet.dto.request.AddressUpdateRequest;
 import com.infina.hissenet.dto.response.AddressResponse;
-import com.infina.hissenet.service.AddressService;
 import com.infina.hissenet.service.abstracts.IAddressService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/addresses")
@@ -28,7 +26,7 @@ public class AddressController implements AddressControllerDoc {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AddressResponse>> createAddress(@Valid @RequestBody AddressCreateDto dto) {
+    public ResponseEntity<ApiResponse<AddressResponse>> createAddress(@Valid @RequestBody AddressCreateRequest dto) {
         AddressResponse createdAddress = addressService.createAddress(dto);
         ApiResponse<AddressResponse> response = ApiResponse.ok("Address created successfully", createdAddress);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -62,7 +60,7 @@ public class AddressController implements AddressControllerDoc {
 
     @PutMapping("/{id}")
     public ApiResponse<AddressResponse> updateAddress(@PathVariable Long id,
-                                                      @Valid @RequestBody AddressUpdateDto dto) {
+                                                      @Valid @RequestBody AddressUpdateRequest dto) {
         return ApiResponse.ok("Address updated successfully", addressService.updateAddress(id, dto));
     }
 

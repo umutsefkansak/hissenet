@@ -1,7 +1,7 @@
 package com.infina.hissenet.service.abstracts;
 
-import com.infina.hissenet.dto.request.RoleCreateDto;
-import com.infina.hissenet.dto.request.RoleUpdateDto;
+import com.infina.hissenet.dto.request.RoleCreateRequest;
+import com.infina.hissenet.dto.request.RoleUpdateRequest;
 import com.infina.hissenet.dto.response.RoleResponse;
 import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
@@ -35,7 +35,7 @@ public interface IRoleService {
      * @return the created role response
      * @throws RoleAlreadyExistsException if role name already exists
      */
-    RoleResponse createRole(RoleCreateDto createRoleDto);
+    RoleResponse createRole(RoleCreateRequest createRoleDto);
 
     /**
      * Retrieves a role by its unique identifier.
@@ -112,7 +112,7 @@ public interface IRoleService {
      * @throws RoleNotFoundException if the role does not exist
      * @throws RoleAlreadyExistsException if new role name already exists
      */
-    RoleResponse updateRole(Long id, RoleUpdateDto updateRoleDto);
+    RoleResponse updateRole(Long id, RoleUpdateRequest updateRoleDto);
 
     /**
      * Deletes a role by its unique identifier.

@@ -5,14 +5,14 @@ const FormActions = ({ onGoBack, onSubmit, isLoading }) => {
         <div className="form-actions">
             <button
                 type="button"
-                className="btn-secondary"
+                className="create-customer-btn-secondary"
                 onClick={onGoBack}
             >
                 Geri Dön
             </button>
             <button
                 type="submit"
-                className="btn-primary"
+                className="create-customer-btn-primary"
                 disabled={isLoading}
                 onClick={onSubmit}
             >

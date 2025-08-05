@@ -4,19 +4,19 @@
     min-height: calc(100vh - 80px);
 }
 
-.page-header {
+.create-customer-page-header {
     margin-bottom: 4px;
     text-align: center;
 }
 
-.page-header h1 {
+.create-customer-page-header h1 {
     color: #1e293b;
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 10px;
 }
 
-.page-header p {
+.create-customer-page-header p {
     color: #64748b;
     font-size: 1rem;
     margin: 0;
@@ -269,7 +269,7 @@
     border-top: 1px solid #e5e7eb;
 }
 
-.btn-secondary {
+.create-customer-btn-secondary {
     background: #6b7280;
     color: white;
     border: none;
@@ -282,12 +282,12 @@
     min-height: 48px;
 }
 
-.btn-secondary:hover {
+.create-customer-btn-secondary:hover {
     background: #4b5563;
     transform: translateY(-1px);
 }
 
-.btn-primary {
+.create-customer-btn-primary {
     background: #1d293d;
     color: white;
     border: none;
@@ -300,13 +300,13 @@
     min-height: 48px;
 }
 
-.btn-primary:hover:not(:disabled) {
+.create-customer-btn-primary:hover:not(:disabled) {
     background: #2a3f56;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(29, 41, 61, 0.3);
 }
 
-.btn-primary:disabled {
+.create-customer-btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
@@ -424,11 +424,11 @@
         padding: 10px;
     }
 
-    .page-header {
+    .create-customer-page-header {
         margin-bottom: 15px;
     }
 
-    .page-header h1 {
+    .create-customer-page-header h1 {
         font-size: 1.5rem;
     }
 
@@ -457,8 +457,8 @@
         padding-top: 20px;
     }
 
-    .btn-secondary,
-    .btn-primary {
+    .create-customer-btn-secondary,
+    .create-customer-btn-primary {
         width: 100%;
     }
 

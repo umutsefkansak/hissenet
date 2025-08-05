@@ -78,7 +78,7 @@ public class MailController implements MailControllerDoc {
 
     @PostMapping("/verify-password-change-token")
     public ApiResponse<VerifyPasswordChangeTokenResponse> verifyPasswordChangeToken(@Valid @RequestBody VerifyPasswordChangeTokenRequest request) {
-        VerifyPasswordChangeTokenResponse response = mailService.verifyPasswordChangeToken(request);
+        VerifyPasswordChangeTokenResponse response = verificationService.verifyPasswordChangeToken(request);
         return ApiResponse.ok("Password change token verification completed", response);
     }
 }

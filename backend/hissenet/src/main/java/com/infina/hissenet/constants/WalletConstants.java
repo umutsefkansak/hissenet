@@ -12,7 +12,8 @@ public final class WalletConstants {
     // Default Values
     public static final BigDecimal DEFAULT_BALANCE = BigDecimal.ZERO;
     public static final String DEFAULT_CURRENCY = "TRY";
-
+    public static final BigDecimal DEFAULT_BLOCKED_BALANCE = BigDecimal.ZERO;
+    public static final BigDecimal DEFAULT_AVAILABLE_BALANCE = BigDecimal.ZERO;
     // Limits
     public static final BigDecimal DEFAULT_DAILY_LIMIT = BigDecimal.valueOf(10_000);
     public static final BigDecimal DEFAULT_MONTHLY_LIMIT = BigDecimal.valueOf(100_000);
@@ -22,7 +23,6 @@ public final class WalletConstants {
     // Transaction Counts
     public static final Integer DEFAULT_MAX_DAILY_TRANSACTION_COUNT = 50;
     public static final Integer DEFAULT_DAILY_TRANSACTION_COUNT = 0;
-
     // Status
     public static final Boolean DEFAULT_IS_LOCKED = false;
 }

@@ -2,8 +2,8 @@ package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
 import com.infina.hissenet.controller.doc.RoleControllerDoc;
-import com.infina.hissenet.dto.request.RoleCreateDto;
-import com.infina.hissenet.dto.request.RoleUpdateDto;
+import com.infina.hissenet.dto.request.RoleCreateRequest;
+import com.infina.hissenet.dto.request.RoleUpdateRequest;
 import com.infina.hissenet.dto.response.RoleResponse;
 import com.infina.hissenet.service.abstracts.IRoleService;
 import jakarta.validation.Valid;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -27,7 +26,7 @@ public class RoleController implements RoleControllerDoc{
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<RoleResponse>> createRole(@Valid @RequestBody RoleCreateDto dto) {
+    public ResponseEntity<ApiResponse<RoleResponse>> createRole(@Valid @RequestBody RoleCreateRequest dto) {
         RoleResponse createdRole = roleService.createRole(dto);
         ApiResponse<RoleResponse> response = ApiResponse.ok("Role created successfully", createdRole);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -79,7 +78,7 @@ public class RoleController implements RoleControllerDoc{
 
     @PutMapping("/{id}")
     public ApiResponse<RoleResponse> updateRole(@PathVariable Long id,
-                                                @Valid @RequestBody RoleUpdateDto dto) {
+                                                @Valid @RequestBody RoleUpdateRequest dto) {
         return ApiResponse.ok("Role updated successfully", roleService.updateRole(id, dto));
     }
 

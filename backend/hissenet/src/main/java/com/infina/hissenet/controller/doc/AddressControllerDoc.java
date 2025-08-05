@@ -1,7 +1,7 @@
 package com.infina.hissenet.controller.doc;
 
-import com.infina.hissenet.dto.request.AddressCreateDto;
-import com.infina.hissenet.dto.request.AddressUpdateDto;
+import com.infina.hissenet.dto.request.AddressCreateRequest;
+import com.infina.hissenet.dto.request.AddressUpdateRequest;
 import com.infina.hissenet.dto.response.AddressResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -105,7 +105,7 @@ public interface AddressControllerDoc {
     )
     ResponseEntity<com.infina.hissenet.common.ApiResponse<AddressResponse>> createAddress(
             @Parameter(description = "Oluşturulacak adres bilgileri", required = true,
-                    schema = @Schema(implementation = AddressCreateDto.class,
+                    schema = @Schema(implementation = AddressCreateRequest.class,
                             example = """
                 {
                   "addressType": "HOME",
@@ -121,7 +121,7 @@ public interface AddressControllerDoc {
                 """
                     )
             )
-            AddressCreateDto dto
+            AddressCreateRequest dto
     );
 
     @Operation(
@@ -554,7 +554,7 @@ public interface AddressControllerDoc {
                     in = ParameterIn.PATH, example = "1")
             Long id,
             @Parameter(description = "Güncelleme bilgileri", required = true,
-                    schema = @Schema(implementation = AddressUpdateDto.class,
+                    schema = @Schema(implementation = AddressUpdateRequest.class,
                             example = """
                 {
                   "addressType": "HOME",
@@ -570,7 +570,7 @@ public interface AddressControllerDoc {
                 """
                     )
             )
-            AddressUpdateDto dto
+            AddressUpdateRequest dto
     );
 
     @Operation(

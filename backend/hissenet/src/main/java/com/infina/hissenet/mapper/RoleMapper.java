@@ -1,7 +1,7 @@
 package com.infina.hissenet.mapper;
 
-import com.infina.hissenet.dto.request.RoleCreateDto;
-import com.infina.hissenet.dto.request.RoleUpdateDto;
+import com.infina.hissenet.dto.request.RoleCreateRequest;
+import com.infina.hissenet.dto.request.RoleUpdateRequest;
 import com.infina.hissenet.dto.response.RoleResponse;
 import com.infina.hissenet.dto.response.EmployeeResponse;
 import com.infina.hissenet.entity.Employee;
@@ -19,7 +19,7 @@ public interface RoleMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "employees", ignore = true)
     @Mapping(target = "active", source = "isActive", defaultValue = "true")
-    Role toEntity(RoleCreateDto createRoleDto);
+    Role toEntity(RoleCreateRequest createRoleDto);
 
     @Mapping(target = "employees", source = "employees", qualifiedByName = "mapEmployeesToResponse")
     RoleResponse toDto(Role role);
@@ -29,7 +29,7 @@ public interface RoleMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "employees", ignore = true)
-    void updateEntityFromDto(RoleUpdateDto updateRoleDto, @MappingTarget Role role);
+    void updateEntityFromDto(RoleUpdateRequest updateRoleDto, @MappingTarget Role role);
 
     @Named("mapEmployeesToResponse")
     default Set<EmployeeResponse> mapEmployeesToResponse(Set<Employee> employees) {

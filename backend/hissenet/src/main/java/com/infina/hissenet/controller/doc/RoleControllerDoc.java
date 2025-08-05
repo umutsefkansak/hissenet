@@ -1,7 +1,7 @@
 package com.infina.hissenet.controller.doc;
 
-import com.infina.hissenet.dto.request.RoleCreateDto;
-import com.infina.hissenet.dto.request.RoleUpdateDto;
+import com.infina.hissenet.dto.request.RoleCreateRequest;
+import com.infina.hissenet.dto.request.RoleUpdateRequest;
 import com.infina.hissenet.dto.response.RoleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -89,7 +89,7 @@ public interface RoleControllerDoc {
     )
     ResponseEntity<com.infina.hissenet.common.ApiResponse<RoleResponse>> createRole(
             @Parameter(description = "Oluşturulacak rol bilgileri", required = true,
-                    schema = @Schema(implementation = RoleCreateDto.class,
+                    schema = @Schema(implementation = RoleCreateRequest.class,
                             example = """
                 {
                   "name": "MANAGER",
@@ -99,7 +99,7 @@ public interface RoleControllerDoc {
                 """
                     )
             )
-            RoleCreateDto dto
+            RoleCreateRequest dto
     );
 
     @Operation(
@@ -568,7 +568,7 @@ public interface RoleControllerDoc {
                     in = ParameterIn.PATH, example = "1")
             Long id,
             @Parameter(description = "Güncelleme bilgileri", required = true,
-                    schema = @Schema(implementation = RoleUpdateDto.class,
+                    schema = @Schema(implementation = RoleUpdateRequest.class,
                             example = """
                 {
                   "name": "SENIOR_ADMIN",
@@ -578,7 +578,7 @@ public interface RoleControllerDoc {
                 """
                     )
             )
-            RoleUpdateDto dto
+            RoleUpdateRequest dto
     );
 
     @Operation(

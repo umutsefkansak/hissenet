@@ -1,17 +1,16 @@
 package com.infina.hissenet.service.abstracts;
 
 import com.infina.hissenet.dto.common.CustomerDto;
-import com.infina.hissenet.dto.request.CorporateCustomerCreateDto;
-import com.infina.hissenet.dto.request.CorporateCustomerUpdateDto;
-import com.infina.hissenet.dto.request.IndividualCustomerCreateDto;
-import com.infina.hissenet.dto.request.IndividualCustomerUpdateDto;
+import com.infina.hissenet.dto.request.CorporateCustomerCreateRequest;
+import com.infina.hissenet.dto.request.CorporateCustomerUpdateRequest;
+import com.infina.hissenet.dto.request.IndividualCustomerCreateRequest;
+import com.infina.hissenet.dto.request.IndividualCustomerUpdateRequest;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for Customer entity operations.
@@ -38,7 +37,7 @@ public interface ICustomerService {
      * @return the created customer response
      * @throws IllegalArgumentException if email or TC number already exists
      */
-    CustomerDto createIndividualCustomer(IndividualCustomerCreateDto createDto);
+    CustomerDto createIndividualCustomer(IndividualCustomerCreateRequest createDto);
 
     /**
      * Creates a new corporate customer.
@@ -49,7 +48,7 @@ public interface ICustomerService {
      * @return the created customer response
      * @throws IllegalArgumentException if email or tax number already exists
      */
-    CustomerDto createCorporateCustomer(CorporateCustomerCreateDto createDto);
+    CustomerDto createCorporateCustomer(CorporateCustomerCreateRequest createDto);
 
     /**
      * Retrieves a customer by its unique identifier.
@@ -115,7 +114,7 @@ public interface ICustomerService {
      * @throws CustomerNotFoundException if the customer does not exist
      * @throws IllegalArgumentException if customer is not individual type or email/TC number already exists
      */
-    CustomerDto updateIndividualCustomer(Long id, IndividualCustomerUpdateDto updateDto);
+    CustomerDto updateIndividualCustomer(Long id, IndividualCustomerUpdateRequest updateDto);
 
     /**
      * Updates an existing corporate customer with new information.
@@ -127,7 +126,7 @@ public interface ICustomerService {
      * @throws CustomerNotFoundException if the customer does not exist
      * @throws IllegalArgumentException if customer is not corporate type or email/tax number already exists
      */
-    CustomerDto updateCorporateCustomer(Long id, CorporateCustomerUpdateDto updateDto);
+    CustomerDto updateCorporateCustomer(Long id, CorporateCustomerUpdateRequest updateDto);
 
     /**
      * Deletes a customer by its unique identifier.

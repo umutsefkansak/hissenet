@@ -1,7 +1,7 @@
 package com.infina.hissenet.service;
 
-import com.infina.hissenet.dto.request.AddressCreateDto;
-import com.infina.hissenet.dto.request.AddressUpdateDto;
+import com.infina.hissenet.dto.request.AddressCreateRequest;
+import com.infina.hissenet.dto.request.AddressUpdateRequest;
 import com.infina.hissenet.dto.response.AddressResponse;
 import com.infina.hissenet.entity.Address;
 import com.infina.hissenet.exception.address.AddressNotFoundException;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -39,7 +38,7 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
     }
 
 
-    public AddressResponse createAddress(AddressCreateDto createAddressDto) {
+    public AddressResponse createAddress(AddressCreateRequest createAddressDto) {
 
         if (!customerService.existsById(createAddressDto.customerId())) {
             throw new CustomerNotFoundException(createAddressDto.customerId());
@@ -104,7 +103,7 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
     }
 
 
-    public AddressResponse updateAddress(Long id, AddressUpdateDto updateAddressDto) {
+    public AddressResponse updateAddress(Long id, AddressUpdateRequest updateAddressDto) {
         Address existingAddress = findById(id)
                 .orElseThrow(() -> new AddressNotFoundException(id));
 

@@ -1,4 +1,4 @@
-const BASE_URL = '/api/customers';
+const BASE_URL = '/api/v1/customers';
 
 export const customerApi = {
   getAllCustomers: async () => {

@@ -1,4 +1,4 @@
-package com.infina.hissenet.dto.request;
+package com.infina.hissenet.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

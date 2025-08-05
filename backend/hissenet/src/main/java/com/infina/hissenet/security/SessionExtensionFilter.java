@@ -41,7 +41,7 @@ public class SessionExtensionFilter implements Filter {
 
     private static final long EXTEND_INTERVAL = 60 * 60 * 1000; // 1 saat
 
-    // Sabit thread sayılı pool (örneğin 5 thread)
+
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     public SessionExtensionFilter(RedisTokenService redisTokenService) {

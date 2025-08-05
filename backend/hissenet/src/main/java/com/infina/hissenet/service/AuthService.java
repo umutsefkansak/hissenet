@@ -41,7 +41,7 @@ public class AuthService implements IAuthService {
         int oneWeek = 7 * 24 * 60 * 60;
         redisTokenService.saveSession(sessionId,token,oneWeek);
 
-        return new AuthResponse(mapper.toResponse(employee),sessionId,oneWeek);
+        return new AuthResponse(mapper.toUserResponse(employee),sessionId,oneWeek);
     }
 
     // logout

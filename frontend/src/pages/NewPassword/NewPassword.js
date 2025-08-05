@@ -1,31 +1,89 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { changePassword } from '../../server/employees';
+import { verifyPasswordChangeToken } from '../../server/mail';
 import './NewPassword.css';
 
 const NewPassword = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [tokenValid, setTokenValid] = useState(false);
+  const [tokenLoading, setTokenLoading] = useState(true);
 
-  const email = location.state?.email;
-
-  // Email yoksa login sayfasına yönlendir
-  React.useEffect(() => {
-    if (!email) {
-      window.showToast('Email bilgisi bulunamadı. Lütfen tekrar giriş yapın.', 'error', 3000);
-      navigate('/login');
+  // Token'ı URL'den al ve doğrula
+  useEffect(() => {
+    const token = searchParams.get('token');
+    
+    if (!token || token.trim() === '') {
+      setError('Geçersiz link. Lütfen e-postanızdaki linki kullanın.');
+      setTokenLoading(false);
+      return;
     }
-  }, [email, navigate]);
 
-  // Email yoksa sayfayı render etme
-  if (!email) {
-    return null;
+    const verifyToken = async () => {
+      try {
+        const result = await verifyPasswordChangeToken(token);
+        
+        if (result.success && result.data?.data?.valid) {
+          setEmail(result.data.data.email);
+          setTokenValid(true);
+        } else {
+          setError('Token hatalı. Lütfen daha sonra tekrar deneyin.');
+        }
+      } catch (error) {
+        setError('Token doğrulanırken hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      } finally {
+        setTokenLoading(false);
+      }
+    };
+
+    verifyToken();
+  }, [searchParams]);
+
+  // Token yükleniyorsa loading göster
+  if (tokenLoading) {
+    return (
+      <div className="new-password-container">
+        <div className="new-password-card">
+          <div className="new-password-header">
+            <h1 className="new-password-title">Yükleniyor...</h1>
+            <p className="new-password-description">
+              Token doğrulanıyor, lütfen bekleyin.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Token geçersizse hata mesajı göster
+  if (!tokenValid) {
+    return (
+      <div className="new-password-container">
+        <div className="new-password-card">
+          <div className="new-password-header">
+            <h1 className="new-password-title">Geçersiz Link</h1>
+            <p className="new-password-description">
+              {error}
+            </p>
+            <button 
+              className="submit-button" 
+              onClick={() => navigate('/forgot-password')}
+              style={{ marginTop: '20px' }}
+            >
+              Şifre Sıfırlama Sayfasına Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const validatePassword = (password) => {
@@ -83,7 +141,7 @@ const NewPassword = () => {
         <div className="new-password-header">
           <h1 className="new-password-title">Yeni Şifre</h1>
           <p className="new-password-description">
-            Yeni şifrenizi oluşturun.
+            Yeni şifrenizi oluşturun. ({email})
           </p>
         </div>
 

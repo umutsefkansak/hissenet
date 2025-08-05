@@ -10,7 +10,8 @@ import Wallet from './pages/Wallet';
 import ToastContainer from './components/Toast/ToastContainer';
 import IndividualCustomer from './pages/NewCustomer/IndividualCustomer';
 import CorporateCustomer from './pages/NewCustomer/CorporateCustomer';
-
+import CustomerList from './pages/CustomerList/CustomerList';
+import CustomerDetail from './pages/CustomerDetail/CustomerDetail';
 import './App.css';
 
 function AppContent() {
@@ -32,6 +33,8 @@ function AppContent() {
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
         <Route path="/wallet" element={<Wallet />} />
+        <Route path="/customers" element={<CustomerList />} />
+        <Route path="/customers/:id" element={<CustomerDetail />} />
       </Routes>
       <ToastContainer />
     </div>

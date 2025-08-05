@@ -24,6 +24,9 @@ public class CorporateCustomer extends Customer {
     @Column(name = "trade_registry_number", length = 50)
     private String tradeRegistryNumber;
 
+    @Column(name = "tax_office")
+    private String taxOffice;
+
     @Column(name = "establishment_date")
     private LocalDate establishmentDate;
 
@@ -141,5 +144,13 @@ public class CorporateCustomer extends Customer {
 
     public void setAuthorizedPersonEmail(String authorizedPersonEmail) {
         this.authorizedPersonEmail = authorizedPersonEmail;
+    }
+
+    public String getTaxOffice() {
+        return taxOffice;
+    }
+
+    public void setTaxOffice(String taxOffice) {
+        this.taxOffice = taxOffice;
     }
 }

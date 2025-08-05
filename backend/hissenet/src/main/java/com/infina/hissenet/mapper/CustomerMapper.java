@@ -22,7 +22,7 @@ public interface CustomerMapper {
     @Mapping(target = "nationality", defaultValue = "TR")
     @Mapping(target = "riskProfile", source = "riskProfile")
     @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
-    IndividualCustomer toEntity(IndividualCustomerCreateDto createDto);
+    IndividualCustomer toEntity(IndividualCustomerCreateRequest createDto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -34,7 +34,7 @@ public interface CustomerMapper {
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "nationality", defaultValue = "TR")
     @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
-    CorporateCustomer toEntity(CorporateCustomerCreateDto createDto);
+    CorporateCustomer toEntity(CorporateCustomerCreateRequest createDto);
 
     default CustomerDto toDto(Customer customer) {
         if (customer == null) {
@@ -91,7 +91,8 @@ public interface CustomerMapper {
                     realCustomer.getCommissionRate(),
                     corporate.getAuthorizedPersonPhone(),
                     corporate.getAuthorizedPersonTcNumber(),
-                    corporate.getAuthorizedPersonEmail()
+                    corporate.getAuthorizedPersonEmail(),
+                    corporate.getTaxOffice()
 
             );
         }
@@ -106,7 +107,7 @@ public interface CustomerMapper {
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "commissionRate", source = "commissionRate")
-    void updateIndividualCustomerFromDto(IndividualCustomerUpdateDto updateDto, @MappingTarget IndividualCustomer customer);
+    void updateIndividualCustomerFromDto(IndividualCustomerUpdateRequest updateDto, @MappingTarget IndividualCustomer customer);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
@@ -115,5 +116,5 @@ public interface CustomerMapper {
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "commissionRate", source = "commissionRate")
-    void updateCorporateCustomerFromDto(CorporateCustomerUpdateDto updateDto, @MappingTarget CorporateCustomer customer);
+    void updateCorporateCustomerFromDto(CorporateCustomerUpdateRequest updateDto, @MappingTarget CorporateCustomer customer);
 }

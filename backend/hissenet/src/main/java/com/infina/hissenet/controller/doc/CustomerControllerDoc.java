@@ -103,7 +103,7 @@ public interface CustomerControllerDoc {
     )
     ResponseEntity<com.infina.hissenet.common.ApiResponse<CustomerDto>> createIndividualCustomer(
             @Parameter(description = "Oluşturulacak bireysel müşteri bilgileri", required = true,
-                    schema = @Schema(implementation = IndividualCustomerCreateDto.class,
+                    schema = @Schema(implementation = IndividualCustomerCreateRequest.class,
                             example = """
                 {
                   "email": "ahmet@example.com",
@@ -125,7 +125,7 @@ public interface CustomerControllerDoc {
                 """
                     )
             )
-            IndividualCustomerCreateDto dto
+            IndividualCustomerCreateRequest dto
     );
 
     @Operation(
@@ -222,8 +222,8 @@ public interface CustomerControllerDoc {
                     in = ParameterIn.PATH, example = "1")
             Long id,
             @Parameter(description = "Güncelleme bilgileri", required = true,
-                    schema = @Schema(implementation = IndividualCustomerUpdateDto.class))
-            IndividualCustomerUpdateDto dto
+                    schema = @Schema(implementation = IndividualCustomerUpdateRequest.class))
+            IndividualCustomerUpdateRequest dto
     );
 
     @Operation(
@@ -307,7 +307,7 @@ public interface CustomerControllerDoc {
     )
     ResponseEntity<com.infina.hissenet.common.ApiResponse<CustomerDto>> createCorporateCustomer(
             @Parameter(description = "Oluşturulacak kurumsal müşteri bilgileri", required = true,
-                    schema = @Schema(implementation = CorporateCustomerCreateDto.class,
+                    schema = @Schema(implementation = CorporateCustomerCreateRequest.class,
                             example = """
                 {
                   "email": "info@acmecorp.com",
@@ -326,7 +326,7 @@ public interface CustomerControllerDoc {
                 """
                     )
             )
-            CorporateCustomerCreateDto dto
+            CorporateCustomerCreateRequest dto
     );
 
     @Operation(
@@ -420,8 +420,8 @@ public interface CustomerControllerDoc {
                     in = ParameterIn.PATH, example = "2")
             Long id,
             @Parameter(description = "Güncelleme bilgileri", required = true,
-                    schema = @Schema(implementation = CorporateCustomerUpdateDto.class))
-            CorporateCustomerUpdateDto dto
+                    schema = @Schema(implementation = CorporateCustomerUpdateRequest.class))
+            CorporateCustomerUpdateRequest dto
     );
 
     @Operation(

@@ -23,5 +23,6 @@ public record CorporateCustomerDto(
         BigDecimal commissionRate,
         String authorizedPersonPhone,
         String authorizedPersonTcNumber,
-        String authorizedPersonEmail
+        String authorizedPersonEmail,
+        String taxOffice
 ) implements CustomerDto {}

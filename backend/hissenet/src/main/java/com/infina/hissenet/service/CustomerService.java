@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,7 +53,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     }
 
 
-    public CustomerDto createIndividualCustomer(IndividualCustomerCreateDto createDto) {
+    public CustomerDto createIndividualCustomer(IndividualCustomerCreateRequest createDto) {
 
         if (customerRepository.existsByEmail(createDto.email())) {
             throw new EmailAlreadyExistsException(createDto.email());
@@ -76,7 +75,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     }
 
 
-    public CustomerDto createCorporateCustomer(CorporateCustomerCreateDto createDto) {
+    public CustomerDto createCorporateCustomer(CorporateCustomerCreateRequest createDto) {
 
         if (customerRepository.existsByEmail(createDto.email())) {
             throw new EmailAlreadyExistsException(createDto.email());
@@ -150,7 +149,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
                 .toList();
     }
 
-    public CustomerDto updateIndividualCustomer(Long id, IndividualCustomerUpdateDto updateDto) {
+    public CustomerDto updateIndividualCustomer(Long id, IndividualCustomerUpdateRequest updateDto) {
         Customer existingCustomer = findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
 
@@ -179,7 +178,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
         return customerMapper.toDto(updatedCustomer);
     }
 
-    public CustomerDto updateCorporateCustomer(Long id, CorporateCustomerUpdateDto updateDto) {
+    public CustomerDto updateCorporateCustomer(Long id, CorporateCustomerUpdateRequest updateDto) {
         Customer existingCustomer = findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
 

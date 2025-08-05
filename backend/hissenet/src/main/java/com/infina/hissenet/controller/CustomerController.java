@@ -28,7 +28,7 @@ public class CustomerController implements CustomerControllerDoc {
 
     @PostMapping("/individual")
     public ResponseEntity<ApiResponse<CustomerDto>> createIndividualCustomer(
-            @Valid @RequestBody IndividualCustomerCreateDto dto) {
+            @Valid @RequestBody IndividualCustomerCreateRequest dto) {
         CustomerDto createdCustomer = customerService.createIndividualCustomer(dto);
         ApiResponse<CustomerDto> response = ApiResponse.ok("Individual customer created successfully", createdCustomer);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -37,14 +37,14 @@ public class CustomerController implements CustomerControllerDoc {
     @PutMapping("/individual/{id}")
     public ApiResponse<CustomerDto> updateIndividualCustomer(
             @PathVariable Long id,
-            @Valid @RequestBody IndividualCustomerUpdateDto dto) {
+            @Valid @RequestBody IndividualCustomerUpdateRequest dto) {
         return ApiResponse.ok("Individual customer updated successfully",
                 customerService.updateIndividualCustomer(id, dto));
     }
 
     @PostMapping("/corporate")
     public ResponseEntity<ApiResponse<CustomerDto>> createCorporateCustomer(
-            @Valid @RequestBody CorporateCustomerCreateDto dto) {
+            @Valid @RequestBody CorporateCustomerCreateRequest dto) {
         CustomerDto createdCustomer = customerService.createCorporateCustomer(dto);
         ApiResponse<CustomerDto> response = ApiResponse.ok("Corporate customer created successfully", createdCustomer);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -53,7 +53,7 @@ public class CustomerController implements CustomerControllerDoc {
     @PutMapping("/corporate/{id}")
     public ApiResponse<CustomerDto> updateCorporateCustomer(
             @PathVariable Long id,
-            @Valid @RequestBody CorporateCustomerUpdateDto dto) {
+            @Valid @RequestBody CorporateCustomerUpdateRequest dto) {
         return ApiResponse.ok("Corporate customer updated successfully",
                 customerService.updateCorporateCustomer(id, dto));
     }

@@ -6,24 +6,27 @@ const Wallet = () => {
   const [activeTab, setActiveTab] = useState('deposit');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(15420.50);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [availableBalance, setAvailableBalance] = useState(0);
+  const [blockedBalance, setBlockedBalance] = useState(0);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [customerId, setCustomerId] = useState(null);
   const [iban, setIban] = useState(''); 
+
   useEffect(() => {
     const storedCustomerId = localStorage.getItem('customerId');
     if (storedCustomerId) {
       setCustomerId(parseInt(storedCustomerId));
     } else {
-      setCustomerId(46);
-      localStorage.setItem('customerId', '46');
+      setCustomerId(45);
+      localStorage.setItem('customerId', '45');
     }
   }, []);
 
   useEffect(() => {
     if (customerId) {
-      fetchWalletBalance();
+      fetchWalletData();
     }
   }, [customerId]);
 
@@ -32,21 +35,33 @@ const Wallet = () => {
     setMessageType('');
   }, [activeTab]);
 
-  const fetchWalletBalance = async () => {
+  const fetchWalletData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/wallet/customer/${customerId}/balance`);
-      if (response.ok) {
-        const data = await response.json();
-        setWalletBalance(data.data);
+      
+      // Tüm bakiye bilgilerini paralel olarak çek
+      const [balanceResponse, availableResponse, blockedResponse] = await Promise.all([
+        fetch(`/api/v1/wallet/customer/${customerId}/balance`),
+        fetch(`/api/v1/wallet/customer/${customerId}/available-balance`),
+        fetch(`/api/v1/wallet/customer/${customerId}/blocked-balance`)
+      ]);
+
+      if (balanceResponse.ok && availableResponse.ok && blockedResponse.ok) {
+        const balanceData = await balanceResponse.json();
+        const availableData = await availableResponse.json();
+        const blockedData = await blockedResponse.json();
+
+        setWalletBalance(balanceData.data);
+        setAvailableBalance(availableData.data);
+        setBlockedBalance(blockedData.data);
       } else {
-        console.error('Bakiye getirilemedi:', response.status);
-        setMessage('Bakiye bilgisi alınamadı');
+        console.error('Bakiye bilgileri getirilemedi');
+        setMessage('Bakiye bilgileri alınamadı');
         setMessageType('error');
       }
     } catch (error) {
-      console.error('Bakiye getirilemedi:', error);
-      setMessage('Bakiye bilgisi alınamadı');
+      console.error('Bakiye bilgileri getirilemedi:', error);
+      setMessage('Bakiye bilgileri alınamadı');
       setMessageType('error');
     } finally {
       setLoading(false);
@@ -62,10 +77,7 @@ const Wallet = () => {
       return;
     }
 
-    // Bloke bakiye kontrolü
-    const blockedBalance = walletBalance * 0.20;
-    const availableBalance = walletBalance - blockedBalance;
-    
+    // Gerçek available balance ile kontrol
     if (activeTab === 'withdraw') {
       if (!iban) {
         setMessage('Lütfen IBAN bilgisini girin');
@@ -101,8 +113,8 @@ const Wallet = () => {
         setMessage(activeTab === 'deposit' ? 'Para başarıyla yüklendi!' : 'Para çekme talebi gönderildi!');
         setMessageType('success');
         setAmount('');
-        setIban(''); // IBAN'ı da temizle
-        fetchWalletBalance();
+        setIban('');
+        fetchWalletData(); // Bakiye bilgilerini yenile
       } else {
         const errorData = await response.json();
         setMessage(errorData.detail || 'İşlem başarısız');
@@ -127,6 +139,7 @@ const Wallet = () => {
       </div>
     );
   }
+
   return (
     <div className="wallet-page">
       <div className="wallet-modal">
@@ -152,7 +165,11 @@ const Wallet = () => {
         {/* Content */}
         <div className="modal-content">
           {/* Bakiye Bilgileri */}
-          <WalletBalance balance={walletBalance} />
+          <WalletBalance 
+            balance={walletBalance} 
+            availableBalance={availableBalance}
+            blockedBalance={blockedBalance}
+          />
 
           {/* İşlem Formu */}
           <form onSubmit={handleSubmit}>
@@ -168,7 +185,7 @@ const Wallet = () => {
                 setAmount={setAmount}
                 iban={iban}
                 setIban={setIban}
-                walletBalance={walletBalance}
+                availableBalance={availableBalance}
                 loading={loading}
               />
             )}

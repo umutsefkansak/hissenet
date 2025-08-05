@@ -64,6 +64,11 @@ public final class MailConstants {
         public static final String VERIFICATION_CODE_SENT = "Doğrulama kodu gönderildi";
         public static final String VERIFICATION_CODE_SEND_ERROR = "Doğrulama kodu gönderilirken hata oluştu: ";
         public static final String CODE_VERIFIED_SUCCESS = "Kod başarıyla doğrulandı";
+        public static final String PASSWORD_CHANGE_TOKEN_SENT = "Şifre değiştirme linki gönderildi";
+        public static final String PASSWORD_CHANGE_TOKEN_SEND_ERROR = "Şifre değiştirme linki gönderilirken hata oluştu: ";
+        public static final String PASSWORD_CHANGE_TOKEN_VALID = "Şifre değiştirme token'ı geçerli";
+        public static final String PASSWORD_CHANGE_TOKEN_VERIFY_ERROR = "Şifre değiştirme token'ı doğrulanırken hata oluştu: ";
+        public static final String INVALID_PASSWORD_CHANGE_TOKEN = "Geçersiz veya süresi dolmuş şifre değiştirme linki";
 
         // Security and limit messages
         public static final String DAILY_LIMIT_EXCEEDED = "Günlük kod gönderim limitine ulaşıldı";

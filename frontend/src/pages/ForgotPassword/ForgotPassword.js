@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { sendPasswordResetCode } from '../../server/mail';
+import { sendPasswordChangeToken } from '../../server/mail';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,16 +19,16 @@ const ForgotPassword = () => {
     }
 
     try {
-      const result = await sendPasswordResetCode(email);
+      const result = await sendPasswordChangeToken(email);
       
       if (result.success) {
-        window.showToast('Şifre sıfırlama kodu gönderildi!', 'success', 2000);
-        navigate('/verification-code', { state: { email } });
+        window.showToast('Şifre değiştirme linki e-posta adresinize gönderildi!', 'success', 3000);
+        setEmail(''); // Form'u temizle
       } else {
         // API error response'u string'e çevir
         const errorMessage = typeof result.error === 'object' 
-          ? result.error.message || result.error.detail || 'Şifre sıfırlama kodu gönderilemedi.'
-          : result.error || 'Şifre sıfırlama kodu gönderilemedi.';
+          ? result.error.message || result.error.detail || 'Şifre değiştirme linki gönderilemedi.'
+          : result.error || 'Şifre değiştirme linki gönderilemedi.';
         setError(errorMessage);
       }
     } catch (error) {
@@ -52,7 +50,7 @@ const ForgotPassword = () => {
           </div>
           <h1 className="forgot-password-title">Şifremi Unuttum</h1>
           <p className="forgot-password-description">
-            E-posta adresinizi girin, size doğrulama kodu gönderelim.
+            E-posta adresinizi girin, size şifre değiştirme linki gönderelim.
           </p>
         </div>
 
@@ -76,7 +74,7 @@ const ForgotPassword = () => {
           )}
 
           <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? 'Gönderiliyor...' : 'Doğrulama Kodu Gönder'}
+            {loading ? 'Gönderiliyor...' : 'Şifre Değiştirme Linki Gönder'}
           </button>
         </form>
       </div>

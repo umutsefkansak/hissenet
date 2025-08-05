@@ -47,7 +47,7 @@ mail:
     email: ${MAIL_FROM:noreply@hissenet.com}
     name: ${MAIL_FROM_NAME:HisseNet Aracı Kurum}
   company:
-    name: ${COMPANY_NAME:UMUT LTD ŞTİ}
+    name: ${COMPANY_NAME:HİSSENET}
   verification:
     code-length: 6
     default-expiry-minutes: 10

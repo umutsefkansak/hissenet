@@ -544,4 +544,163 @@ public interface MailControllerDoc {
             String email
     );
 
+    @Operation(
+            summary = "Şifre değiştirme token'ı gönderir",
+            description = """
+            Belirtilen e-posta adresine şifre değiştirme linki gönderir.
+            Token 10 dakika geçerlidir ve güvenli bir şekilde şifre değiştirme sayfasına yönlendirir.
+            Bu endpoint şifre sıfırlama işlemi için kullanılır.
+            """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Şifre değiştirme token'ı başarıyla gönderildi",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "status": 200,
+                              "path": null,
+                              "message": "Password change token sent",
+                              "localDateTime": "2025-08-03T14:30:15.123",
+                              "data": {
+                                "success": true,
+                                "message": "Şifre değiştirme linki başarıyla gönderildi"
+                              }
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "400", description = "Validation hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "type": "https://www.hissenet.com/errors/validation",
+                              "title": "Validation Error",
+                              "status": 400,
+                              "detail": "Validation failed",
+                              "timestamp": "2025-08-03T14:30:15.123",
+                              "errors": {
+                                "email": "Geçerli bir e-posta adresi giriniz"
+                              }
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "422", description = "Token gönderim hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "type": "https://www.hissenet.com/errors/mail-processing",
+                              "title": "Mail Processing Error",
+                              "status": 422,
+                              "detail": "Şifre değiştirme linki gönderilemedi: E-posta servisi geçici olarak kullanılamıyor",
+                              "timestamp": "2025-08-03T14:30:15.123"
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "type": "https://www.hissenet.com/errors/internal",
+                              "title": "Internal Server Error",
+                              "status": 500,
+                              "detail": "Internal server error occurred",
+                              "timestamp": "2025-08-03T14:30:15.123"
+                            }
+                            """
+                            )))
+            }
+    )
+    com.infina.hissenet.common.ApiResponse<PasswordChangeTokenResponse> sendPasswordChangeToken(
+            @Parameter(description = "Şifre değiştirme token'ı gönderim bilgileri", required = true,
+                    schema = @Schema(implementation = PasswordChangeTokenRequest.class,
+                            example = """
+                {
+                  "email": "kullanici@example.com"
+                }
+                """
+                    )
+            )
+            PasswordChangeTokenRequest request
+    );
+
+    @Operation(
+            summary = "Şifre değiştirme token'ını doğrular",
+            description = """
+            Şifre değiştirme işlemi için gönderilen token'ın geçerliliğini kontrol eder.
+            Token geçerliyse kullanıcının yeni şifre belirlemesine izin verilir.
+            Token 10 dakika sonra otomatik olarak geçersiz hale gelir.
+            """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Token doğrulama başarılı",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "status": 200,
+                              "path": null,
+                              "message": "Password change token verification completed",
+                              "localDateTime": "2025-08-03T14:30:15.123",
+                              "data": {
+                                "success": true,
+                                "message": "Şifre değiştirme token'ı geçerli",
+                                "email": "kullanici@example.com"
+                              }
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "200", description = "Token geçersiz veya süresi dolmuş",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "status": 200,
+                              "path": null,
+                              "message": "Password change token verification completed",
+                              "localDateTime": "2025-08-03T14:30:15.123",
+                              "data": {
+                                "success": false,
+                                "message": "Geçersiz veya süresi dolmuş şifre değiştirme linki",
+                                "email": null
+                              }
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "400", description = "Validation hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "type": "https://www.hissenet.com/errors/validation",
+                              "title": "Validation Error",
+                              "status": 400,
+                              "detail": "Validation failed",
+                              "timestamp": "2025-08-03T14:30:15.123",
+                              "errors": {
+                                "token": "Token boş olamaz"
+                              }
+                            }
+                            """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                            {
+                              "type": "https://www.hissenet.com/errors/internal",
+                              "title": "Internal Server Error",
+                              "status": 500,
+                              "detail": "Internal server error occurred",
+                              "timestamp": "2025-08-03T14:30:15.123"
+                            }
+                            """
+                            )))
+            }
+    )
+    com.infina.hissenet.common.ApiResponse<VerifyPasswordChangeTokenResponse> verifyPasswordChangeToken(
+            @Parameter(description = "Şifre değiştirme token'ı doğrulama bilgileri", required = true,
+                    schema = @Schema(implementation = VerifyPasswordChangeTokenRequest.class,
+                            example = """
+                {
+                  "token": "3fbc7d81-004e-44f1-91c0-2770b2d06943"
+                }
+                """
+                    )
+            )
+            VerifyPasswordChangeTokenRequest request
+    );
+
 }

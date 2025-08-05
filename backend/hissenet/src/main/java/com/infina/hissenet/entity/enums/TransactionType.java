@@ -7,4 +7,5 @@ public enum TransactionType {
         STOCK_PURCHASE,
         STOCK_SALE,
         FEE,
+        BLOCKED
 }

@@ -22,6 +22,7 @@ public record CreateWalletRequest(
         BigDecimal monthlyLimit,
         BigDecimal maxTransactionAmount,
         BigDecimal minTransactionAmount,
-        Integer maxDailyTransactionCount
-) {
+        Integer maxDailyTransactionCount,
+        BigDecimal defaultBlockedBalance,
+        BigDecimal defaultAvailableBalance) {
 }

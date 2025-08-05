@@ -6,9 +6,7 @@ import com.infina.hissenet.entity.enums.RiskProfile;
 import com.infina.hissenet.validation.MinAge;
 import com.infina.hissenet.validation.UniqueValue;
 import com.infina.hissenet.validation.UniqueValueType;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +30,8 @@ public record IndividualCustomerCreateDto(
         String profession,
         String educationLevel,
         RiskProfile riskProfile,
+        @DecimalMin(value = "0.0", message = "Commission rate cannot be negative")
+        @DecimalMax(value = "5.0", message = "Commission rate cannot exceed 5%")
         BigDecimal commissionRate,
         IncomeRange incomeRange
 ) {}

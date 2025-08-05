@@ -13,23 +13,14 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     // Belirli bir portföye ait işlemler - Join fetch ile
     @Query("SELECT st FROM StockTransaction st " +
            "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
            "LEFT JOIN FETCH st.order o " +
            "WHERE p.id = :portfolioId")
     List<StockTransaction> findByPortfolioIdWithJoins(@Param("portfolioId") Long portfolioId);
 
-    // Belirli bir hisseye ait işlemler - Join fetch ile
-    @Query("SELECT st FROM StockTransaction st " +
-           "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
-           "LEFT JOIN FETCH st.order o " +
-           "WHERE s.id = :stockId")
-    List<StockTransaction> findByStockIdWithJoins(@Param("stockId") Long stockId);
 
     // Belirli bir order'a ait işlemler - Join fetch ile
     @Query("SELECT st FROM StockTransaction st " +
            "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
            "LEFT JOIN FETCH st.order o " +
            "WHERE o.id = :orderId")
     List<StockTransaction> findByOrderIdWithJoins(@Param("orderId") Long orderId);
@@ -37,7 +28,6 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     // Tarih aralığına göre işlemler - Join fetch ile
     @Query("SELECT st FROM StockTransaction st " +
            "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
            "LEFT JOIN FETCH st.order o " +
            "WHERE st.transactionDate BETWEEN :startDate AND :endDate")
     List<StockTransaction> findByTransactionDateBetweenWithJoins(@Param("startDate") LocalDateTime startDate, 
@@ -46,7 +36,6 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     // İşlem türüne göre filtreleme - Join fetch ile
     @Query("SELECT st FROM StockTransaction st " +
            "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
            "LEFT JOIN FETCH st.order o " +
            "WHERE st.transactionType = :transactionType")
     List<StockTransaction> findByTransactionTypeWithJoins(@Param("transactionType") String transactionType);
@@ -54,7 +43,6 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     // Tüm işlemleri join fetch ile getir
     @Query("SELECT st FROM StockTransaction st " +
            "LEFT JOIN FETCH st.portfolio p " +
-           "LEFT JOIN FETCH st.stock s " +
            "LEFT JOIN FETCH st.order o")
     List<StockTransaction> findAllWithJoins();
 
@@ -62,7 +50,7 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     List<StockTransaction> findByPortfolioId(Long portfolioId);
 
     // Belirli bir hisseye ait işlemler (orijinal metod - geriye uyumluluk için)
-    List<StockTransaction> findByStockId(Long stockId);
+    List<StockTransaction> findByStockCode(String stockCode);
 
     // Belirli bir order'a ait işlemler (orijinal metod - geriye uyumluluk için)
     List<StockTransaction> findByOrderId(Long orderId);

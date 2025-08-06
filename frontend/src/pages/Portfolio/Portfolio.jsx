@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { portfolioApi } from '../../services/api/portfolioApi';
+import { walletApi } from '../../services/api/walletApi';
 import './Portfolio.css';
 
 const Portfolio = () => {
@@ -8,12 +9,14 @@ const Portfolio = () => {
   const [portfolios, setPortfolios] = useState([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
   const [stockTransactions, setStockTransactions] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch portfolios on component mount
+  // Fetch portfolios and wallet balance on component mount
   useEffect(() => {
     fetchPortfolios();
+    fetchWalletBalance();
   }, [customerId]);
 
   // Fetch stock transactions when selected portfolio changes
@@ -44,6 +47,19 @@ const Portfolio = () => {
     }
   };
 
+  const fetchWalletBalance = async () => {
+    try {
+      const response = await walletApi.getCustomerWalletBalance(customerId);
+      
+      if (response.status === 200 && response.data !== undefined) {
+        setWalletBalance(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching wallet balance:', err);
+      setWalletBalance(0);
+    }
+  };
+
   const fetchStockTransactions = async (portfolioId) => {
     try {
       const response = await portfolioApi.getPortfolioStockTransactions(portfolioId);
@@ -65,7 +81,7 @@ const Portfolio = () => {
       totalValue: portfolio.totalValue || 0,
       totalProfit: portfolio.totalProfitLoss || 0,
       profitPercentage: portfolio.profitLossPercentage || 0,
-      availableBalance: 0, // This should come from another API endpoint
+      availableBalance: walletBalance,
       blockedBalance: 0 // This should come from another API endpoint
     };
   };
@@ -317,4 +333,4 @@ const Portfolio = () => {
   );
 };
 
-export default Portfolio; 
+export default Portfolio;

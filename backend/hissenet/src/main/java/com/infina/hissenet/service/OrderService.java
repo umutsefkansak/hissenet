@@ -28,6 +28,7 @@ import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
@@ -42,15 +43,18 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final OrderMapper orderMapper;
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
+	private final WalletRepository walletRepository;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService) {
+			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+			WalletRepository walletRepository) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
 		this.orderMapper = orderMapper;
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
+		this.walletRepository = walletRepository;
 	}
 
 	@Transactional
@@ -138,8 +142,30 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-		return findAll().stream().map(orderMapper::toResponse).toList();
+	    List<Order> orders = findAll();
+
+	    return orders.stream().map(order -> {
+	        Boolean isLocked = walletRepository.findIsLockedByCustomerId(order.getCustomer().getId()).orElse(false);
+
+	        return new OrderResponse(
+	            order.getId(),
+	            order.getCustomer().getId(),
+	            order.getCategory(),
+	            order.getType(),
+	            order.getStatus(),
+	            order.getStockCode(),
+	            order.getQuantity(),
+	            order.getPrice(),
+	            order.getTotalAmount(),
+	            order.getCreatedAt(),
+	            order.getUpdatedAt(),
+	            order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
+	            order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
+	            isLocked
+	        );
+	    }).toList();
 	}
+
 
 	@Transactional(readOnly = true)
 	public BigDecimal getOwnedStockQuantity(Long customerId, String stockCode) {

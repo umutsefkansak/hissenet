@@ -3,6 +3,7 @@ package com.infina.hissenet.controller.doc;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 
@@ -200,5 +201,38 @@ public interface OrderControllerDoc {
 	    		    }
 	    		)
 	    		com.infina.hissenet.common.ApiResponse<BigDecimal> getTodayTotalTradeVolume();
+	    	
+	    	@Operation(
+	    		    summary = "En popüler 10 hisseyi getirir",
+	    		    description = """
+	    		        'FILLED' durumundaki işlemler baz alınarak toplam işlem hacmine göre en popüler 
+	    		        (en yüksek hacimli) 10 hisse kodunu döndürür.
+	    		        Hisse kodları, işlem hacmi sıralamasına göre azalan şekilde listelenir.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Popüler hisseler başarıyla listelendi",
+	    		            content = @Content(schema = @Schema(implementation = PopularStockCodesResponse.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<List<PopularStockCodesResponse>> getPopularStockCodes();
+
+	    	@Operation(
+	    		    summary = "Toplam işlem hacmini getirir",
+	    		    description = """
+	    		        Sistemdeki tüm FILLED emirler (alış ve satışlar) için toplam işlem hacmini (totalAmount) hesaplar.
+	    		        Bu, tüm zamanların toplam işlem hacmidir.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Toplam işlem hacmi başarıyla hesaplandı",
+	    		            content = @Content(schema = @Schema(implementation = BigDecimal.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<BigDecimal> getTotalTradeVolume();
 
 }

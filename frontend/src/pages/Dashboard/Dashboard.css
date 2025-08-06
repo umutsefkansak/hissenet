@@ -1,0 +1,200 @@
+.dashboard {
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #1f1f1f;
+  background-color: #fafafa;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.summaryCards {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 180px;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  text-align: center;
+  height: 110px; 
+}
+
+.cardValue {
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.4;
+  margin-top: 0.3rem;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 0.4rem;
+}
+
+.cardValue {
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.4;
+}
+
+.bottomSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.popularStocks,
+.recentTransactions {
+  flex: 1;
+  min-width: 350px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.popularStocks h3,
+.recentTransactions h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1d1d1d;
+}
+
+.popularStocks table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.popularStocks th,
+.popularStocks td {
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #efefef;
+}
+
+.green {
+  color: #3cb371;
+  font-weight: 500;
+}
+
+.red {
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewAll {
+  background: none;
+  border: none;
+  color: #051d2c;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.viewAll:hover {
+  color: #0056b3;
+}
+
+.recentTransactions ul {
+  margin-top: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.recentTransactions li {
+  font-size: 14px;
+  margin-bottom: 0.75rem;
+  color: #2b2b2b;
+}
+
+.transactionsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactionsTable td {
+  padding: 0.4rem 0.5rem;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.transactionsTable td.right {
+  text-align: right;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.dashboardModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dashboardModalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardModalContent h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.dashboardModalCloseButton {
+  margin-top: 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.dashboardModalCloseButton:hover {
+  background-color: #0056b3;
+}

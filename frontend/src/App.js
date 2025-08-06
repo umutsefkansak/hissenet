@@ -14,6 +14,7 @@ import CorporateCustomer from './pages/CreateCustomer/Corporate/CorporateCustome
 import CustomerList from './pages/CustomerList/CustomerList';
 import CustomerDetail from './pages/CustomerDetail/CustomerDetail';
 import StocksPage from './pages/StocksPage/StocksPage';
+import DashBoard from './pages/Dashboard/Dashboard'
 
 import './App.css';
 
@@ -44,6 +45,7 @@ function AppContent() {
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />
+        <Route path="/dashboard" element={<DashBoard/>} />
       </Routes>
       <ToastContainer />
     </div>

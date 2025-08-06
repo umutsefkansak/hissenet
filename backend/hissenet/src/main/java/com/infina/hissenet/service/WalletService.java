@@ -164,7 +164,6 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
 
     private void processSettlement(WalletTransaction transaction) {
         Wallet wallet = transaction.getWallet();
-
         if (transaction.getTransactionType() == TransactionType.STOCK_PURCHASE) {
 
             wallet.transferBlockedToBalance(transaction.getAmount());

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -227,14 +228,14 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getTodayFilledOrders() {
-		LocalDate today = LocalDate.now();
-		LocalDateTime startOfDay = today.atStartOfDay();
-		LocalDateTime endOfDay = today.atTime(23, 59, 59, 999_999_999);
+	    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+	    LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 
-		List<Order> filledToday = orderRepository.findByStatusAndCreatedAtBetween(
-				OrderStatus.FILLED, startOfDay, endOfDay);
+	    List<Order> filledToday = orderRepository.findFilledOrdersToday(startOfDay, endOfDay);
 
-		return filledToday.stream().map(orderMapper::toResponse).collect(Collectors.toList());
+	    return filledToday.stream()
+	            .map(orderMapper::toResponse)
+	            .collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
@@ -243,5 +244,22 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.getTodayTotalVolume(startOfDay, endOfDay);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PopularStockCodesResponse> getPopularStockCodes() {
+	    return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
+	            .stream()
+	            .map(PopularStockCodesResponse::new)
+	            .toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public BigDecimal getTotalTradeVolume() {
+	    return orderRepository.getTotalTradeVolume();
+	}
+
+
 
 }

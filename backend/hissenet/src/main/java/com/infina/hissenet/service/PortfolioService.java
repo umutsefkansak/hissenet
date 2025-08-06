@@ -6,6 +6,7 @@ import com.infina.hissenet.dto.response.PortfolioResponse;
 import com.infina.hissenet.dto.response.PortfolioSummaryResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Portfolio;
+import com.infina.hissenet.entity.enums.StockTransactionType;
 import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.employee.UserNotFoundException;
@@ -18,7 +19,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PortfolioService extends GenericServiceImpl<Portfolio,Long> implements IPortfolioService {
@@ -75,50 +78,59 @@ Portfolio portfolio = getPortfolio(id);
         deleteById(portfolio.getId());
     }
 
-    // toplam değer hesapla (güncel fiyat * miktar)
+    // Toplam değer hesaplama (quantity * currentPrice)
     private BigDecimal calculateTotalValue(Portfolio portfolio) {
         if (portfolio.getTransactions() == null || portfolio.getTransactions().isEmpty()) {
             return BigDecimal.ZERO;
         }
-        return portfolio.getTransactions().stream()
-                .filter(transaction -> transaction.getTransactionStatus() == TransactionStatus.COMPLETED)
-                .map(transaction -> {
-                    BigDecimal currentPrice = transaction.getCurrentPrice() != null ?
-                            transaction.getCurrentPrice() : BigDecimal.ZERO;
-                    return currentPrice.multiply(BigDecimal.valueOf(transaction.getQuantity()));
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalValue = BigDecimal.ZERO;
+
+        for (var tx : portfolio.getTransactions()) {
+            if (tx.getTransactionStatus() != TransactionStatus.SETTLED) continue;
+            if (tx.getTransactionType() != StockTransactionType.BUY) continue;
+
+            BigDecimal currentPrice = tx.getCurrentPrice() != null ? tx.getCurrentPrice() : BigDecimal.ZERO;
+            BigDecimal quantity = BigDecimal.valueOf(tx.getQuantity());
+
+            totalValue = totalValue.add(currentPrice.multiply(quantity));
+        }
+
+        return totalValue;
     }
 
-    // toplam maliyet hesapla (gerçekleşme fiyatı * miktar + komisyon + vergi + diğer masraflar)
+    // Toplam maliyet hesaplama (price * quantity + komisyon + vergi + diğer masraflar)
     private BigDecimal calculateTotalCost(Portfolio portfolio) {
         if (portfolio.getTransactions() == null || portfolio.getTransactions().isEmpty()) {
             return BigDecimal.ZERO;
         }
-        return portfolio.getTransactions().stream()
-                .filter(transaction -> transaction.getTransactionStatus() == TransactionStatus.COMPLETED)
-                .map(transaction -> {
-                    // Gerçekleşme fiyatı * miktar + masraflar
-                    BigDecimal executionPrice = transaction.getExecutionPrice() != null ?
-                            transaction.getExecutionPrice() :
-                            (transaction.getPrice() != null ? transaction.getPrice() : BigDecimal.ZERO);
 
-                    BigDecimal transactionCost = executionPrice.multiply(BigDecimal.valueOf(transaction.getQuantity()));
+        BigDecimal totalCost = BigDecimal.ZERO;
 
-                    // Masrafları ekle
-                    if (transaction.getCommission() != null) {
-                        transactionCost = transactionCost.add(transaction.getCommission());
-                    }
-                    if (transaction.getTax() != null) {
-                        transactionCost = transactionCost.add(transaction.getTax());
-                    }
-                    if (transaction.getOtherFees() != null) {
-                        transactionCost = transactionCost.add(transaction.getOtherFees());
-                    }
+        for (var tx : portfolio.getTransactions()) {
+            if (tx.getTransactionStatus() != TransactionStatus.SETTLED) continue;
+            if (tx.getTransactionType() != StockTransactionType.BUY) continue;
 
-                    return transactionCost;
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal price = tx.getPrice() != null ? tx.getPrice() : BigDecimal.ZERO;
+            BigDecimal quantity = BigDecimal.valueOf(tx.getQuantity());
+
+            BigDecimal transactionCost = price.multiply(quantity);
+
+            // Komisyon, vergi ve diğer masrafları ekle
+            if (tx.getCommission() != null) {
+                transactionCost = transactionCost.add(tx.getCommission());
+            }
+            if (tx.getTax() != null) {
+                transactionCost = transactionCost.add(tx.getTax());
+            }
+            if (tx.getOtherFees() != null) {
+                transactionCost = transactionCost.add(tx.getOtherFees());
+            }
+
+            totalCost = totalCost.add(transactionCost);
+        }
+
+        return totalCost;
     }
 
     // kar zarar hesapla
@@ -138,55 +150,52 @@ Portfolio portfolio = getPortfolio(id);
             BigDecimal totalCost = calculateTotalCost(portfolio);
             BigDecimal totalProfitLoss = calculateProfitLoss(portfolio);
 
+            // BigDecimal değerler için daha güvenli maksimum değerler
+            BigDecimal maxDecimal = new BigDecimal("9999999999999999999999999999999999.9999"); // precision=38,scale=4
 
-
-
-            // Overflow kontrolü
-            if (totalValue.compareTo(BigDecimal.valueOf(999999999)) > 0) {
-
-                totalValue = BigDecimal.valueOf(999999999);
+            // Overflow kontrolü - precision=38,scale=4 için
+            if (totalValue.abs().compareTo(maxDecimal) > 0) {
+                totalValue = totalValue.signum() > 0 ? maxDecimal : maxDecimal.negate();
             }
 
-            if (totalCost.compareTo(BigDecimal.valueOf(999999999)) > 0) {
-
-                totalCost = BigDecimal.valueOf(999999999);
+            if (totalCost.abs().compareTo(maxDecimal) > 0) {
+                totalCost = totalCost.signum() > 0 ? maxDecimal : maxDecimal.negate();
             }
 
-            if (totalProfitLoss.abs().compareTo(BigDecimal.valueOf(999999999)) > 0) {
-
-                totalProfitLoss = totalProfitLoss.signum() > 0 ?
-                        BigDecimal.valueOf(999999999) : BigDecimal.valueOf(-999999999);
+            if (totalProfitLoss.abs().compareTo(maxDecimal) > 0) {
+                totalProfitLoss = totalProfitLoss.signum() > 0 ? maxDecimal : maxDecimal.negate();
             }
 
             portfolio.setTotalValue(totalValue);
             portfolio.setTotalCost(totalCost);
             portfolio.setTotalProfitLoss(totalProfitLoss);
 
+            // Profit Loss Percentage hesaplama - EN KRİTİK KISIM!
             BigDecimal profitLossPercentage = BigDecimal.ZERO;
             if (totalCost.compareTo(BigDecimal.ZERO) > 0) {
                 profitLossPercentage = totalProfitLoss.divide(totalCost, 4, BigDecimal.ROUND_HALF_UP)
                         .multiply(BigDecimal.valueOf(100));
 
+                // PRECISION(5,2) için maksimum değer: 999.99
+                BigDecimal maxPercentage = new BigDecimal("999.99");
+                BigDecimal minPercentage = new BigDecimal("-999.99");
 
-                // Kar oranı overflow kontrolü - en kritik kısım!
-                if (profitLossPercentage.abs().compareTo(BigDecimal.valueOf(999999)) > 0) {
-
-
-                    profitLossPercentage = profitLossPercentage.signum() > 0 ?
-                            BigDecimal.valueOf(999999) : BigDecimal.valueOf(-999999);
+                // Percentage overflow kontrolü - database constraint'e uygun
+                if (profitLossPercentage.compareTo(maxPercentage) > 0) {
+                    profitLossPercentage = maxPercentage;
+                } else if (profitLossPercentage.compareTo(minPercentage) < 0) {
+                    profitLossPercentage = minPercentage;
                 }
             }
 
             portfolio.setProfitLossPercentage(profitLossPercentage);
 
-
-
             Portfolio updatedPortfolio = save(portfolio);
-
-
             return portfolioMapper.toResponse(updatedPortfolio);
 
         } catch (Exception e) {
+            // Debug için hangi değerlerin problematik olduğunu logla
+
             throw e;
         }
     }
@@ -217,4 +226,5 @@ Portfolio portfolio = getPortfolio(id);
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Portfolio "));
     }
+
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WalletBalance, DepositForm, WithdrawForm } from '../../components/wallet';
+import { walletApi } from '../../server/wallet';
 import './Wallet.css';
 
 const Wallet = () => {
@@ -40,25 +41,15 @@ const Wallet = () => {
       setLoading(true);
       
       // Tüm bakiye bilgilerini paralel olarak çek
-      const [balanceResponse, availableResponse, blockedResponse] = await Promise.all([
-        fetch(`/api/v1/wallet/customer/${customerId}/balance`),
-        fetch(`/api/v1/wallet/customer/${customerId}/available-balance`),
-        fetch(`/api/v1/wallet/customer/${customerId}/blocked-balance`)
+      const [balanceData, availableData, blockedData] = await Promise.all([
+        walletApi.getWalletBalance(customerId),
+        walletApi.getAvailableBalance(customerId),
+        walletApi.getBlockedBalance(customerId)
       ]);
 
-      if (balanceResponse.ok && availableResponse.ok && blockedResponse.ok) {
-        const balanceData = await balanceResponse.json();
-        const availableData = await availableResponse.json();
-        const blockedData = await blockedResponse.json();
-
-        setWalletBalance(balanceData.data);
-        setAvailableBalance(availableData.data);
-        setBlockedBalance(blockedData.data);
-      } else {
-        console.error('Bakiye bilgileri getirilemedi');
-        setMessage('Bakiye bilgileri alınamadı');
-        setMessageType('error');
-      }
+      setWalletBalance(balanceData.data);
+      setAvailableBalance(availableData.data);
+      setBlockedBalance(blockedData.data);
     } catch (error) {
       console.error('Bakiye bilgileri getirilemedi:', error);
       setMessage('Bakiye bilgileri alınamadı');
@@ -96,33 +87,21 @@ const Wallet = () => {
     setMessage('');
 
     try {
-      const endpoint = activeTab === 'deposit' 
-        ? `/api/v1/wallet/customer/${customerId}/deposit`
-        : `/api/v1/wallet/customer/${customerId}/withdrawal`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `amount=${amount}`
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(activeTab === 'deposit' ? 'Para başarıyla yüklendi!' : 'Para çekme talebi gönderildi!');
-        setMessageType('success');
-        setAmount('');
-        setIban('');
-        fetchWalletData(); // Bakiye bilgilerini yenile
+      if (activeTab === 'deposit') {
+        await walletApi.deposit(customerId, amount);
+        setMessage('Para başarıyla yüklendi!');
       } else {
-        const errorData = await response.json();
-        setMessage(errorData.detail || 'İşlem başarısız');
-        setMessageType('error');
+        await walletApi.withdraw(customerId, amount);
+        setMessage('Para çekme talebi gönderildi!');
       }
+      
+      setMessageType('success');
+      setAmount('');
+      setIban('');
+      fetchWalletData(); // Bakiye bilgilerini yenile
     } catch (error) {
       console.error('İşlem hatası:', error);
-      setMessage('Bir hata oluştu');
+      setMessage(error.message || 'Bir hata oluştu');
       setMessageType('error');
     } finally {
       setLoading(false);
@@ -162,16 +141,14 @@ const Wallet = () => {
           <button className="close-button">×</button>
         </div>
 
-        {/* Content */}
         <div className="modal-content">
-          {/* Bakiye Bilgileri */}
+          
           <WalletBalance 
             balance={walletBalance} 
             availableBalance={availableBalance}
             blockedBalance={blockedBalance}
           />
 
-          {/* İşlem Formu */}
           <form onSubmit={handleSubmit}>
             {activeTab === 'deposit' ? (
               <DepositForm 
@@ -187,17 +164,16 @@ const Wallet = () => {
                 setIban={setIban}
                 availableBalance={availableBalance}
                 loading={loading}
+                customerId={customerId}
               />
             )}
 
-            {/* Mesaj */}
             {message && (
               <div className={`message ${messageType}`}>
                 {message}
               </div>
             )}
 
-            {/* Onay Butonu */}
             <button 
               type="submit" 
               className="confirm-button"

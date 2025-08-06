@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
-import { orderApi } from "../../services/api/orderApi";
+import { orderApi } from "../../server/order";
 
 const Dashboard = () => {
   const [dailyVolume, setDailyVolume] = useState(null);

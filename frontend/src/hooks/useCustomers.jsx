@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { customerApi } from '../services/api/customerApi';
+import { getAllCustomers, updateIndividualCustomer } from '../server/customer';
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState([]);
@@ -11,7 +11,7 @@ export const useCustomers = () => {
     setError(null);
     
     try {
-      const result = await customerApi.getAllCustomers();
+      const result = await getAllCustomers();
       setCustomers(result.data);
     } catch (err) {
       setError(err.message);
@@ -20,13 +20,22 @@ export const useCustomers = () => {
     }
   };
 
-  const deleteCustomer = async (id) => {
+  
+
+  const updateCustomer = async (updateData) => {
     try {
-      await customerApi.deleteCustomer(id);
+      const { id, ...data } = updateData;
+      
+      console.log('Updating customer with data:', { id, data });
+      
+      // Sadece individual customer güncellemesi yapıyoruz
+      await updateIndividualCustomer(id, data);
+      
       // Listeyi yenile
       await fetchCustomers();
       return true;
     } catch (err) {
+      console.error('Update customer error:', err);
       setError(err.message);
       return false;
     }
@@ -41,6 +50,6 @@ export const useCustomers = () => {
     loading,
     error,
     refreshCustomers: fetchCustomers,
-    deleteCustomer
+    updateCustomer
   };
 };

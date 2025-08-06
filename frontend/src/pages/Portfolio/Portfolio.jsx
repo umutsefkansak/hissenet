@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { portfolioApi } from '../../services/api/portfolioApi';
-import { walletApi } from '../../services/api/walletApi';
+import { walletApi } from '../../server/wallet';
 import './Portfolio.css';
 
 const Portfolio = () => {

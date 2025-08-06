@@ -4,15 +4,16 @@ import CustomerList from '../../components/customer/CustomerList';
 
 
 const CustomerListPage = () => {
-  const { customers, loading, error, deleteCustomer } = useCustomers();
+  const { customers, loading, error, updateCustomer } = useCustomers();
 
-  const handleDelete = async (customerId) => {
-    const success = await deleteCustomer(customerId);
-    if (success) {
   
-      window.showToast('Müşteri başarıyla silindi!', 'success', 3000);
+
+  const handleUpdate = async (updateData) => {
+    const success = await updateCustomer(updateData);
+    if (success) {
+      window.showToast('Müşteri başarıyla güncellendi!', 'success', 3000);
     } else {
-      window.showToast('Müşteri silinirken hata oluştu!', 'error', 3000);
+      window.showToast('Müşteri güncellenirken hata oluştu!', 'error', 3000);
     }
   };
 
@@ -22,7 +23,7 @@ const CustomerListPage = () => {
         customers={customers}
         loading={loading}
         error={error}
-        onDelete={handleDelete}
+        onUpdate={handleUpdate}
       />
     </div>
   );

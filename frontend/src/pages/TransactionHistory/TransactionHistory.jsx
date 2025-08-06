@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { orderApi } from "../../services/api/orderApi";
+import { orderApi } from "../../server/order";
 import "./TransactionHistory.css";
 
 const ITEMS_PER_PAGE = 10;

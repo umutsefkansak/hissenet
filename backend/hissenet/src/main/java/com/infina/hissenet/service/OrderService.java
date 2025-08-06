@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -145,9 +146,18 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	    List<Order> orders = findAll();
 
 	    return orders.stream().map(order -> {
-	        Long customerId = order.getCustomer().getId();  
+	        Long customerId = order.getCustomer().getId();
+	        LocalDateTime createdAt = order.getCreatedAt();
 
-	        BigDecimal blockedBalance = walletRepository.findBlockedBalanceByCustomerId(customerId).orElse(BigDecimal.ZERO);
+	        BigDecimal blockedBalance = BigDecimal.ZERO;
+
+	        if (order.getStatus() == OrderStatus.FILLED) {
+	            LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
+
+	            if (LocalDateTime.now().isBefore(tPlus2)) {
+	                blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+	            }
+	        }
 
 	        return new OrderResponse(
 	            order.getId(),
@@ -166,6 +176,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	            blockedBalance
 	        );
 	    }).toList();
+	}
+
+	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
+	    int businessDaysAdded = 0;
+	    LocalDateTime result = startDateTime;
+
+	    while (businessDaysAdded < 2) {
+	        result = result.plusDays(1);
+	        DayOfWeek day = result.getDayOfWeek();
+	        if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+	            businessDaysAdded++;
+	        }
+	    }
+
+	    return result;
 	}
 
 	@Transactional(readOnly = true)

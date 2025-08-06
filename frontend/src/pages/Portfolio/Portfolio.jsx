@@ -1,61 +1,136 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { portfolioApi } from '../../services/api/portfolioApi';
 import './Portfolio.css';
 
 const Portfolio = () => {
-  const [selectedPortfolio, setSelectedPortfolio] = useState('portfolio1');
+  const { customerId = '68' } = useParams(); // Default to 68 for testing
+  const [portfolios, setPortfolios] = useState([]);
+  const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+  const [stockTransactions, setStockTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Mock data for multiple portfolios
-  const portfolios = {
-    portfolio1: {
-      name: 'Ana Portföy',
-      totalValue: 375000,
-      availableBalance: 125000,
-      portfolioValue: 250000,
-      blockedBalance: 0,
-      totalProfit: 25000,
-      profitPercentage: 7.14,
-      stocks: [
-        { symbol: 'THYAO', name: 'Türk Hava Yolları', quantity: 100, avgPrice: 200.00, currentPrice: 250.50, profit: 5050, profitPercentage: 25.25, currentValue: 25050 },
-        { symbol: 'BIST100', name: 'BIST 100 Endeksi', quantity: 50, avgPrice: 9500, currentPrice: 9845, profit: 17250, profitPercentage: 3.63, currentValue: 492250 },
-        { symbol: 'ARCLK', name: 'Arçelik', quantity: 200, avgPrice: 16.00, currentPrice: 15.21, profit: -158, profitPercentage: -4.94, currentValue: 3042 },
-        { symbol: 'GARAN', name: 'Garanti Bankası', quantity: 150, avgPrice: 40.00, currentPrice: 42.88, profit: 432, profitPercentage: 7.20, currentValue: 6432 },
-        { symbol: 'AKBNK', name: 'Akbank', quantity: 100, avgPrice: 35.00, currentPrice: 38.50, profit: 350, profitPercentage: 10.00, currentValue: 3850 }
-      ]
-    },
-    portfolio2: {
-      name: 'Emeklilik Portföyü',
-      totalValue: 180000,
-      availableBalance: 45000,
-      portfolioValue: 135000,
-      blockedBalance: 0,
-      totalProfit: 12000,
-      profitPercentage: 7.14,
-      stocks: [
-        { symbol: 'GARAN', name: 'Garanti Bankası', quantity: 200, avgPrice: 38.00, currentPrice: 42.88, profit: 976, profitPercentage: 12.84, currentValue: 8576 },
-        { symbol: 'AKBNK', name: 'Akbank', quantity: 150, avgPrice: 32.00, currentPrice: 38.50, profit: 975, profitPercentage: 20.31, currentValue: 5775 },
-        { symbol: 'THYAO', name: 'Türk Hava Yolları', quantity: 50, avgPrice: 220.00, currentPrice: 250.50, profit: 1525, profitPercentage: 13.86, currentValue: 12525 },
-        { symbol: 'ASELS', name: 'Aselsan', quantity: 300, avgPrice: 12.00, currentPrice: 11.80, profit: -60, profitPercentage: -5.00, currentValue: 3540 }
-      ]
-    },
-    portfolio3: {
-      name: 'Yatırım Portföyü',
-      totalValue: 520000,
-      availableBalance: 80000,
-      portfolioValue: 440000,
-      blockedBalance: 0,
-      totalProfit: 35000,
-      profitPercentage: 7.22,
-      stocks: [
-        { symbol: 'BIST100', name: 'BIST 100 Endeksi', quantity: 100, avgPrice: 9200, currentPrice: 9845, profit: 64500, profitPercentage: 7.01, currentValue: 984500 },
-        { symbol: 'THYAO', name: 'Türk Hava Yolları', quantity: 200, avgPrice: 180.00, currentPrice: 250.50, profit: 14100, profitPercentage: 39.17, currentValue: 50100 },
-        { symbol: 'GARAN', name: 'Garanti Bankası', quantity: 300, avgPrice: 35.00, currentPrice: 42.88, profit: 2364, profitPercentage: 22.51, currentValue: 12864 },
-        { symbol: 'ARCLK', name: 'Arçelik', quantity: 500, avgPrice: 14.00, currentPrice: 15.21, profit: 605, profitPercentage: 8.64, currentValue: 7605 },
-        { symbol: 'KRDMD', name: 'Kardemir', quantity: 400, avgPrice: 8.50, currentPrice: 9.45, profit: 380, profitPercentage: 11.18, currentValue: 3780 }
-      ]
+  // Fetch portfolios on component mount
+  useEffect(() => {
+    fetchPortfolios();
+  }, [customerId]);
+
+  // Fetch stock transactions when selected portfolio changes
+  useEffect(() => {
+    if (selectedPortfolio) {
+      fetchStockTransactions(selectedPortfolio.id);
+    }
+  }, [selectedPortfolio]);
+
+  const fetchPortfolios = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await portfolioApi.getCustomerPortfolios(customerId);
+      
+      if (response.status === 200 && response.data) {
+        setPortfolios(response.data);
+        // Set first portfolio as selected by default
+        if (response.data.length > 0) {
+          setSelectedPortfolio(response.data[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching portfolios:', err);
+      setError('Portföy bilgileri yüklenirken hata oluştu');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const portfolioData = portfolios[selectedPortfolio];
+  const fetchStockTransactions = async (portfolioId) => {
+    try {
+      const response = await portfolioApi.getPortfolioStockTransactions(portfolioId);
+      
+      if (response.status === 200 && response.data) {
+        setStockTransactions(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching stock transactions:', err);
+      setStockTransactions([]);
+    }
+  };
+
+  // Calculate total portfolio values
+  const calculatePortfolioTotals = (portfolio) => {
+    if (!portfolio) return {};
+
+    return {
+      totalValue: portfolio.totalValue || 0,
+      totalProfit: portfolio.totalProfitLoss || 0,
+      profitPercentage: portfolio.profitLossPercentage || 0,
+      availableBalance: 0, // This should come from another API endpoint
+      blockedBalance: 0 // This should come from another API endpoint
+    };
+  };
+
+  // Calculate totals for all portfolios
+  const calculateAllPortfoliosTotal = () => {
+    if (!portfolios || portfolios.length === 0) return 0;
+    return portfolios.reduce((sum, portfolio) => sum + (portfolio.totalValue || 0), 0);
+  };
+
+  // Calculate stock distribution for pie chart
+  const calculateStockDistribution = () => {
+    if (!stockTransactions || stockTransactions.length === 0) return [];
+
+    // Group transactions by stock code and sum quantities
+    const stockGroups = stockTransactions.reduce((groups, transaction) => {
+      const stockCode = transaction.stockCode;
+      if (!groups[stockCode]) {
+        groups[stockCode] = {
+          stockCode: stockCode,
+          totalQuantity: 0,
+          totalValue: 0
+        };
+      }
+      groups[stockCode].totalQuantity += transaction.quantity;
+      groups[stockCode].totalValue += transaction.quantity * transaction.currentPrice;
+      return groups;
+    }, {});
+
+    // Convert to array and sort by quantity
+    const stockArray = Object.values(stockGroups).sort((a, b) => b.totalQuantity - a.totalQuantity);
+    
+    // Calculate total quantity for percentages
+    const totalQuantity = stockArray.reduce((sum, stock) => sum + stock.totalQuantity, 0);
+    
+    // Calculate percentages and degrees for pie chart
+    let currentDegree = 0;
+    const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316'];
+    
+    return stockArray.map((stock, index) => {
+      const percentage = totalQuantity > 0 ? (stock.totalQuantity / totalQuantity) * 100 : 0;
+      const degree = (percentage / 100) * 360;
+      const startDegree = currentDegree;
+      currentDegree += degree;
+      
+      return {
+        ...stock,
+        percentage: percentage,
+        startDegree: startDegree,
+        endDegree: currentDegree,
+        color: colors[index % colors.length]
+      };
+    });
+  };
+
+  // Generate pie chart CSS
+  const generatePieChartCSS = (stockDistribution) => {
+    if (stockDistribution.length === 0) return '';
+
+    const segments = stockDistribution.map(stock => 
+      `${stock.color} ${stock.startDegree}deg ${stock.endDegree}deg`
+    ).join(', ');
+
+    return `conic-gradient(${segments})`;
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -67,6 +142,34 @@ const Portfolio = () => {
   const formatPercentage = (percentage) => {
     return `${percentage > 0 ? '+' : ''}${percentage.toFixed(2)}%`;
   };
+
+  if (loading) {
+    return (
+      <div className="portfolio">
+        <div className="loading">Portföy bilgileri yükleniyor...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="portfolio">
+        <div className="error">{error}</div>
+        <button onClick={fetchPortfolios} className="retry-btn">Tekrar Dene</button>
+      </div>
+    );
+  }
+
+  if (!selectedPortfolio) {
+    return (
+      <div className="portfolio">
+        <div className="no-portfolio">Portföy bulunamadı</div>
+      </div>
+    );
+  }
+
+  const portfolioTotals = calculatePortfolioTotals(selectedPortfolio);
+  const stockDistribution = calculateStockDistribution();
 
   return (
     <div className="portfolio">
@@ -80,13 +183,16 @@ const Portfolio = () => {
         <div className="header-right">
           <div className="portfolio-selector">
             <select 
-              value={selectedPortfolio} 
-              onChange={(e) => setSelectedPortfolio(e.target.value)}
+              value={selectedPortfolio.id} 
+              onChange={(e) => {
+                const portfolio = portfolios.find(p => p.id === parseInt(e.target.value));
+                setSelectedPortfolio(portfolio);
+              }}
               className="portfolio-dropdown"
             >
-              {Object.keys(portfolios).map((key) => (
-                <option key={key} value={key}>
-                  {portfolios[key].name}
+              {portfolios.map((portfolio) => (
+                <option key={portfolio.id} value={portfolio.id}>
+                  {portfolio.portfolioName}
                 </option>
               ))}
             </select>
@@ -100,36 +206,36 @@ const Portfolio = () => {
         <div className="summary-card total-value">
           <div className="card-content">
             <h3>Toplam Değer</h3>
-            <p className="card-amount">{formatCurrency(portfolioData.totalValue)}</p>
+            <p className="card-amount">{formatCurrency(calculateAllPortfoliosTotal())}</p>
           </div>
         </div>
         
         <div className="summary-card available-balance">
           <div className="card-content">
             <h3>Kullanılabilir Bakiye</h3>
-            <p className="card-amount">{formatCurrency(portfolioData.availableBalance)}</p>
+            <p className="card-amount">{formatCurrency(portfolioTotals.availableBalance)}</p>
           </div>
         </div>
         
         <div className="summary-card portfolio-value">
           <div className="card-content">
             <h3>Portföy Değeri</h3>
-            <p className="card-amount">{formatCurrency(portfolioData.portfolioValue)}</p>
+            <p className="card-amount">{formatCurrency(portfolioTotals.totalValue)}</p>
           </div>
         </div>
         
         <div className="summary-card blocked-balance">
           <div className="card-content">
             <h3>Bloke Bakiye</h3>
-            <p className="card-amount">{formatCurrency(portfolioData.blockedBalance)}</p>
+            <p className="card-amount">{formatCurrency(portfolioTotals.blockedBalance)}</p>
           </div>
         </div>
         
         <div className="summary-card total-profit">
           <div className="card-content">
             <h3>Toplam Kar/Zarar</h3>
-            <p className={`card-amount ${portfolioData.totalProfit >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(portfolioData.totalProfit)}
+            <p className={`card-amount ${portfolioTotals.totalProfit >= 0 ? 'positive' : 'negative'}`}>
+              {formatCurrency(portfolioTotals.totalProfit)}
             </p>
           </div>
         </div>
@@ -143,19 +249,16 @@ const Portfolio = () => {
           <div className="chart-container">
             <div className="donut-chart">
               <div className="donut-segment" style={{ 
-                background: 'conic-gradient(#10b981 0deg 180deg, #3b82f6 180deg 220deg, #8b5cf6 220deg 250deg, #f59e0b 250deg 280deg, #ef4444 280deg 360deg)' 
+                background: generatePieChartCSS(stockDistribution)
               }}></div>
             </div>
             <div className="chart-legend">
-              {portfolioData.stocks.map((stock, index) => {
-                const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
-                return (
-                  <div key={index} className="legend-item">
-                    <span className="legend-color" style={{ backgroundColor: colors[index % colors.length] }}></span>
-                    <span>{stock.symbol}</span>
-                  </div>
-                );
-              })}
+              {stockDistribution.map((stock, index) => (
+                <div key={index} className="legend-item">
+                  <span className="legend-color" style={{ backgroundColor: stock.color }}></span>
+                  <span>{stock.stockCode} ({stock.percentage.toFixed(1)}%)</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -169,36 +272,42 @@ const Portfolio = () => {
                 <tr>
                   <th>Hisse</th>
                   <th>Güncel Fiyat</th>
-                  <th>Ort. Alış Fiyatı</th>
+                  <th>Alış Fiyatı</th>
                   <th>Kar/Zarar</th>
                   <th>Adet</th>
                   <th>Güncel Değer</th>
                 </tr>
               </thead>
               <tbody>
-                {portfolioData.stocks.map((stock, index) => (
-                  <tr key={index}>
-                    <td>
-                      <div className="stock-info">
-                        <span className="stock-symbol">{stock.symbol}</span>
-                      </div>
-                    </td>
-                    <td>{formatCurrency(stock.currentPrice)}</td>
-                    <td>{formatCurrency(stock.avgPrice)}</td>
-                    <td>
-                      <div className="profit-info">
-                        <span className={`profit-amount ${stock.profit >= 0 ? 'positive' : 'negative'}`}>
-                          {formatCurrency(stock.profit)}
-                        </span>
-                        <span className={`profit-percentage ${stock.profitPercentage >= 0 ? 'positive' : 'negative'}`}>
-                          {formatPercentage(stock.profitPercentage)}
-                        </span>
-                      </div>
-                    </td>
-                    <td>{stock.quantity.toLocaleString()}</td>
-                    <td>{formatCurrency(stock.currentValue)}</td>
-                  </tr>
-                ))}
+                {stockTransactions.map((transaction, index) => {
+                  const currentValue = transaction.quantity * transaction.currentPrice;
+                  const profit = currentValue - transaction.totalAmount;
+                  const profitPercentage = transaction.totalAmount > 0 ? (profit / transaction.totalAmount) * 100 : 0;
+                  
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <div className="stock-info">
+                          <span className="stock-symbol">{transaction.stockCode}</span>
+                        </div>
+                      </td>
+                      <td>{formatCurrency(transaction.currentPrice)}</td>
+                      <td>{formatCurrency(transaction.price)}</td>
+                      <td>
+                        <div className="profit-info">
+                          <span className={`profit-amount ${profit >= 0 ? 'positive' : 'negative'}`}>
+                            {formatCurrency(profit)}
+                          </span>
+                          <span className={`profit-percentage ${profitPercentage >= 0 ? 'positive' : 'negative'}`}>
+                            {formatPercentage(profitPercentage)}
+                          </span>
+                        </div>
+                      </td>
+                      <td>{transaction.quantity.toLocaleString()}</td>
+                      <td>{formatCurrency(currentValue)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

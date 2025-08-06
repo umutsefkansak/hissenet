@@ -9,6 +9,7 @@ import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.repository.PortfolioRepository;
 import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
+import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> {
+public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
 
     private final StockTransactionRepository stockTransactionRepository;
     private final PortfolioService portfolioService;
@@ -75,46 +76,8 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
     }
 
-
-    @Transactional
-    public void updateAllCurrentPrices() {
-        List<StockTransaction> transactions = stockTransactionRepository.findAll();
-        
-        for (StockTransaction transaction : transactions) {
-            try {
-                var cachedStock = cacheManagerService.getCachedByCode(transaction.getStockCode());
-                if (cachedStock != null) {
-                    transaction.setCurrentPrice(cachedStock.lastPrice());
-                    save(transaction);
-                }
-            } catch (Exception e) {
-                System.err.println("Fiyat güncellenemedi: " + transaction.getStockCode() + " - " + e.getMessage());
-            }
-        }
-    }
-
-
-    @Transactional
-    public void updateCurrentPriceByStockCode(String stockCode) {
-        List<StockTransaction> transactions = stockTransactionRepository.findByStockCode(stockCode);
-        
-        BigDecimal currentPrice = BigDecimal.ZERO;
-        try {
-            var cachedStock = cacheManagerService.getCachedByCode(stockCode);
-            if (cachedStock != null) {
-                currentPrice = cachedStock.lastPrice();
-            }
-        } catch (Exception e) {
-            System.err.println("Cache'den fiyat alınamadı: " + stockCode + " - " + e.getMessage());
-            return;
-        }
-        
-        for (StockTransaction transaction : transactions) {
-            transaction.setCurrentPrice(currentPrice);
-            save(transaction);
-        }
-    }
-
+   @Override
+   @Transactional
     public void saveAll(List<StockTransaction> stockTransactions) {
         stockTransactionRepository.saveAll(stockTransactions);
     }

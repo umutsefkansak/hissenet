@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.entity.Customer;
@@ -29,6 +31,7 @@ import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
@@ -43,18 +46,17 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final OrderMapper orderMapper;
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
-	private final StockTransactionService stockTransactionService;
 	private final WalletRepository walletRepository;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-						OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService, StockTransactionService stockTransactionService, WalletRepository walletRepository) {
+			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+			WalletRepository walletRepository) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
 		this.orderMapper = orderMapper;
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
-		this.stockTransactionService = stockTransactionService;
 		this.walletRepository = walletRepository;
 	}
 
@@ -143,12 +145,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-	    List<Order> orders = findAll();
+	    List<Order> orders = orderRepository.findAllByCreatedAtDesc();
 
 	    return orders.stream().map(order -> {
 	        Long customerId = order.getCustomer().getId();
+	        LocalDateTime createdAt = order.getCreatedAt();
 
-	        BigDecimal blockedBalance = walletRepository.findBlockedBalanceByCustomerId(customerId).orElse(BigDecimal.ZERO);
+	        BigDecimal blockedBalance = BigDecimal.ZERO;
+
+	        if (order.getStatus() == OrderStatus.FILLED) {
+	            LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
+
+	            if (LocalDateTime.now().isBefore(tPlus2)) {
+	                blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+	            }
+	        }
 
 	        return new OrderResponse(
 	            order.getId(),
@@ -167,6 +178,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	            blockedBalance
 	        );
 	    }).toList();
+	}
+
+	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
+	    int businessDaysAdded = 0;
+	    LocalDateTime result = startDateTime;
+
+	    while (businessDaysAdded < 2) {
+	        result = result.plusDays(1);
+	        DayOfWeek day = result.getDayOfWeek();
+	        if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+	            businessDaysAdded++;
+	        }
+	    }
+
+	    return result;
 	}
 
 	@Transactional(readOnly = true)

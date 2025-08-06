@@ -19,6 +19,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 	List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status);
 	List<Order> findByCustomerId(Long customerId);
 	List<Order> findByStatusAndCreatedAtBetween(OrderStatus status, LocalDateTime start, LocalDateTime end);
+	
+	@Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
+	List<Order> findAllByCreatedAtDesc();
 
 	@Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
 	List<Order> findRecentOrders(Pageable pageable);

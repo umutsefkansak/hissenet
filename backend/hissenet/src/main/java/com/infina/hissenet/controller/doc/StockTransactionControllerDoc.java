@@ -1,6 +1,5 @@
 package com.infina.hissenet.controller.doc;
 
-import com.infina.hissenet.dto.request.StockTransactionCreateRequest;
 import com.infina.hissenet.dto.response.StockTransactionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,112 +9,111 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Stock Transaction Management", description = "Hisse işlemleri yönetimi API'si")
 public interface StockTransactionControllerDoc {
 
     @Operation(
-        summary = "Order emri üzerine hisse işlemi oluşturur",
+        summary = "Portföydeki satın alınan hisseleri listeler",
         description = """
-            Mevcut bir order emri üzerine hisse işlemi oluşturur.
+            Belirtilen portföydeki tüm satın alınan hisse işlemlerini getirir.
             
-            İşlem türleri:
-            - BUY: Alım işlemi
-            - SELL: Satım işlemi
+            Filtreleme kriterleri:
+            - Sadece BUY (alım) işlemleri
+            - Sadece SETTLED (takas edilmiş) işlemler
+            - Aynı hisse koduna sahip işlemler birleştirilir
             
-            İşlem durumları:
-            - PENDING: Beklemede
-            - COMPLETED: Tamamlandı
-            - FAILED: Başarısız
-            - CANCELLED: İptal edildi
+            Dönen bilgiler:
+            - Hisse kodu ve portföy bilgileri
+            - Toplam miktar ve tutarlar
+            - İşlem tarihleri ve durumları
+            - Komisyon ve vergi bilgileri
             
-            Market emir türleri:
-            - MARKET: Piyasa emri
-            - LIMIT: Limit emri
-            - STOP_LOSS: Zarar durdurma emri
-            - STOP_LIMIT: Zarar durdurma limit emri
-            - TRAILING_STOP: İzleyen zarar durdurma
-            - ICEBERG: Buzdağı emri
-            - TWAP: Time Weighted Average Price
-            - VWAP: Volume Weighted Average Price
+            Bu endpoint portföy detay sayfasında hisse pozisyonlarını göstermek için kullanılır.
             """,
         responses = {
-            @ApiResponse(responseCode = "201", description = "Hisse işlemi başarıyla oluşturuldu",
+            @ApiResponse(responseCode = "200", description = "Satın alınan hisseler başarıyla getirildi",
                 content = @Content(schema = @Schema(implementation = StockTransactionResponse.class,
                     example = """
                     {
-                      "status": 201,
+                      "status": 200,
                       "path": null,
-                      "message": "Transaction created from order successfully",
+                      "message": "Satın Alınan Hisseler",
                       "localDateTime": "2025-08-03T14:30:15.123",
-                      "data": {
-                        "id": 123,
-                        "portfolioId": 456,
-                        "portfolioName": "Uzun Vadeli Yatırım",
-                        "stockId": 789,
-                        "stockTicker": "THYAO",
-                        "stockName": "Türk Hava Yolları",
-                        "orderId": 101,
-                        "transactionType": "BUY",
-                        "transactionStatus": "COMPLETED",
-                        "quantity": 100,
-                        "price": 45.30,
-                        "totalAmount": 4530.00,
-                        "commission": 15.00,
-                        "tax": 0.00,
-                        "otherFees": 0.00,
-                        "marketOrderType": "MARKET",
-                        "limitPrice": null,
-                        "executionPrice": 45.30,
-                        "transactionDate": "2025-08-03T14:30:15.123",
-                        "settlementDate": "2025-08-05T14:30:15.123",
-                        "notes": "Piyasa emri ile alım",
-                        "createdAt": "2025-08-03T14:30:15.123",
-                        "updatedAt": "2025-08-03T14:30:15.123"
-                      }
+                      "data": [
+                        {
+                          "id": 123,
+                          "portfolioId": 456,
+                          "portfolioName": "Uzun Vadeli Yatırım",
+                          "stockCode": "THYAO",
+                          "orderId": 101,
+                          "transactionType": "BUY",
+                          "transactionStatus": "SETTLED",
+                          "quantity": 500,
+                          "price": 45.30,
+                          "totalAmount": 22650.00,
+                          "commission": 45.30,
+                          "tax": 0.00,
+                          "otherFees": 0.00,
+                          "marketOrderType": "MARKET",
+                          "limitPrice": null,
+                          "executionPrice": 45.30,
+                          "currentPrice": 47.50,
+                          "transactionDate": "2025-08-01T10:30:00",
+                          "settlementDate": "2025-08-03T10:30:00",
+                          "notes": "Piyasa emri ile alım",
+                          "createdAt": "2025-08-01T10:30:00",
+                          "updatedAt": "2025-08-03T10:30:00"
+                        },
+                        {
+                          "id": 124,
+                          "portfolioId": 456,
+                          "portfolioName": "Uzun Vadeli Yatırım",
+                          "stockCode": "GARAN",
+                          "orderId": 102,
+                          "transactionType": "BUY",
+                          "transactionStatus": "SETTLED",
+                          "quantity": 200,
+                          "price": 32.75,
+                          "totalAmount": 6550.00,
+                          "commission": 13.10,
+                          "tax": 0.00,
+                          "otherFees": 0.00,
+                          "marketOrderType": "LIMIT",
+                          "limitPrice": 32.50,
+                          "executionPrice": 32.75,
+                          "currentPrice": 34.20,
+                          "transactionDate": "2025-08-02T14:15:00",
+                          "settlementDate": "2025-08-04T14:15:00",
+                          "notes": "Limit emri ile alım",
+                          "createdAt": "2025-08-02T14:15:00",
+                          "updatedAt": "2025-08-04T14:15:00"
+                        }
+                      ]
                     }
                     """
                 ))),
-            @ApiResponse(responseCode = "400", description = "Validation hatası",
-                content = @Content(schema = @Schema(
-                    example = """
-                    {
-                      "type": "https://www.hissenet.com/errors/validation",
-                      "title": "Validation Error",
-                      "status": 400,
-                      "detail": "Validation failed",
-                      "timestamp": "2025-08-03T14:30:15.123",
-                      "errors": {
-                        "portfolioId": "Portfolio ID boş olamaz",
-                        "stockId": "Stock ID boş olamaz",
-                        "quantity": "Miktar pozitif olmalıdır",
-                        "price": "Fiyat negatif olamaz"
-                      }
-                    }
-                    """
-                ))),
-            @ApiResponse(responseCode = "404", description = "Portföy veya hisse bulunamadı",
+            @ApiResponse(responseCode = "404", description = "Portföy bulunamadı",
                 content = @Content(schema = @Schema(
                     example = """
                     {
                       "type": "https://www.hissenet.com/errors/not-found",
                       "title": "Resource Not Found",
                       "status": 404,
-                      "detail": "Portföy veya hisse bulunamadı",
+                      "detail": "Portföy bulunamadı",
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
                 ))),
-            @ApiResponse(responseCode = "422", description = "İşlem oluşturulamadı",
+            @ApiResponse(responseCode = "403", description = "Portföye erişim yetkisi yok",
                 content = @Content(schema = @Schema(
                     example = """
                     {
-                      "type": "https://www.hissenet.com/errors/processing",
-                      "title": "Processing Error",
-                      "status": 422,
-                      "detail": "Hisse işlemi oluşturulamadı: Yetersiz bakiye",
+                      "type": "https://www.hissenet.com/errors/forbidden",
+                      "title": "Forbidden",
+                      "status": 403,
+                      "detail": "Bu portföye erişim yetkiniz bulunmamaktadır",
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
@@ -134,122 +132,82 @@ public interface StockTransactionControllerDoc {
                 )))
         }
     )
-    com.infina.hissenet.common.ApiResponse<StockTransactionResponse> createTransactionFromOrder(
-        @Parameter(description = "Hisse işlemi oluşturma bilgileri", required = true,
-            schema = @Schema(implementation = StockTransactionCreateRequest.class,
-                example = """
-                {
-                  "portfolioId": 456,
-                  "stockId": 789,
-                  "orderId": 101,
-                  "transactionType": "BUY",
-                  "transactionStatus": "COMPLETED",
-                  "quantity": 100,
-                  "price": 45.30,
-                  "totalAmount": 4530.00,
-                  "commission": 15.00,
-                  "tax": 0.00,
-                  "otherFees": 0.00,
-                  "marketOrderType": "MARKET",
-                  "limitPrice": null,
-                  "executionPrice": 45.30,
-                  "transactionDate": "2025-08-03T14:30:15.123",
-                  "settlementDate": "2025-08-05T14:30:15.123",
-                  "notes": "Piyasa emri ile alım"
-                }
-                """
-            )
-        )
-        StockTransactionCreateRequest request
+    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getStockTransactions(
+        @Parameter(description = "Hisse işlemleri getirilecek portföy ID'si", required = true,
+            in = ParameterIn.PATH, example = "456")
+        Long portfolioId
     );
 
     @Operation(
-        summary = "Temettü işlemi oluşturur",
+        summary = "Hisse işlemini başka portföye taşır",
         description = """
-            Hisse temettü ödemesi için işlem oluşturur.
+            Belirtilen hisse işlemini başka bir portföye taşır.
             
-            Temettü işlemleri:
-            - İşlem türü otomatik olarak DIVIDEND olarak ayarlanır
-            - Miktar temettü adet hisse sayısına göre hesaplanır
-            - Fiyat temettü tutarına göre belirlenir
-            - Komisyon ve vergi genellikle 0 olur
+            Taşıma kuralları:
+            - Sadece aynı müşteriye ait portföyler arasında taşıma yapılabilir
+            - İşlem durumu değişmez
+            - Taşıma sonrası her iki portföyün değerleri güncellenir
+            - İşlem geçmişi korunur
             
-            Bu işlem genellikle otomatik olarak sistem tarafından oluşturulur.
+            Bu işlem genellikle portföy yönetimi ve reorganizasyon için kullanılır.
             """,
         responses = {
-            @ApiResponse(responseCode = "201", description = "Temettü işlemi başarıyla oluşturuldu",
-                content = @Content(schema = @Schema(implementation = StockTransactionResponse.class,
-                    example = """
-                    {
-                      "status": 201,
-                      "path": null,
-                      "message": "Dividend transaction created successfully",
-                      "localDateTime": "2025-08-03T14:30:15.123",
-                      "data": {
-                        "id": 124,
-                        "portfolioId": 456,
-                        "portfolioName": "Uzun Vadeli Yatırım",
-                        "stockId": 789,
-                        "stockTicker": "THYAO",
-                        "stockName": "Türk Hava Yolları",
-                        "orderId": null,
-                        "transactionType": "DIVIDEND",
-                        "transactionStatus": "COMPLETED",
-                        "quantity": 100,
-                        "price": 2.50,
-                        "totalAmount": 250.00,
-                        "commission": 0.00,
-                        "tax": 0.00,
-                        "otherFees": 0.00,
-                        "marketOrderType": null,
-                        "limitPrice": null,
-                        "executionPrice": 2.50,
-                        "transactionDate": "2025-08-03T14:30:15.123",
-                        "settlementDate": "2025-08-05T14:30:15.123",
-                        "notes": "2024 yılı temettü ödemesi",
-                        "createdAt": "2025-08-03T14:30:15.123",
-                        "updatedAt": "2025-08-03T14:30:15.123"
-                      }
-                    }
-                    """
-                ))),
-            @ApiResponse(responseCode = "400", description = "Validation hatası",
+            @ApiResponse(responseCode = "200", description = "Hisse işlemi başarıyla taşındı",
                 content = @Content(schema = @Schema(
                     example = """
                     {
-                      "type": "https://www.hissenet.com/errors/validation",
-                      "title": "Validation Error",
-                      "status": 400,
-                      "detail": "Validation failed",
-                      "timestamp": "2025-08-03T14:30:15.123",
-                      "errors": {
-                        "portfolioId": "Portfolio ID boş olamaz",
-                        "stockId": "Stock ID boş olamaz",
-                        "quantity": "Miktar pozitif olmalıdır"
-                      }
+                      "status": 200,
+                      "path": null,
+                      "message": "hisse yeni pörtföye taşındı",
+                      "localDateTime": "2025-08-03T14:30:15.123",
+                      "data": null
                     }
                     """
                 ))),
-            @ApiResponse(responseCode = "404", description = "Portföy veya hisse bulunamadı",
+            @ApiResponse(responseCode = "400", description = "Geçersiz taşıma işlemi",
+                content = @Content(schema = @Schema(
+                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Geçersiz portföy ID'si",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                ))),
+            @ApiResponse(responseCode = "403", description = "Yetkisiz işlem",
+                content = @Content(schema = @Schema(
+                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/forbidden",
+                      "title": "Forbidden",
+                      "status": 403,
+                      "detail": "You are not authorized to modify this portfolio",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                ))),
+            @ApiResponse(responseCode = "404", description = "İşlem veya portföy bulunamadı",
                 content = @Content(schema = @Schema(
                     example = """
                     {
                       "type": "https://www.hissenet.com/errors/not-found",
                       "title": "Resource Not Found",
                       "status": 404,
-                      "detail": "Portföy veya hisse bulunamadı",
+                      "detail": "Stock transaction or portfolio not found",
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
                 ))),
-            @ApiResponse(responseCode = "422", description = "Temettü işlemi oluşturulamadı",
+            @ApiResponse(responseCode = "422", description = "Taşıma işlemi başarısız",
                 content = @Content(schema = @Schema(
                     example = """
                     {
                       "type": "https://www.hissenet.com/errors/processing",
                       "title": "Processing Error",
                       "status": 422,
-                      "detail": "Temettü işlemi oluşturulamadı: Hisse pozisyonu bulunamadı",
+                      "detail": "Hisse işlemi taşınamadı: Farklı müşteri portföyü",
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
@@ -268,35 +226,12 @@ public interface StockTransactionControllerDoc {
                 )))
         }
     )
-    com.infina.hissenet.common.ApiResponse<StockTransactionResponse> createDividendTransaction(
-        @Parameter(description = "Temettü işlemi oluşturma bilgileri", required = true,
-            schema = @Schema(implementation = StockTransactionCreateRequest.class,
-                example = """
-                {
-                  "portfolioId": 456,
-                  "stockId": 789,
-                  "transactionType": "DIVIDEND",
-                  "transactionStatus": "COMPLETED",
-                  "quantity": 100,
-                  "price": 2.50,
-                  "totalAmount": 250.00,
-                  "commission": 0.00,
-                  "tax": 0.00,
-                  "otherFees": 0.00,
-                  "transactionDate": "2025-08-03T14:30:15.123",
-                  "settlementDate": "2025-08-05T14:30:15.123",
-                  "notes": "2024 yılı temettü ödemesi"
-                }
-                """
-            )
-        )
-        StockTransactionCreateRequest request
+    com.infina.hissenet.common.ApiResponse<Void> updatePortfolio(
+        @Parameter(description = "Taşınacak hisse işlemi ID'si", required = true,
+            in = ParameterIn.PATH, example = "123")
+        Long transactionId,
+        @Parameter(description = "Hedef portföy ID'si", required = true,
+            in = ParameterIn.PATH, example = "789")
+        Long portfolioId
     );
-
-    // Diğer endpoint'ler için placeholder'lar
-    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getTransactionsByPortfolioId(Long portfolioId);
-    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getTransactionsByStockId(Long stockId);
-    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getTransactionsByOrderId(Long orderId);
-    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getTransactionsByDateRange(LocalDateTime start, LocalDateTime end);
-    com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getTransactionsByType(String transactionType);
 } 

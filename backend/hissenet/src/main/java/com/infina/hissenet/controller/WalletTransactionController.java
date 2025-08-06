@@ -1,9 +1,7 @@
 package com.infina.hissenet.controller;
 
 import com.infina.hissenet.common.ApiResponse;
-import com.infina.hissenet.controller.doc.WalletControllerDoc;
 import com.infina.hissenet.controller.doc.WalletTransactionControllerDoc;
-import com.infina.hissenet.dto.request.CreateWalletRequest;
 import com.infina.hissenet.dto.request.CreateWalletTransactionRequest;
 import com.infina.hissenet.dto.request.UpdateWalletTransactionRequest;
 import com.infina.hissenet.dto.response.WalletTransactionResponse;
@@ -16,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController

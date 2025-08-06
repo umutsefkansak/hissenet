@@ -9,7 +9,7 @@ export const orderApi = {
     return response.json();
   },
 
-   createOrder: async (orderData) => {
+  createOrder: async (orderData) => {
     const response = await fetch(`${BASE_URL}`, {
       method: 'POST',
       headers: {
@@ -26,5 +26,19 @@ export const orderApi = {
     return response.json(); 
   },
 
-};
+  getTodayTotalTradeVolume: async () => {
+    const response = await fetch(`${BASE_URL}/filled/today/volume`);
+    if (!response.ok) {
+      throw new Error('Bugünkü toplam işlem hacmi alınamadı');
+    }
+    return response.json();
+  },
 
+  getLastFiveOrders: async () => {
+    const response = await fetch(`${BASE_URL}/recent`);
+    if (!response.ok) {
+      throw new Error('Son 5 emir getirilemedi');
+    }
+    return response.json();
+  },
+};

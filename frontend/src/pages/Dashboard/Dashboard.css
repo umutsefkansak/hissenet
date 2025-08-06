@@ -1,0 +1,126 @@
+.dashboard {
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #1f1f1f;
+  background-color: #fafafa;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.summaryCards {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 180px;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 0.4rem;
+}
+
+.cardValue {
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.4;
+}
+
+.bottomSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.popularStocks,
+.recentTransactions {
+  flex: 1;
+  min-width: 350px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.popularStocks h3,
+.recentTransactions h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1d1d1d;
+}
+
+.popularStocks table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.popularStocks th,
+.popularStocks td {
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #efefef;
+}
+
+.green {
+  color: #3cb371;
+  font-weight: 500;
+}
+
+.red {
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewAll {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.viewAll:hover {
+  color: #0056b3;
+}
+
+.recentTransactions ul {
+  margin-top: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.recentTransactions li {
+  font-size: 14px;
+  margin-bottom: 0.75rem;
+  color: #2b2b2b;
+}

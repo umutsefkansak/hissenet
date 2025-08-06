@@ -5,6 +5,7 @@ import com.infina.hissenet.entity.enums.RiskProfile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PortfolioSummaryResponse(
     Long id,
@@ -15,5 +16,6 @@ public record PortfolioSummaryResponse(
     RiskProfile riskProfile,
     PortfolioType portfolioType,
     Boolean isActive,
-    LocalDateTime lastRebalanceDate
+    LocalDateTime lastRebalanceDate,
+    List<StockTransactionResponse> list
 ) {} 

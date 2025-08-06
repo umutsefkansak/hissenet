@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

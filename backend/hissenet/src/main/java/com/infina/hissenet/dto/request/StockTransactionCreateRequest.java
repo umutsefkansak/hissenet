@@ -14,9 +14,6 @@ public record StockTransactionCreateRequest(
     @NotNull(message = "Portfolio ID boş olamaz")
     Long portfolioId,
 
-    @NotNull(message = "Stock ID boş olamaz")
-    Long stockId,
-
     Long orderId,
 
     @NotNull(message = "İşlem türü boş olamaz")

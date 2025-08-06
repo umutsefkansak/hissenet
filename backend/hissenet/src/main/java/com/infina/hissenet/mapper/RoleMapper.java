@@ -60,7 +60,8 @@ public interface RoleMapper {
                             employee.getAccount() != null ? employee.getAccount().getId() : null,
                             roleIds,
                             employee.getCreatedAt(),
-                            employee.getUpdatedAt()
+                            employee.getUpdatedAt(),
+                            employee.getIsOnLeave()
                     );
                 })
                 .collect(Collectors.toSet());

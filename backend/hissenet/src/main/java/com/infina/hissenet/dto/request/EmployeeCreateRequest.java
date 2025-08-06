@@ -48,7 +48,9 @@ public record EmployeeCreateRequest(
 
 		@NotNull(message = "Role IDs cannot be null")
 		@Size(min = 1, message = "At least one role ID must be provided")
-		Set<@NotNull(message = "Role ID cannot be null") Long> roleIds
+		Set<@NotNull(message = "Role ID cannot be null") Long> roleIds,
+
+		Boolean isOnLeave
 
 ) {}
 

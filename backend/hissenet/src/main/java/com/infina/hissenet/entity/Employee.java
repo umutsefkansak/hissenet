@@ -45,13 +45,8 @@ public class Employee extends BaseEntity implements UserDetails {
     @Column(name = "phone", length = 20)
     private String phone;
 
-//    @NotBlank
-//    @Column(name = "employee_id", nullable = false, unique = true, length = 20)
-//    private String employeeId; // Personel numarası (örn: EMP001)
-
-
     @Column(name = "position", length = 100)
-    private String position; // Görev unvanı (Müdür, Uzman, Analyst vb.)
+    private String position;
 
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
@@ -71,6 +66,9 @@ public class Employee extends BaseEntity implements UserDetails {
 
     @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Account account;
+
+    @Column(name = "is_on_leave", nullable = false)
+    private Boolean isOnLeave = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -169,6 +167,13 @@ public class Employee extends BaseEntity implements UserDetails {
         this.account = account;
     }
 
+    public Boolean getIsOnLeave() {
+        return isOnLeave;
+    }
+
+    public void setIsOnLeave(Boolean isOnLeave) {
+        this.isOnLeave = isOnLeave;
+    }
     public Set<Role> getRoles() {
         return roles;
     }

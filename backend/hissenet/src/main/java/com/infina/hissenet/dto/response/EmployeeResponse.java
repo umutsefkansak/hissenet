@@ -21,7 +21,9 @@ public record EmployeeResponse(
 	    Long accountId,
 	    Set<Long> roleIds,
 	    LocalDateTime createdAt,
-	    LocalDateTime updatedAt
+	    LocalDateTime updatedAt,
+		Boolean isOnLeave
+
 ) {
 
 }

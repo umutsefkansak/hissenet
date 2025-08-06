@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
+import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,10 +48,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
 	private final WalletRepository walletRepository;
+	private final IStockTransactionService stockTransactionService;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
-			WalletRepository walletRepository) {
+                        OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+                        WalletRepository walletRepository, IStockTransactionService stockTransactionService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -58,7 +60,8 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
 		this.walletRepository = walletRepository;
-	}
+        this.stockTransactionService = stockTransactionService;
+    }
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateRequest request) {
@@ -110,6 +113,13 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		}
 
 		Order saved = save(order);
+		if (saved.getStatus() == OrderStatus.FILLED) {
+			try {
+				stockTransactionService.createTransactionFromOrder(saved);
+			} catch (Exception e) {
+				System.err.println("StockTransaction oluşturulamadı: " + e.getMessage());
+			}
+		}
 		return orderMapper.toResponse(saved);
 	}
 

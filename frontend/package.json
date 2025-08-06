@@ -10,12 +10,14 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.11.0",
     "http-proxy-middleware": "^3.0.5",
+    "lucide-react": "^0.536.0",
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.1",
     "react-scripts": "5.0.1",
-    "turkey-neighbourhoods": "^4.0.3",
     "sockjs-client": "^1.6.1",
+    "turkey-neighbourhoods": "^4.0.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

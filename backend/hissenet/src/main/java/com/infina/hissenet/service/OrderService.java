@@ -143,7 +143,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-	    List<Order> orders = findAll();
+	    List<Order> orders = orderRepository.findAllByCreatedAtDesc();
 
 	    return orders.stream().map(order -> {
 	        Long customerId = order.getCustomer().getId();

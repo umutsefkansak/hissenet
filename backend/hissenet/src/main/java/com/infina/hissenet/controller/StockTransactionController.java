@@ -20,5 +20,15 @@ public class StockTransactionController {
         this.stockTransactionService = stockTransactionService;
     }
 
+    @GetMapping("/buylist/{portfolioId}")
+    public ApiResponse<List<StockTransactionResponse>> getStockTransactions(@PathVariable Long portfolioId) {
+        return ApiResponse.ok("Satın Alınan Hisseler",stockTransactionService.getAllBuyTransactions(portfolioId));
+    }
+    @PatchMapping("/{transactionId}/{portfolioId}")
+    public ApiResponse<Void> updatePortfolio(@PathVariable Long transactionId,@PathVariable Long portfolioId) {
+        stockTransactionService.updatePortfolioIdForStockTransactions(transactionId,portfolioId);
+        return ApiResponse.ok("hisse yeni pörtföye taşındı");
+    }
+
 
 }

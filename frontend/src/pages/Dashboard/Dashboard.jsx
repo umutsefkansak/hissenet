@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
-import { orderApi } from "../../services/api/orderApi"; 
+import { orderApi } from "../../services/api/orderApi";
 
 const Dashboard = () => {
   const [dailyVolume, setDailyVolume] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [allFilledOrders, setAllFilledOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const volumeResponse = await orderApi.getTodayTotalTradeVolume();
+        const volumeResponse = await orderApi.getTotalTradeVolume();
         const recentResponse = await orderApi.getLastFiveOrders();
-
-        setDailyVolume(volumeResponse.data); 
-        setRecentOrders(recentResponse.data); 
+        setDailyVolume(volumeResponse.data);
+        setRecentOrders(recentResponse.data);
       } catch (error) {
         console.error("Dashboard verileri alınamadı:", error);
       }
@@ -21,6 +22,16 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
+
+  const handleShowModal = async () => {
+    try {
+      const response = await orderApi.getTodayFilledOrders();
+      setAllFilledOrders(response.data);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Tüm işlemler getirilemedi:", error);
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -32,7 +43,7 @@ const Dashboard = () => {
           <span className="cardValue">Günlük İşlem<br />147</span>
         </div>
         <div className="card">
-          <span className="cardTitle">Günlük Toplam Hacim</span>
+          <span className="cardTitle">Toplam Hacim</span>
           <span className="cardValue">
             {dailyVolume !== null ? `${dailyVolume} ₺` : 'Yükleniyor...'}
           </span>
@@ -87,20 +98,48 @@ const Dashboard = () => {
         <div className="recentTransactions">
           <div className="transactionsHeader">
             <h3>Son İşlemler</h3>
+            <button className="viewAll" onClick={handleShowModal}>Tümünü Gör</button>
           </div>
-          <ul>
-            {recentOrders.length > 0 ? (
-              recentOrders.map((order, index) => (
-                <li key={index}>
-                    <strong>{order.stockCode}</strong> – {order.totalAmount} ₺ ({order.type === 'BUY' ? 'Alış' : 'Satış'})
-                </li>
-              ))
-            ) : (
-              <li>Yükleniyor...</li>
-            )}
-          </ul>
+          <table className="transactionsTable">
+            <tbody>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order, index) => (
+                  <tr key={index}>
+                    <td><strong>{order.stockCode}</strong> {order.type === 'BUY' ? 'alış' : 'satış'}</td>
+                    <td className="right">{Number(order.totalAmount).toLocaleString()} TL</td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={2}>Yükleniyor...</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
+
+     {showModal && (
+  <div className="dashboardModalOverlay" onClick={() => setShowModal(false)}>
+    <div className="dashboardModalContent" onClick={(e) => e.stopPropagation()}>
+      <h2>Tüm İşlemler</h2>
+      <table className="transactionsTable full">
+        <tbody>
+          {allFilledOrders.length > 0 ? (
+            allFilledOrders.map((order, index) => (
+              <tr key={index}>
+                <td><strong>{order.stockCode}</strong> {order.type === 'BUY' ? 'alış' : 'satış'}</td>
+                <td className="right">{Number(order.totalAmount).toLocaleString()} TL</td>
+              </tr>
+            ))
+          ) : (
+            <tr><td colSpan={2}>Veri bulunamadı</td></tr>
+          )}
+        </tbody>
+      </table>
+      <button className="dashboardModalCloseButton" onClick={() => setShowModal(false)}>Kapat</button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

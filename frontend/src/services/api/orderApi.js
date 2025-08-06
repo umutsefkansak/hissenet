@@ -41,4 +41,28 @@ export const orderApi = {
     }
     return response.json();
   },
+
+  getTodayFilledOrders: async () => {
+    const response = await fetch(`${BASE_URL}/filled/today`);
+    if (!response.ok) {
+      throw new Error("Bugünkü FILLED emirleri alınamadı");
+    }
+    return response.json();
+  },
+
+  getPopularStockCodes: async () => {
+    const response = await fetch(`${BASE_URL}/popular`);
+    if (!response.ok) {
+      throw new Error('En popüler hisseler getirilemedi');
+    }
+    return response.json();
+  },
+
+  getTotalTradeVolume: async () => {
+    const response = await fetch(`${BASE_URL}/volume/total`);
+    if (!response.ok) {
+      throw new Error('Toplam işlem hacmi alınamadı');
+    }
+    return response.json();
+  }
 };

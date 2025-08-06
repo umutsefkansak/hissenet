@@ -23,7 +23,7 @@ export const orderApi = {
       throw new Error(errData.message || 'Emir oluşturulamadı');
     }
 
-    return response.json(); 
+    return response.json();
   },
 
   getTodayTotalTradeVolume: async () => {
@@ -62,6 +62,14 @@ export const orderApi = {
     const response = await fetch(`${BASE_URL}/volume/total`);
     if (!response.ok) {
       throw new Error('Toplam işlem hacmi alınamadı');
+    }
+    return response.json();
+  },
+
+  getAllOrders: async () => {
+    const response = await fetch(`${BASE_URL}`);
+    if (!response.ok) {
+      throw new Error('Tüm emirler getirilemedi');
     }
     return response.json();
   }

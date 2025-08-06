@@ -1,0 +1,66 @@
+/* Modal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background-color: #fff;
+  border-radius: 10px;
+  max-width: 360px;
+  width: 80%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.header {
+  padding: 28px 12px 6px;
+  text-align: center;
+}
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+}
+
+.body {
+  padding: 0 12px 16px;
+  text-align: center;
+  font-size: 16px;
+  color: #444;
+}
+
+.footer {
+  padding: 12px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  gap: 12px;
+}
+
+/* Tek butonlu modalda ortala */
+.single {
+  justify-content: center;
+}
+
+/* İki butonlu modalda en solda/en sağda yerleşim */
+.multiple {
+  justify-content: space-between;
+}

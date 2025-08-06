@@ -105,17 +105,6 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		}
 
 		Order saved = save(order);
-
-		// Eğer order FILLED ise StockTransaction oluştur
-		if (saved.getStatus() == OrderStatus.FILLED) {
-			try {
-				stockTransactionService.createTransactionFromOrder(saved);
-			} catch (Exception e) {
-				// StockTransaction oluşturulamazsa log'la ama order'ı iptal etme
-				System.err.println("StockTransaction oluşturulamadı: " + e.getMessage());
-			}
-		}
-
 		return orderMapper.toResponse(saved);
 	}
 
@@ -151,7 +140,30 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-		return findAll().stream().map(orderMapper::toResponse).toList();
+	    List<Order> orders = findAll();
+
+	    return orders.stream().map(order -> {
+	        Long customerId = order.getCustomer().getId();
+
+	        BigDecimal blockedBalance = walletRepository.findBlockedBalanceByCustomerId(customerId).orElse(BigDecimal.ZERO);
+
+	        return new OrderResponse(
+	            order.getId(),
+	            customerId,
+	            order.getCategory(),
+	            order.getType(),
+	            order.getStatus(),
+	            order.getStockCode(),
+	            order.getQuantity(),
+	            order.getPrice(),
+	            order.getTotalAmount(),
+	            order.getCreatedAt(),
+	            order.getUpdatedAt(),
+	            order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
+	            order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
+	            blockedBalance
+	        );
+	    }).toList();
 	}
 
 	@Transactional(readOnly = true)
@@ -244,7 +256,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.getTodayTotalVolume(startOfDay, endOfDay);
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<PopularStockCodesResponse> getPopularStockCodes() {
@@ -253,13 +265,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	            .map(PopularStockCodesResponse::new)
 	            .toList();
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public BigDecimal getTotalTradeVolume() {
 	    return orderRepository.getTotalTradeVolume();
 	}
-
-
 
 }

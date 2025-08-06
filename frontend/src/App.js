@@ -15,6 +15,8 @@ import CustomerList from './pages/CustomerList/CustomerList';
 import CustomerDetail from './pages/CustomerDetail/CustomerDetail';
 import StocksPage from './pages/StocksPage/StocksPage';
 import DashBoard from './pages/Dashboard/Dashboard'
+import ModalDemo from './pages/ModalDemo/ModalDemo';
+import TransactionHistory  from './pages/TransactionHistory/TransactionHistory';
 
 import './App.css';
 
@@ -46,6 +48,8 @@ function AppContent() {
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />
         <Route path="/dashboard" element={<DashBoard/>} />
+        <Route path="/popup" element={<ModalDemo/>} />
+        <Route path="/transaction-history" element={<TransactionHistory/>} />
       </Routes>
       <ToastContainer />
     </div>

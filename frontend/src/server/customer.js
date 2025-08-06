@@ -26,6 +26,38 @@ export const createCorporateCustomer = async (customerData) => {
     }
 };
 
+export const getAllCustomers = async () => {
+    try {
+        const response = await api.get('/customers');
+        return response.data;
+    } catch (error) {
+        console.error('Get all customers error:', error);
+        throw error;
+    }
+};
+export const updateIndividualCustomer = async (id, data) => {
+    try {
+        console.log('Updating individual customer with data:', data);
+        const response = await api.put(`/customers/individual/${id}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Update individual customer error:', error);
+        console.error('Error details:', error.response?.data);
+        throw error;
+    }
+};
+
+export const updateCorporateCustomer = async (id, data) => {
+    try {
+        console.log('Updating corporate customer with data:', data);
+        const response = await api.put(`/customers/corporate/${id}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Update corporate customer error:', error);
+        console.error('Error details:', error.response?.data);
+        throw error;
+    }
+};
 
 export const getCustomerById = async (id) => {
     try {

@@ -50,6 +50,10 @@ const TransactionHistory = () => {
   const getOrderCategoryLabel = (category) => category === "MARKET" ? "Piyasa" : category === "LIMIT" ? "Limit" : category;
   const formatDate = (dateString) => new Date(dateString).toLocaleString("tr-TR");
 
+  const formatBlockedBalance = (balance) => {
+    if (!balance || Number(balance) === 0) return "Yok";
+    return <span className="blocked-balance">{Number(balance).toLocaleString()} ₺</span>;
+  };
 
   const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
   const paginatedOrders = orders.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -96,6 +100,7 @@ const TransactionHistory = () => {
               <th>Toplam</th>
               <th>İşlem Türü</th>
               <th>İşlem Durumu</th>
+              <th>Blokaj</th>
               <th>Emir Tipi</th>
             </tr>
           </thead>
@@ -117,6 +122,7 @@ const TransactionHistory = () => {
                     {getOrderStatusLabel(order.status)}
                   </span>
                 </td>
+                <td>{formatBlockedBalance(order.blockedBalance)}</td>
                 <td>{getOrderCategoryLabel(order.category)}</td>
               </tr>
             ))}

@@ -5,6 +5,7 @@ import com.infina.hissenet.controller.doc.OrderControllerDoc;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.service.abstracts.IOrderService;
@@ -93,5 +94,17 @@ public class OrderController implements OrderControllerDoc {
 	    return ApiResponse.ok("Today's total trade volume calculated successfully",
 	            service.getTodayTotalTradeVolume());
 	}
+	
+	@GetMapping("/popular")
+	public ApiResponse<List<PopularStockCodesResponse>> getPopularStockCodes() {
+	    List<PopularStockCodesResponse> popularStockCodes = service.getPopularStockCodes();
+	    return ApiResponse.ok("Top 10 most popular stocks listed successfully", popularStockCodes);
+	}
+
+	@GetMapping("/volume/total")
+	public ApiResponse<BigDecimal> getTotalTradeVolume() {
+	    return ApiResponse.ok("Total trade volume calculated successfully", service.getTotalTradeVolume());
+	}
+
 
 }

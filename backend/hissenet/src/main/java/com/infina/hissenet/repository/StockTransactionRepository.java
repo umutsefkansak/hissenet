@@ -1,12 +1,15 @@
 package com.infina.hissenet.repository;
 
 import com.infina.hissenet.entity.StockTransaction;
+import com.infina.hissenet.entity.enums.StockTransactionType;
+import com.infina.hissenet.entity.enums.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface StockTransactionRepository extends JpaRepository<StockTransaction, Long> {
@@ -59,5 +62,16 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     List<StockTransaction> findByTransactionDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     // İşlem türüne göre filtreleme (orijinal metod - geriye uyumluluk için)
-    List<StockTransaction> findByTransactionType(String transactionType);
+    @Query("SELECT s FROM StockTransaction s WHERE s.transactionType = :type")
+    List<StockTransaction> findByTransactionType(@Param("type") StockTransactionType type);
+
+    @Query("SELECT st FROM StockTransaction st WHERE st.settlementDate <= :currentTime AND st.transactionStatus = :status AND st.transactionType IN (:buyType, :sellType)")
+    List<StockTransaction> findStockTransactionsReadyForSettlement(
+            @Param("currentTime") LocalDateTime currentTime,
+            @Param("status") TransactionStatus status,
+            @Param("buyType") StockTransactionType buyType,
+            @Param("sellType") StockTransactionType sellType
+    );
+
+
 }

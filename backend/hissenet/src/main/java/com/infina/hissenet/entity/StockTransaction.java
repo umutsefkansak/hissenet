@@ -88,8 +88,8 @@ public class StockTransaction extends BaseEntity {
         this.limitPrice = limitPrice;
         this.executionPrice = executionPrice;
         this.currentPrice = currentPrice;
-        this.transactionDate = transactionDate;
-        this.settlementDate = settlementDate;
+        this.transactionDate = transactionDate;// alış
+        this.settlementDate = settlementDate; // t+2
         this.notes = notes;
     }
 

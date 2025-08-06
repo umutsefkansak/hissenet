@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import uuid
 import json
 from dotenv import dotenv_values

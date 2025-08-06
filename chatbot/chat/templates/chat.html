@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Chatbot</title>
+    <title>HisseNet Asistan</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -91,7 +91,7 @@
 <div id="chat-container">
     <div id="chatbox"></div>
     <div id="inputArea">
-        <input type="text" id="userInput" placeholder="Chatbot'a sor" />
+        <input type="text" id="userInput" placeholder="Asistan'a sor" />
         <button id="sendBtn" onclick="sendMessage()">Gönder</button>
     </div>
 </div>
@@ -122,11 +122,11 @@
             });
 
             const data = await response.json();
-            chatbox.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+            chatbox.innerHTML += `<div><strong>Asistan:</strong> ${data.response}</div>`;
             chatbox.scrollTop = chatbox.scrollHeight;
 
         } catch (error) {
-            chatbox.innerHTML += `<div><strong>Bot:</strong> Bir hata oluştu.</div>`;
+            chatbox.innerHTML += `<div><strong>Asistan:</strong> Bir hata oluştu.</div>`;
         }
     }
 </script>

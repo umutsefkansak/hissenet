@@ -1,14 +1,15 @@
+# -*- coding: utf-8 -*-
+import os
 from pathlib import Path
 
-# GÜVENLİK
-SECRET_KEY = 'gizli_anahtar'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True
 
+SECRET_KEY = 'secret_key'
+
 ALLOWED_HOSTS = []
 
-# UYGULAMALAR
 INSTALLED_APPS = [
     'django.contrib.admin',            
     'django.contrib.auth',             
@@ -16,7 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chat',  # Senin uygulaman burada olmalı
+    'chat',
     'chatbot_api',
 ]
 
@@ -32,7 +33,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'chatbot_api.urls'
 
-# HTML DOSYALARI (şablonlar)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -48,9 +48,63 @@ TEMPLATES = [
     }
 ]
 
-# ZAMAN, DİL
+if not os.path.exists(os.path.join(BASE_DIR, 'logs')):
+    os.makedirs(os.path.join(BASE_DIR, 'logs'))
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {name} - {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/app.log'),
+            'formatter': 'verbose',
+            'encoding': "utf-8", 
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'chat': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'database': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'llm': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
 LANGUAGE_CODE = 'tr-tr'
 TIME_ZONE = 'Europe/Istanbul'
 
-# STATİK DOSYALAR (opsiyonel)
 STATIC_URL = '/static/'

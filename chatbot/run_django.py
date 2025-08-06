@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 import os
 import subprocess
+from dotenv import dotenv_values
 
-project_dir = r"/Users/zeynepguney/Downloads/chatbot/"
+secrets = dotenv_values(".SECRETS")
+project_dir = secrets["projectDIR"]
+
 os.chdir(project_dir)
-subprocess.call("source .venv/bin/activate && python manage.py runserver", shell=True)
-run_django.py
+subprocess.call(r".venv\Scripts\activate && python manage.py runserver", shell=True)

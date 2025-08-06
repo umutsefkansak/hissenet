@@ -1,31 +1,24 @@
+# -*- coding: utf-8 -*-
 import json
-import asyncio
+import logging
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from LLM.llm import searchVector
-from Database.database import readDBUri, connectDB, getCollection
+from LLM.llmDbOperate import getLlmResponse
 
-# <- İşlemler henüz tamamlanmadı -> 
-def get_bot_response(message):    
-    uri: str      = readDBUri()
-    db            = connectDB(uri=uri)
-    collection    = getCollection(db=db)
-    results       = asyncio.run(searchVector(query=message, collection=collection))
-    
-    return results
+chatLogger = logging.getLogger('chat')
 
-    """
-    uri: str      = readDBUri()
-    db            = connectDB(uri=uri)
-    collection    = getCollection(db=db)
-    embeddedQuery = asyncio.run(makeEmbedding(query=message))
-    results       = findMatch(collection=collection, embeddedQuery=embeddedQuery)
-    results       = getResults(results=results)
+def get_bot_response(message):
+    chatLogger.info(f"LLM çağrısı başlatıldı. Kullanıcı mesajı: {message}")
 
-    return results[0]["answer"], results[0]["score"], results[1]["answer"], results[1]["score"]
-    """
+    try:
+        llmResponse = getLlmResponse(message=message)
+        chatLogger.debug(f"LLM yanıtı alındı: {llmResponse}")
+        return llmResponse
+    except Exception as e:
+        chatLogger.exception("LLM yanıtı alınırken hata oluştu!")
+        return "Bir hata oluştu. Tekrar deneyin."
 
 def chat_page(request):
     return render(request, 'chat.html')
@@ -33,8 +26,17 @@ def chat_page(request):
 @csrf_exempt
 def chat_api(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        user_message = data.get('message', '')
-        bot_reply = get_bot_response(user_message)
-        return JsonResponse({'response': bot_reply})
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '')
+            chatLogger.info(f"Kullanıcı mesaj gönderdi: {user_message}")
+
+            bot_reply = get_bot_response(user_message)
+            chatLogger.info("LLM yanıtı gönderildi: {bot_reply}")
+            return JsonResponse({'response': bot_reply})
+
+        except Exception as e:
+            chatLogger.exception("chatbot_api endpointinde hata oluştu!")
+            return JsonResponse({'error':'Sunucu hatası!'}, status=500)
+
     return JsonResponse({'error': 'POST method required'}, status=400)

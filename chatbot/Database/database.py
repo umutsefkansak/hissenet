@@ -1,18 +1,38 @@
-import json
+# -*- coding: utf-8 -*-
+import logging
 import pymongo
 from dotenv import dotenv_values
 
 secrets = dotenv_values(".SECRETS")
 
-def readDBUri() -> str:
-    return secrets["mongoDBURI"]
+dbLogger = logging.getLogger('database')
 
-def connectDB(uri:str):
-    client = pymongo.MongoClient(uri, connect=False)
-    return client.RagDocuments0
+def readDBUri() -> str:
+    try:
+        uri = secrets["mongoDBURI"]
+        if not uri:
+            dbLogger.warning("Uyarı: 'mongoDBURI' bulunamadı veya boş!")
+            return None
+        return uri
+    except Exception as e:
+        dbLogger.exception("HATA: uri bilgisi okunamadı!")
+
+def connectMongo(uri:str):
+    try:
+        client = pymongo.MongoClient(uri)
+        documents = client.RagDocuments0
+        dbLogger.debug("MongoDb bağlantısı kuruldu.")
+        return documents
+    except Exception as e:
+        dbLogger.exception("HATA: MongoDb bağlantısı kurulamadı!")
 
 def getCollection(db):
-    return db.steps
+    try:
+        steps = db.steps
+        dbLogger.debug("MongoDb koleksiyonu okundu.")
+        return steps
+    except Exception as e:
+        dbLogger.exception("HATA: MongoDb koleksiyonu okunamadı!")
 
 def findMatch(collection, embeddedQuery: list):
     return collection.aggregate([{"$vectorSearch":{
@@ -29,28 +49,12 @@ def findMatch(collection, embeddedQuery: list):
         }
     },{"$match": {
             "score": {
-                "$gte": 0.1}
+                "$gte": 0.3}
                 }}]);
 
 def getResults(results):
     res = list()
     for r in results:
         res.append(r)
- 
+
     return res
-
-# ----------------------------------
-"""
-uri: str   = readDBUri()
-db         = connectDB(uri=uri) 
-collection = getCollection(db=db)
-
-query: str  = "portföy oluşmak" 
-pathDB: str = secrets["pathDATABASE"]
-
-with open(f"{pathDB}embeddedQuery.json", "r") as file:
-    embeddedQuery: list = json.load(file)
-        
-results = findMatch(collection, embeddedQuery)
-printResults(results)
-"""

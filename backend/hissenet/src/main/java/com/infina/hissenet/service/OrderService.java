@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.entity.Customer;
@@ -27,6 +31,7 @@ import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
@@ -41,15 +46,18 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final OrderMapper orderMapper;
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
+	private final WalletRepository walletRepository;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService) {
+			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+			WalletRepository walletRepository) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
 		this.orderMapper = orderMapper;
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
+		this.walletRepository = walletRepository;
 	}
 
 	@Transactional
@@ -137,7 +145,54 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-		return findAll().stream().map(orderMapper::toResponse).toList();
+	    List<Order> orders = orderRepository.findAllByCreatedAtDesc();
+
+	    return orders.stream().map(order -> {
+	        Long customerId = order.getCustomer().getId();
+	        LocalDateTime createdAt = order.getCreatedAt();
+
+	        BigDecimal blockedBalance = BigDecimal.ZERO;
+
+	        if (order.getStatus() == OrderStatus.FILLED) {
+	            LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
+
+	            if (LocalDateTime.now().isBefore(tPlus2)) {
+	                blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+	            }
+	        }
+
+	        return new OrderResponse(
+	            order.getId(),
+	            customerId,
+	            order.getCategory(),
+	            order.getType(),
+	            order.getStatus(),
+	            order.getStockCode(),
+	            order.getQuantity(),
+	            order.getPrice(),
+	            order.getTotalAmount(),
+	            order.getCreatedAt(),
+	            order.getUpdatedAt(),
+	            order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
+	            order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
+	            blockedBalance
+	        );
+	    }).toList();
+	}
+
+	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
+	    int businessDaysAdded = 0;
+	    LocalDateTime result = startDateTime;
+
+	    while (businessDaysAdded < 2) {
+	        result = result.plusDays(1);
+	        DayOfWeek day = result.getDayOfWeek();
+	        if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+	            businessDaysAdded++;
+	        }
+	    }
+
+	    return result;
 	}
 
 	@Transactional(readOnly = true)
@@ -214,14 +269,14 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getTodayFilledOrders() {
-		LocalDate today = LocalDate.now();
-		LocalDateTime startOfDay = today.atStartOfDay();
-		LocalDateTime endOfDay = today.atTime(23, 59, 59, 999_999_999);
+	    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+	    LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 
-		List<Order> filledToday = orderRepository.findByStatusAndCreatedAtBetween(
-				OrderStatus.FILLED, startOfDay, endOfDay);
+	    List<Order> filledToday = orderRepository.findFilledOrdersToday(startOfDay, endOfDay);
 
-		return filledToday.stream().map(orderMapper::toResponse).collect(Collectors.toList());
+	    return filledToday.stream()
+	            .map(orderMapper::toResponse)
+	            .collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
@@ -231,4 +286,19 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		return orderRepository.getTodayTotalVolume(startOfDay, endOfDay);
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public List<PopularStockCodesResponse> getPopularStockCodes() {
+	    return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
+	            .stream()
+	            .map(PopularStockCodesResponse::new)
+	            .toList();
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public BigDecimal getTotalTradeVolume() {
+	    return orderRepository.getTotalTradeVolume();
+	}
+
 }

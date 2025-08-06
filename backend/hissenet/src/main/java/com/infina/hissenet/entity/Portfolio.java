@@ -17,43 +17,44 @@ import java.util.List;
 public class Portfolio extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
-    
+
     @Column(name = "portfolio_name", nullable = false, length = 100)
     private String portfolioName;
-    
+
     @Column(name = "description", length = 500)
     private String description;
-    
-    @Column(name = "total_value", precision = 19, scale = 4)
+
+    // Precision maksimuma çıkarıldı: 25 → 38 (Arithmetic overflow'ı kesin önlemek için)
+    @Column(name = "total_value", precision = 38, scale = 4)
     private BigDecimal totalValue = BigDecimal.ZERO;
-    
-    @Column(name = "total_cost", precision = 19, scale = 4)
+
+    @Column(name = "total_cost", precision = 38, scale = 4)
     private BigDecimal totalCost = BigDecimal.ZERO;
-    
-    @Column(name = "total_profit_loss", precision = 19, scale = 4)
+
+    @Column(name = "total_profit_loss", precision = 38, scale = 4)
     private BigDecimal totalProfitLoss = BigDecimal.ZERO;
-    
-    @Column(name = "profit_loss_percentage", precision = 5, scale = 2)
+
+    @Column(name = "profit_loss_percentage", precision = 8, scale = 2) // 999999.99 max
     private BigDecimal profitLossPercentage = BigDecimal.ZERO;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "risk_profile")
     private RiskProfile riskProfile;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "portfolio_type")
     private PortfolioType portfolioType = PortfolioType.BALANCED;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = Status.ACTIVE;
-    
+
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
-    
+
     @Column(name = "last_rebalance_date")
     private LocalDateTime lastRebalanceDate;
-    
+
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockTransaction> transactions;
 
@@ -61,10 +62,10 @@ public class Portfolio extends BaseEntity {
         this.customer = customer;
         this.portfolioName = portfolioName;
         this.description = description;
-        this.totalValue = totalValue;
-        this.totalCost = totalCost;
-        this.totalProfitLoss = totalProfitLoss;
-        this.profitLossPercentage = profitLossPercentage;
+        this.totalValue = totalValue != null ? totalValue : BigDecimal.ZERO;
+        this.totalCost = totalCost != null ? totalCost : BigDecimal.ZERO;
+        this.totalProfitLoss = totalProfitLoss != null ? totalProfitLoss : BigDecimal.ZERO;
+        this.profitLossPercentage = profitLossPercentage != null ? profitLossPercentage : BigDecimal.ZERO;
         this.riskProfile = riskProfile;
         this.portfolioType = portfolioType;
         this.status = status;
@@ -74,6 +75,11 @@ public class Portfolio extends BaseEntity {
     }
 
     public Portfolio() {
+        // Default constructor'da da null check ekledim
+        this.totalValue = BigDecimal.ZERO;
+        this.totalCost = BigDecimal.ZERO;
+        this.totalProfitLoss = BigDecimal.ZERO;
+        this.profitLossPercentage = BigDecimal.ZERO;
     }
 
     public Customer getCustomer() {
@@ -101,35 +107,35 @@ public class Portfolio extends BaseEntity {
     }
 
     public BigDecimal getTotalValue() {
-        return totalValue;
+        return totalValue != null ? totalValue : BigDecimal.ZERO;
     }
 
     public void setTotalValue(BigDecimal totalValue) {
-        this.totalValue = totalValue;
+        this.totalValue = totalValue != null ? totalValue : BigDecimal.ZERO;
     }
 
     public BigDecimal getTotalCost() {
-        return totalCost;
+        return totalCost != null ? totalCost : BigDecimal.ZERO;
     }
 
     public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
+        this.totalCost = totalCost != null ? totalCost : BigDecimal.ZERO;
     }
 
     public BigDecimal getTotalProfitLoss() {
-        return totalProfitLoss;
+        return totalProfitLoss != null ? totalProfitLoss : BigDecimal.ZERO;
     }
 
     public void setTotalProfitLoss(BigDecimal totalProfitLoss) {
-        this.totalProfitLoss = totalProfitLoss;
+        this.totalProfitLoss = totalProfitLoss != null ? totalProfitLoss : BigDecimal.ZERO;
     }
 
     public BigDecimal getProfitLossPercentage() {
-        return profitLossPercentage;
+        return profitLossPercentage != null ? profitLossPercentage : BigDecimal.ZERO;
     }
 
     public void setProfitLossPercentage(BigDecimal profitLossPercentage) {
-        this.profitLossPercentage = profitLossPercentage;
+        this.profitLossPercentage = profitLossPercentage != null ? profitLossPercentage : BigDecimal.ZERO;
     }
 
     public RiskProfile getRiskProfile() {

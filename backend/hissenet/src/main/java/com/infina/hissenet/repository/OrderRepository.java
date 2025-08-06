@@ -19,6 +19,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 	List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status);
 	List<Order> findByCustomerId(Long customerId);
 	List<Order> findByStatusAndCreatedAtBetween(OrderStatus status, LocalDateTime start, LocalDateTime end);
+	
+	@Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
+	List<Order> findAllByCreatedAtDesc();
 
 	@Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
 	List<Order> findRecentOrders(Pageable pageable);
@@ -33,4 +36,29 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 		    AND o.createdAt BETWEEN :start AND :end
 		""")
 		BigDecimal getTodayTotalVolume(LocalDateTime start, LocalDateTime end);
+	
+	@Query("""
+		    SELECT o FROM Order o
+		    WHERE o.status = com.infina.hissenet.entity.enums.OrderStatus.FILLED
+		    AND o.createdAt BETWEEN :start AND :end
+		    ORDER BY o.createdAt DESC
+		""")
+		List<Order> findFilledOrdersToday(LocalDateTime start, LocalDateTime end);
+	
+	@Query("""
+		    SELECT o.stockCode
+		    FROM Order o
+		    WHERE o.status = com.infina.hissenet.entity.enums.OrderStatus.FILLED
+		    GROUP BY o.stockCode
+		    ORDER BY SUM(o.totalAmount) DESC
+		""")
+		List<String> findPopularStockCodes(Pageable pageable);
+	
+	@Query("""
+		    SELECT COALESCE(SUM(o.totalAmount), 0) 
+		    FROM Order o 
+		    WHERE o.status = com.infina.hissenet.entity.enums.OrderStatus.FILLED
+		""")
+		BigDecimal getTotalTradeVolume();
+
 }

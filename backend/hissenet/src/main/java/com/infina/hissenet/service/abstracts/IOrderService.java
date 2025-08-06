@@ -6,6 +6,7 @@ import java.util.List;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 
@@ -107,5 +108,22 @@ public interface IOrderService {
      * @return today's total trade volume
      */
     BigDecimal getTodayTotalTradeVolume();
+    
+    /**
+     * Retrieves the top 10 most popular stock codes based on total traded volume.
+     * <p>
+     * This method queries all FILLED orders and calculates the total traded volume (sum of totalAmount)
+     * per stock. The top 10 stocks with the highest volume are returned in descending order.
+     *
+     * @return list of top 10 stock codes ordered by popularity (highest traded volume)
+     */
+    List<PopularStockCodesResponse> getPopularStockCodes();
+
+    /**
+     * Retrieves the total trade volume (sum of totalAmount) for all FILLED orders in the system.
+     *
+     * @return total trade volume
+     */
+    BigDecimal getTotalTradeVolume();
 
 }

@@ -1,0 +1,216 @@
+.transaction-history {
+  padding: 30px;
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.transaction-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.transaction-history-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 22px;
+}
+
+.transaction-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.transaction-table-container {
+  overflow-x: auto;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.transaction-table th {
+  background: #f8f9fa;
+  font-weight: 700;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.transaction-table tr:hover {
+  background: #f8f9fa;
+}
+
+.transaction-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.transaction-type.buy {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.transaction-type.sell {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.transaction-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.transaction-status.completed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.transaction-status.pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.transaction-status.rejected {
+  background: #fbe9e7;
+  color: #d32f2f;
+}
+
+.transaction-status.failed {
+  background: #e1bee7;
+  color: #6a1b9a;
+}
+
+.transaction-status.open {
+  background: #e0f7fa;
+  color: #00838f;
+}
+
+.blocked-balance.active {
+  background: #fff3cd;
+  color: #856404;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.blocked-balance.none {
+  color: #777;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  background: #001f3f; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #001634; 
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.transaction-history-loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.transaction-history-error {
+  text-align: center;
+  padding: 40px;
+  color: #dc3545;
+}
+
+.transaction-history-error button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.transaction-history-error button:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .transaction-table {
+    font-size: 13px;
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: 8px 10px;
+    font-weight: 600;
+  }
+
+  .transaction-history {
+    padding: 16px;
+    width: 95%;
+  }
+
+  .transaction-table td {
+    font-weight: bold;
+  }
+}

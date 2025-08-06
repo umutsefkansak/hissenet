@@ -13,7 +13,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {StockTransactionMapper.class}) // StockTransactionMapper'ı kullan
 public interface PortfolioMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -32,8 +34,8 @@ public interface PortfolioMapper {
     PortfolioResponse toResponse(Portfolio portfolio);
 
     @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "list", source = "transactions") // Portfolio'daki transactions'ı list'e map et
     PortfolioSummaryResponse toSummaryResponse(Portfolio portfolio);
-
 
     default String getCustomerName(Customer customer) {
         if (customer == null) {

@@ -7,21 +7,29 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import VerificationCode from './pages/VerificationCode/VerificationCode';
 import NewPassword from './pages/NewPassword/NewPassword';
 import Wallet from './pages/Wallet';
+import Portfolio from './pages/Portfolio/Portfolio';
 import ToastContainer from './components/Toast/ToastContainer';
 import IndividualCustomer from './pages/CreateCustomer/Individual/IndividualCustomer';
 import CorporateCustomer from './pages/CreateCustomer/Corporate/CorporateCustomer';
 import CustomerList from './pages/CustomerList/CustomerList';
 import CustomerDetail from './pages/CustomerDetail/CustomerDetail';
 import StocksPage from './pages/StocksPage/StocksPage';
+import DashBoard from './pages/Dashboard/Dashboard'
+import ModalDemo from './pages/ModalDemo/ModalDemo';
+import TransactionHistory  from './pages/TransactionHistory/TransactionHistory';
 
 import './App.css';
 
 function AppContent() {
   const location = useLocation();
+  
+  // Drawer'ın gözükmeyeceği sayfalar
+  const authPages = ['/login', '/forgot-password', '/verification-code', '/new-password'];
+  const isAuthPage = authPages.includes(location.pathname);
 
   return (
-    <div className="App">
-      <Navbar />
+    <div className={`App ${isAuthPage ? 'auth-page' : ''}`}>
+      {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -35,9 +43,13 @@ function AppContent() {
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
         <Route path="/wallet" element={<Wallet />} />
+        <Route path="/portfolio/:customerId?" element={<Portfolio />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />
+        <Route path="/dashboard" element={<DashBoard/>} />
+        <Route path="/popup" element={<ModalDemo/>} />
+        <Route path="/transaction-history" element={<TransactionHistory/>} />
       </Routes>
       <ToastContainer />
     </div>

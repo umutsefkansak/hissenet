@@ -10,6 +10,12 @@ export const login = async (email, password) => {
     
     if (response.data) {
       localStorage.setItem('isLogin', 'true');
+      console.log(response.data)
+      // Store personnelId if available
+      if (response.data.data.response && response.data.data.response.id) {
+        
+        localStorage.setItem('personnelId', response.data.data.response.id.toString());
+      }
       return { success: true, data: response.data };
     }
   } catch (error) {

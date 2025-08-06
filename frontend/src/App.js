@@ -19,10 +19,14 @@ import './App.css';
 
 function AppContent() {
   const location = useLocation();
+  
+  // Drawer'ın gözükmeyeceği sayfalar
+  const authPages = ['/login', '/forgot-password', '/verification-code', '/new-password'];
+  const isAuthPage = authPages.includes(location.pathname);
 
   return (
-    <div className="App">
-      <Navbar />
+    <div className={`App ${isAuthPage ? 'auth-page' : ''}`}>
+      {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

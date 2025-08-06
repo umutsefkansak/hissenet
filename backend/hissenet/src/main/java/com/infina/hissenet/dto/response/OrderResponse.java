@@ -20,7 +20,8 @@ public record OrderResponse(
 	    LocalDateTime createdAt,
 	    LocalDateTime updatedAt,
 	    Long createdById,
-	    Long updatedById
+	    Long updatedById,
+	    Boolean isLocked
 ) {
 
 }

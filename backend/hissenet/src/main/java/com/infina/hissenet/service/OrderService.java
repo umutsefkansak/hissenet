@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -43,9 +44,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
 	private final StockTransactionService stockTransactionService;
+	private final WalletRepository walletRepository;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService, StockTransactionService stockTransactionService) {
+						OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService, StockTransactionService stockTransactionService, WalletRepository walletRepository) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -53,6 +55,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
 		this.stockTransactionService = stockTransactionService;
+		this.walletRepository = walletRepository;
 	}
 
 	@Transactional

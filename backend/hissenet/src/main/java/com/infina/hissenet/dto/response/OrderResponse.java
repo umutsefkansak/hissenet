@@ -21,7 +21,7 @@ public record OrderResponse(
 	    LocalDateTime updatedAt,
 	    Long createdById,
 	    Long updatedById,
-	    Boolean isLocked
+	    BigDecimal blockedBalance
 ) {
 
 }

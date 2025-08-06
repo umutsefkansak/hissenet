@@ -145,11 +145,13 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	    List<Order> orders = findAll();
 
 	    return orders.stream().map(order -> {
-	        Boolean isLocked = walletRepository.findIsLockedByCustomerId(order.getCustomer().getId()).orElse(false);
+	        Long customerId = order.getCustomer().getId();  
+
+	        BigDecimal blockedBalance = walletRepository.findBlockedBalanceByCustomerId(customerId).orElse(BigDecimal.ZERO);
 
 	        return new OrderResponse(
 	            order.getId(),
-	            order.getCustomer().getId(),
+	            customerId,
 	            order.getCategory(),
 	            order.getType(),
 	            order.getStatus(),
@@ -161,11 +163,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	            order.getUpdatedAt(),
 	            order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
 	            order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
-	            isLocked
+	            blockedBalance
 	        );
 	    }).toList();
 	}
-
 
 	@Transactional(readOnly = true)
 	public BigDecimal getOwnedStockQuantity(Long customerId, String stockCode) {
@@ -273,5 +274,4 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	    return orderRepository.getTotalTradeVolume();
 	}
 
-	
 }

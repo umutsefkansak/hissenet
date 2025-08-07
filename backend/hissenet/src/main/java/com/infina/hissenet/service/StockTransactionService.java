@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -151,14 +152,25 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         BigDecimal totalCommission = BigDecimal.ZERO;
         BigDecimal totalTax = BigDecimal.ZERO;
         BigDecimal totalOtherFees = BigDecimal.ZERO;
+        BigDecimal totalPriceAmount = BigDecimal.ZERO;
 
         for (StockTransaction tx : transactions) {
-            totalQuantity += tx.getQuantity();
+            int quantity = tx.getQuantity();
+            totalQuantity += quantity;
             totalAmount = totalAmount.add(tx.getTotalAmount());
             totalCommission = totalCommission.add(tx.getCommission());
             totalTax = totalTax.add(tx.getTax());
             totalOtherFees = totalOtherFees.add(tx.getOtherFees());
+
+            BigDecimal price = tx.getPrice();
+            if (price != null) {
+                totalPriceAmount = totalPriceAmount.add(price.multiply(BigDecimal.valueOf(quantity)));
+            }
         }
+
+        BigDecimal averagePrice = totalQuantity > 0
+                ? totalPriceAmount.divide(BigDecimal.valueOf(totalQuantity), 4, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
 
         return new StockTransactionResponse(
                 baseResponse.id(),
@@ -169,7 +181,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
                 baseResponse.transactionType(),
                 baseResponse.transactionStatus(),
                 totalQuantity,
-                baseResponse.price(),
+                averagePrice,
                 totalAmount,
                 totalCommission,
                 totalTax,
@@ -187,12 +199,15 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
         StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException("Stock "));
+        Long oldPortfolioId = transaction.getPortfolio().getId();
         Portfolio portfolio=portfolioService.findById(portfolioId).orElseThrow(()->new NotFoundException("Portfolio "));
         if (!portfolio.getCustomer().getId().equals(transaction.getPortfolio().getCustomer().getId())) {
             throw new UnauthorizedOperationException("You are not authorized to modify this portfolio");
         }
         transaction.setPortfolio(portfolio);
         save(transaction);
+        portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
+        portfolioService.updatePortfolioValues(oldPortfolioId);
     }
 
 }

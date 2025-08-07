@@ -23,7 +23,7 @@ const data = useBist100Data();
   const formattedCurrent = `${current.toFixed(3).replace(/\./g, '')}₺`;
   const formattedRate  = `${changerate.toFixed(2)}%`;
   const variant        = positive ? "trend-up" : "trend-down"
-  const iconComponent  = positive ? <UpArrow  /> : <DownArrow  />;
+  const iconComponent  = positive ? <UpArrow width={24} height={24} /> : <DownArrow width={24} height={24} />;
 
   return (
 

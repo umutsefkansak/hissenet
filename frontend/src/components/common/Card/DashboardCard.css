@@ -50,6 +50,21 @@
   color: #c62828;
 }
 
+.card-icon.daily {
+  background-color: #FFF3E0;
+  color: #FB8C00;
+}
+
+.card-icon.volume {
+  background-color: #E8F0FE;
+  color: #1A73E8;
+}
+
+.card-icon.active-users {
+background-color: #FFF0F6;  
+  color: #F06292; 
+}
+
 .card-icon.users {
     background-color: #dbeafe;
     color: #2563eb;

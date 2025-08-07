@@ -48,6 +48,15 @@ public interface IMailService {
     void sendNotification(NotificationSendRequest request);
 
     /**
+     * Generates and sends verification code to customer email using identification number.
+     * Supports both TC number (11 digits) and Tax number (10 digits).
+     *
+     * @param request the identification number request
+     * @return response with sending status and attempt/expiry details
+     */
+    CodeSendResponse sendVerificationCodeByIdentification(CustomerIdentificationRequest request);
+
+    /**
      * Checks if an email address has exceeded the daily verification code limit.
      *
      * @param email the email address to check

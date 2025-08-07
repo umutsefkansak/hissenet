@@ -126,4 +126,13 @@ public interface IOrderService {
      */
     BigDecimal getTotalTradeVolume();
 
+    /**
+     * Counts the total number of orders created today (regardless of status).
+     * <p>
+     * This includes all orders (e.g., OPEN, FILLED, CANCELED) placed within the current day.
+     *
+     * @return the number of today's orders
+     */
+    Long getTodayOrderCount();
+
 }

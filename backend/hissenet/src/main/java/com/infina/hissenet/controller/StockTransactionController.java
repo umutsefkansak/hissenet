@@ -29,4 +29,8 @@ public class StockTransactionController implements StockTransactionControllerDoc
         stockTransactionService.updatePortfolioIdForStockTransactions(transactionId,portfolioId);
         return ApiResponse.ok("hisse yeni pörtföye taşındı");
     }
+    @GetMapping("/quantity/{cursomerId}/{stockCode}")
+    public ApiResponse<Integer> getQuantityForStockTransaction(@PathVariable Long cursomerId,@PathVariable String stockCode) {
+        return ApiResponse.ok(stockCode+ "ait hisse sayısı",stockTransactionService.getQuantityForStockTransactionWithStream(cursomerId,stockCode));
+    }
 }

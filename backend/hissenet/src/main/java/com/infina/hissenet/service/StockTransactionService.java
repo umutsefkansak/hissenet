@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import com.infina.hissenet.dto.response.StockTransactionResponse;
+import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.StockTransaction;
@@ -10,7 +11,6 @@ import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.transaction.UnauthorizedOperationException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
-import com.infina.hissenet.repository.PortfolioRepository;
 import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
@@ -34,13 +34,15 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private final PortfolioService portfolioService;
     private final ICacheManagerService cacheManagerService;
     private final StockTransactionMapper mapper;
+    private final CustomerService customerService;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, ICacheManagerService cacheManagerService, StockTransactionMapper mapper) {
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, ICacheManagerService cacheManagerService, StockTransactionMapper mapper, CustomerService customerService) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
         this.cacheManagerService = cacheManagerService;
         this.mapper = mapper;
+        this.customerService = customerService;
     }
 
     // Order oluştuğunda otomatik StockTransaction oluştur
@@ -208,6 +210,21 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         save(transaction);
         portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
         portfolioService.updatePortfolioValues(oldPortfolioId);
+    }
+    // aktif hisse adedini döndüren methot
+    public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {
+        Customer customer = customerService.findById(customerId)
+                .orElseThrow(() -> new NotFoundException("Customer not found with id: " + customerId));
+
+        return customer.getPortfolios().stream()
+                .flatMap(portfolio -> portfolio.getTransactions().stream())
+                .filter(transaction ->
+                        stockCode.equals(transaction.getStockCode()) &&
+                                TransactionStatus.SETTLED.equals(transaction.getTransactionStatus()) &&
+                                StockTransactionType.BUY.equals(transaction.getTransactionType())
+                )
+                .mapToInt(StockTransaction::getQuantity)
+                .sum();
     }
 
 }

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.infina.hissenet.utils.DateUtils.calculateT2SettlementDate;
+
 @Service
 public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
 
@@ -68,7 +70,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         transaction.setCurrentPrice(currentPrice);
         transaction.setOrder(order);
         transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setSettlementDate(LocalDateTime.now().plusMinutes(1));
+        transaction.setSettlementDate(calculateT2SettlementDate(LocalDateTime.now()));
         transaction.setNotes("Order üzerinden oluşturulan işlem");
 
 

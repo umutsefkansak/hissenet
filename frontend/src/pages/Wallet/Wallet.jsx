@@ -129,7 +129,6 @@ const Wallet = () => {
               Bakiye Yükle
             </button>
           </div>
-          <button className="close-button">×</button>
         </div>
 
         <div className="modal-content">

@@ -105,6 +105,10 @@ public class OrderController implements OrderControllerDoc {
 	public ApiResponse<BigDecimal> getTotalTradeVolume() {
 	    return ApiResponse.ok("Total trade volume calculated successfully", service.getTotalTradeVolume());
 	}
-
-
+	
+	@GetMapping("/today/count")
+	public ApiResponse<Long> getTodayOrderCount() {
+	    return ApiResponse.ok("Today's total order count retrieved successfully", service.getTodayOrderCount());
+	}
+	
 }

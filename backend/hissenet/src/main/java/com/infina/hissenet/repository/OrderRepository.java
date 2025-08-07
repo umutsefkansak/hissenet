@@ -60,5 +60,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 		    WHERE o.status = com.infina.hissenet.entity.enums.OrderStatus.FILLED
 		""")
 		BigDecimal getTotalTradeVolume();
-
+	
+	@Query("""
+		    SELECT COUNT(o) 
+		    FROM Order o 
+		    WHERE o.createdAt BETWEEN :start AND :end
+		""")
+		Long countTodayOrders(LocalDateTime start, LocalDateTime end);
+	
 }

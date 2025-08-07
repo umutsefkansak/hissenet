@@ -235,4 +235,20 @@ public interface OrderControllerDoc {
 	    		)
 	    		com.infina.hissenet.common.ApiResponse<BigDecimal> getTotalTradeVolume();
 
+	    	@Operation(
+	    		    summary = "Bugünkü toplam emir sayısını getirir",
+	    		    description = """
+	    		        Sistem tarihine göre bugün oluşturulmuş tüm emirlerin sayısını döndürür.
+	    		        Emir durumu (örn. FILLED, PENDING) dikkate alınmaz; sadece tarih filtresi uygulanır.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Bugünkü toplam emir sayısı başarıyla getirildi",
+	    		            content = @Content(schema = @Schema(implementation = Long.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<Long> getTodayOrderCount();
+
 }

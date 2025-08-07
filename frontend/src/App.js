@@ -21,6 +21,7 @@ import { useState, useEffect } from 'react';
 
 import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
+import Reports from './pages/Reports/Reports';
 
 function AppContent() {
   const location = useLocation();
@@ -41,7 +42,7 @@ function AppContent() {
         <Route path="/individual-customer" element={<IndividualCustomer />} />
         <Route path="/corporate-customer" element={<CorporateCustomer />} />
         <Route path="/customer-transactions" element={<div className="page-content">Müşteri İşlemleri Sayfası</div>} />
-        <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="/employee-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
         <Route path="/wallet/:customerId?" element={<Wallet />} />
         <Route path="/portfolio/:customerId?" element={<Portfolio />} />

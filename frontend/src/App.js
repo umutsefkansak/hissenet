@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Layout/Sidebar/Navbar';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
@@ -17,18 +17,18 @@ import StocksPage from './pages/StocksPage/StocksPage';
 import DashBoard from './pages/Dashboard/Dashboard'
 import ModalDemo from './pages/ModalDemo/ModalDemo';
 import TransactionHistory  from './pages/TransactionHistory/TransactionHistory';
+import { useState, useEffect } from 'react';
 
 import './App.css';
 
 function AppContent() {
   const location = useLocation();
-  
   // Drawer'ın gözükmeyeceği sayfalar
   const authPages = ['/login', '/forgot-password', '/verification-code', '/new-password'];
   const isAuthPage = authPages.includes(location.pathname);
 
   return (
-    <div className={`App ${isAuthPage ? 'auth-page' : ''}`}>
+    <div className={`App ${isAuthPage ? 'auth-page' : ''}`}>  
       {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />

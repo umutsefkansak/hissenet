@@ -7,7 +7,7 @@ import SearchInput from '../../components/common/SearchInput/SearchInput';
 import './EmployeeManagementPage.css';
 import Pagination from "../../components/common/Pagination/Pagination";
 import DashboardCard from '../../components/common/Card/DashboardCard';
-import { orderApi } from '../../services/api/orderApi';
+import { orderApi } from '../../server/order';
 
 
 

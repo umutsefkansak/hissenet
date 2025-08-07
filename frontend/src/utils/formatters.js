@@ -22,8 +22,8 @@ export const formatChange = change =>
  */
 export const formatRate = rate =>
     rate != null
-        ? `(${rate > 0 ? '+' : ''}${rate.toFixed(2)}%)`
-        : '(0.00%)';
+        ? `${rate > 0 ? '+' : ''}${rate.toFixed(2)}%`
+        : '0.00%';
 
 /**
  * Sayının pozitif olup olmadığını kontrol eder.

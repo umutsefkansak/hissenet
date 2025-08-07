@@ -2,6 +2,7 @@ package com.infina.hissenet.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.infina.hissenet.properties.StockProperties;
+import com.infina.hissenet.service.BorsaIstanbulCacheService;
 import com.infina.hissenet.service.CombinedCacheService;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -22,7 +23,8 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(Caffeine<Object,Object> caffeine) {
-        CaffeineCacheManager mgr = new CaffeineCacheManager(CombinedCacheService.CACHE_NAME);
+        CaffeineCacheManager mgr = new CaffeineCacheManager( CombinedCacheService.CACHE_NAME,
+                BorsaIstanbulCacheService.CACHE_NAME);
         mgr.setCaffeine(caffeine);
         return mgr;
     }

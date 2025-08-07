@@ -31,6 +31,15 @@ public class CollectApiProperties {
 
     public static class Endpoints {
         private String stocks;
+        private String borsaIstanbul;    // ← yeni
+
+        public String getBorsaIstanbul() {
+            return borsaIstanbul;
+        }
+
+        public void setBorsaIstanbul(String borsaIstanbul) {
+            this.borsaIstanbul = borsaIstanbul;
+        }
 
         public String getStocks() {
             return stocks;

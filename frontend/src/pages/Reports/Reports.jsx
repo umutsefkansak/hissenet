@@ -180,6 +180,70 @@ const Reports = () => {
     }
   };
 
+  const generateExcel = async () => {
+    try {
+      // Dynamic import for xlsx
+      const XLSX = await import('xlsx');
+      
+      // Prepare data for Excel
+      const excelData = orders.map(order => ({
+        'Tarih': formatDate(order.createdAt),
+        'Müşteri': getCustomerName(order.customerId),
+        'Hisse': order.stockCode,
+        'İşlem Türü': getOrderTypeText(order.type),
+        'Adet': order.quantity,
+        'Toplam Tutar': order.totalAmount,
+        'Fiyat': order.price,
+        'Komisyon': order.commission || 0,
+        'Durum': order.status
+      }));
+      
+      // Add summary row at the beginning
+      const summaryRow = {
+        'Tarih': 'ÖZET',
+        'Müşteri': '',
+        'Hisse': '',
+        'İşlem Türü': '',
+        'Adet': orders.length,
+        'Toplam Tutar': orders.reduce((sum, order) => sum + order.totalAmount, 0),
+        'Fiyat': '',
+        'Komisyon': '',
+        'Durum': ''
+      };
+      
+      const allData = [summaryRow, ...excelData];
+      
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(allData);
+      
+      // Set column widths
+      const colWidths = [
+        { wch: 15 }, // Tarih
+        { wch: 25 }, // Müşteri
+        { wch: 10 }, // Hisse
+        { wch: 12 }, // İşlem Türü
+        { wch: 10 }, // Adet
+        { wch: 15 }, // Toplam Tutar
+        { wch: 12 }, // Fiyat
+        { wch: 12 }, // Komisyon
+        { wch: 12 }  // Durum
+      ];
+      ws['!cols'] = colWidths;
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'İşlem Raporu');
+      
+      // Save Excel file
+      const fileName = `islem_raporu_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+    } catch (error) {
+      console.error('Excel oluşturulurken hata:', error);
+      alert('Excel dosyası oluşturulamadı. Lütfen tekrar deneyin.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="reports">
@@ -251,6 +315,7 @@ const Reports = () => {
         </div>
         <div className="header-right">
           <button className="download-btn" onClick={generatePDF}>İndir ></button>
+          <button className="download-btn" onClick={generateExcel}>Excel İndir ></button>
         </div>
       </div>
 

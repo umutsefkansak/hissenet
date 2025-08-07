@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { portfolioApi } from '../../services/api/portfolioApi';
+import { portfolioApi } from '../../server/portfolioApi';
 import { walletApi } from '../../server/wallet';
 import './Portfolio.css';
 

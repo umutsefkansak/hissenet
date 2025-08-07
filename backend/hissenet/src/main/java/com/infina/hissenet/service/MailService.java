@@ -1,16 +1,19 @@
 package com.infina.hissenet.service;
 
 import com.infina.hissenet.constants.MailConstants;
+import com.infina.hissenet.dto.common.CorporateCustomerDto;
+import com.infina.hissenet.dto.common.CustomerDto;
+import com.infina.hissenet.dto.common.IndividualCustomerDto;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.dto.response.CodeSendResponse;
 import com.infina.hissenet.dto.response.CodeVerifyResponse;
 import com.infina.hissenet.dto.response.MailSendResponse;
 import com.infina.hissenet.dto.response.PasswordChangeTokenResponse;
+import com.infina.hissenet.entity.CorporateCustomer;
+import com.infina.hissenet.entity.Customer;
+import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.exception.mail.MailException;
-import com.infina.hissenet.service.abstracts.IEmailTemplateService;
-import com.infina.hissenet.service.abstracts.IEmployeeService;
-import com.infina.hissenet.service.abstracts.IMailService;
-import com.infina.hissenet.service.abstracts.IVerificationService;
+import com.infina.hissenet.service.abstracts.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,10 +32,10 @@ public class MailService implements IMailService {
 
     private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
-    private final IEmployeeService employeeService;
     private final JavaMailSender mailSender;
     private final IEmailTemplateService emailTemplateService;
     private final IVerificationService verificationService;
+    private final ICustomerService customerService;
 
 
     @Value("${mail.from.email}")
@@ -50,14 +53,14 @@ public class MailService implements IMailService {
     @Value("${mail.company.name}")
     private String companyName;
 
-    public MailService(IEmployeeService employeeService, JavaMailSender mailSender,
+    public MailService(JavaMailSender mailSender,
                        IEmailTemplateService emailTemplateService,
-                       IVerificationService verificationService) {
-        this.employeeService = employeeService;
+                       IVerificationService verificationService, ICustomerService customerService) {
         this.mailSender = mailSender;
         this.emailTemplateService = emailTemplateService;
         this.verificationService = verificationService;
 
+        this.customerService = customerService;
     }
 
     @Async
@@ -109,7 +112,8 @@ public class MailService implements IMailService {
             return CodeSendResponse.success(
                     MailConstants.Messages.VERIFICATION_CODE_SENT,
                     maxAttempts,
-                    expiryMinutes
+                    expiryMinutes,
+                    request.email()
             );
 
         } catch (Exception e) {
@@ -167,6 +171,54 @@ public class MailService implements IMailService {
         );
 
         sendMail(mailRequest);
+    }
+
+    @Override
+    public CodeSendResponse sendVerificationCodeByIdentification(CustomerIdentificationRequest request) {
+        try {
+            String identificationNumber = request.identificationNumber().trim();
+            CustomerDto customerDto;
+
+            if (identificationNumber.length() == 11) {
+                customerDto = customerService.getCustomerByTcNumber(identificationNumber);
+            } else if (identificationNumber.length() == 10) {
+                customerDto = customerService.getCustomerByTaxNumber(identificationNumber);
+            } else {
+                throw new IllegalArgumentException("Invalid identification number format");
+            }
+
+            CodeSendRequest codeRequest = new CodeSendRequest(
+                    customerDto.email(),
+                    getCustomerFullNameFromDto(customerDto),
+                    "Kimlik Doğrulama",
+                    defaultMaxAttempts,
+                    defaultExpiryMinutes,
+                    "Kimlik No: " + maskIdentificationNumber(identificationNumber)
+            );
+
+            return sendVerificationCode(codeRequest);
+
+        } catch (Exception e) {
+            logger.error("Error sending verification code for identification: {}",
+                    request.identificationNumber(), e);
+            throw new MailException("Failed to send verification code using identification number: " + e.getMessage(), e);
+        }
+    }
+
+    private String getCustomerFullNameFromDto(CustomerDto customerDto) {
+        return switch (customerDto) {
+            case IndividualCustomerDto individual ->
+                    individual.firstName() + " " + individual.lastName();
+            case CorporateCustomerDto corporate ->
+                    corporate.companyName();
+        };
+    }
+
+    private String maskIdentificationNumber(String number) {
+        if (number.length() >= 4) {
+            return number.substring(0, 2) + "*".repeat(number.length() - 4) + number.substring(number.length() - 2);
+        }
+        return number;
     }
 
     @Override

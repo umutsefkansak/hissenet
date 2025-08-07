@@ -1,6 +1,6 @@
 // src/hooks/useBist100Data.js
 import { useState, useEffect } from 'react';
-import stockService from '../server/stockService';
+import stockService from '../server/websocket/stock';
 
 export default function useBist100Data() {
   const [bist, setBist] = useState(null);

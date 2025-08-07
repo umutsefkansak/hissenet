@@ -99,7 +99,8 @@ const Dashboard = () => {
       <h1 className="title">Hoş Geldiniz</h1>
 
       <div className="summaryCards">
-        <Bist100Card />
+        <Bist100Card className="card"/>
+
         <div className="card">
           <span className="cardTitle">Günlük İşlem</span>
           <span className="cardValue">
@@ -110,7 +111,7 @@ const Dashboard = () => {
         <div className="card">
           <span className="cardTitle">Toplam Hacim</span>
           <span className="cardValue">
-            {dailyVolume !== null ? `${dailyVolume} ₺` : 'Yükleniyor...'}
+            {dailyVolume !== null ? `${dailyVolume}₺` : 'Yükleniyor...'}
           </span>
         </div>
 

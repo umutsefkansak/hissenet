@@ -40,6 +40,15 @@
     background-color: #dcfce7;
     color: #16a34a;
 }
+.card-icon.up-arrow {
+    background-color: #dcfce7;
+  color: #2e7d32;
+}
+
+.card-icon.down-arrow {
+    background-color: #ffcaca;
+  color: #c62828;
+}
 
 .card-icon.users {
     background-color: #dbeafe;

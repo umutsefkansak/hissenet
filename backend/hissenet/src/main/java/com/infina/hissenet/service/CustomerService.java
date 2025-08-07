@@ -279,4 +279,21 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
         }
         return customerNumber;
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomerDto getCustomerByTcNumber(String tcNumber) {
+        return individualCustomerRepository.findByTcNumber(tcNumber)
+                .map(customerMapper::toDto)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with identification number: " + tcNumber));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomerDto getCustomerByTaxNumber(String taxNumber) {
+        return corporateCustomerRepository.findByTaxNumber(taxNumber)
+                .map(customerMapper::toDto)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with tax number: " + taxNumber));
+    }
 }

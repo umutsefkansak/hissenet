@@ -194,4 +194,23 @@ public interface ICustomerService {
      * @return the customer entity reference
      */
     Customer getReferenceById(Long id);
+
+
+    /**
+     * Retrieves a customer by Turkish Identification Number (TC number).
+     *
+     * @param tcNumber Turkish ID number
+     * @return customer data transfer object
+     * @throws CustomerNotFoundException if no customer exists with the given TC number
+     */
+    CustomerDto getCustomerByTcNumber(String tcNumber);
+
+    /**
+     * Retrieves a customer by tax number.
+     *
+     * @param taxNumber tax number
+     * @return customer data transfer object
+     * @throws CustomerNotFoundException if no customer exists with the given tax number
+     */
+    CustomerDto getCustomerByTaxNumber(String taxNumber);
 }

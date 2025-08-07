@@ -1,5 +1,6 @@
 package com.infina.hissenet.service;
 
+import com.infina.hissenet.dto.response.BorsaIstanbulResult;
 import com.infina.hissenet.dto.response.CombinedStockData;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.cache.Cache;
@@ -7,6 +8,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -25,11 +27,14 @@ public class CacheManagerService implements ICacheManagerService {
      * Eğer cache’de yoksa null döner.
      */
     public CombinedStockData getCachedByCode(String code) {
-        List<CombinedStockData> all = getAllCached();
-        return all.stream()
+        Cache cache = cacheManager.getCache(CombinedCacheService.CACHE_NAME);
+        List<CombinedStockData> all =
+                cache.get(CACHE_KEY, List.class);
+
+        return all != null ? all.stream()
                 .filter(c -> c.code().equalsIgnoreCase(code))
                 .findFirst()
-                .orElse(null);
+                .orElse(null) : null;
     }
 
     /**
@@ -37,7 +42,7 @@ public class CacheManagerService implements ICacheManagerService {
      */
     @SuppressWarnings("unchecked")
     public List<CombinedStockData> getAllCached() {
-        Cache cache = cacheManager.getCache(BorsaIstanbulCacheService.CACHE_NAME);
+        Cache cache = cacheManager.getCache(CombinedCacheService.CACHE_NAME);
         if (cache == null) return List.of();
         List<CombinedStockData> all =
                 cache.get(CACHE_KEY, List.class);

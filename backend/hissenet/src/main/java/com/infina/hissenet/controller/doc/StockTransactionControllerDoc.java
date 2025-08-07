@@ -15,8 +15,8 @@ import java.util.List;
 public interface StockTransactionControllerDoc {
 
     @Operation(
-        summary = "Portföydeki satın alınan hisseleri listeler",
-        description = """
+            summary = "Portföydeki satın alınan hisseleri listeler",
+            description = """
             Belirtilen portföydeki tüm satın alınan hisse işlemlerini getirir.
             
             Filtreleme kriterleri:
@@ -32,10 +32,10 @@ public interface StockTransactionControllerDoc {
             
             Bu endpoint portföy detay sayfasında hisse pozisyonlarını göstermek için kullanılır.
             """,
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Satın alınan hisseler başarıyla getirildi",
-                content = @Content(schema = @Schema(implementation = StockTransactionResponse.class,
-                    example = """
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Satın alınan hisseler başarıyla getirildi",
+                            content = @Content(schema = @Schema(implementation = StockTransactionResponse.class,
+                                    example = """
                     {
                       "status": 200,
                       "path": null,
@@ -93,10 +93,10 @@ public interface StockTransactionControllerDoc {
                       ]
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "404", description = "Portföy bulunamadı",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "404", description = "Portföy bulunamadı",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/not-found",
                       "title": "Resource Not Found",
@@ -105,10 +105,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "403", description = "Portföye erişim yetkisi yok",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "403", description = "Portföye erişim yetkisi yok",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/forbidden",
                       "title": "Forbidden",
@@ -117,10 +117,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "500", description = "Sunucu hatası",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/internal",
                       "title": "Internal Server Error",
@@ -129,18 +129,18 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                )))
-        }
+                            )))
+            }
     )
     com.infina.hissenet.common.ApiResponse<List<StockTransactionResponse>> getStockTransactions(
-        @Parameter(description = "Hisse işlemleri getirilecek portföy ID'si", required = true,
-            in = ParameterIn.PATH, example = "456")
-        Long portfolioId
+            @Parameter(description = "Hisse işlemleri getirilecek portföy ID'si", required = true,
+                    in = ParameterIn.PATH, example = "456")
+            Long portfolioId
     );
 
     @Operation(
-        summary = "Hisse işlemini başka portföye taşır",
-        description = """
+            summary = "Hisse işlemini başka portföye taşır",
+            description = """
             Belirtilen hisse işlemini başka bir portföye taşır.
             
             Taşıma kuralları:
@@ -151,10 +151,10 @@ public interface StockTransactionControllerDoc {
             
             Bu işlem genellikle portföy yönetimi ve reorganizasyon için kullanılır.
             """,
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Hisse işlemi başarıyla taşındı",
-                content = @Content(schema = @Schema(
-                    example = """
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hisse işlemi başarıyla taşındı",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "status": 200,
                       "path": null,
@@ -163,10 +163,10 @@ public interface StockTransactionControllerDoc {
                       "data": null
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "400", description = "Geçersiz taşıma işlemi",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "400", description = "Geçersiz taşıma işlemi",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/bad-request",
                       "title": "Bad Request",
@@ -175,10 +175,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "403", description = "Yetkisiz işlem",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "403", description = "Yetkisiz işlem",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/forbidden",
                       "title": "Forbidden",
@@ -187,10 +187,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "404", description = "İşlem veya portföy bulunamadı",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "404", description = "İşlem veya portföy bulunamadı",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/not-found",
                       "title": "Resource Not Found",
@@ -199,10 +199,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "422", description = "Taşıma işlemi başarısız",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "422", description = "Taşıma işlemi başarısız",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/processing",
                       "title": "Processing Error",
@@ -211,10 +211,10 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                ))),
-            @ApiResponse(responseCode = "500", description = "Sunucu hatası",
-                content = @Content(schema = @Schema(
-                    example = """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
                     {
                       "type": "https://www.hissenet.com/errors/internal",
                       "title": "Internal Server Error",
@@ -223,15 +223,94 @@ public interface StockTransactionControllerDoc {
                       "timestamp": "2025-08-03T14:30:15.123"
                     }
                     """
-                )))
-        }
+                            )))
+            }
     )
     com.infina.hissenet.common.ApiResponse<Void> updatePortfolio(
-        @Parameter(description = "Taşınacak hisse işlemi ID'si", required = true,
-            in = ParameterIn.PATH, example = "123")
-        Long transactionId,
-        @Parameter(description = "Hedef portföy ID'si", required = true,
-            in = ParameterIn.PATH, example = "789")
-        Long portfolioId
+            @Parameter(description = "Taşınacak hisse işlemi ID'si", required = true,
+                    in = ParameterIn.PATH, example = "123")
+            Long transactionId,
+            @Parameter(description = "Hedef portföy ID'si", required = true,
+                    in = ParameterIn.PATH, example = "789")
+            Long portfolioId
     );
-} 
+
+    @Operation(
+            summary = "Belirli bir müşterinin belirli bir hisse koduna ait toplam miktarını döner",
+            description = """
+            Müşteri ve hisse kodu bazında toplam hisse miktarını döndürür.
+            
+            Hesaplama kriterleri:
+            - Sadece BUY (alım) işlemleri dahil edilir
+            - Sadece SETTLED (takas edilmiş) işlemler hesaplanır
+            - Tüm portföylerdeki işlemler toplanır
+            - Satış işlemleri bu hesaplamaya dahil edilmez
+            
+            Kullanım alanları:
+            - Satış emri verirken maksimum miktar kontrolü
+            - Portföy pozisyon hesaplamaları
+            - Risk yönetimi ve limit kontrolleri
+            - Toplam hisse senedi pozisyonu görüntüleme
+            
+            Bu endpoint gerçek zamanlı pozisyon bilgisi sağlar ve satış işlemlerinde kritik rol oynar.
+            """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hisse miktarı başarıyla getirildi",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "status": 200,
+                      "path": null,
+                      "message": "THYAO koduna ait hisse sayısı",
+                      "localDateTime": "2025-08-03T14:30:15.123",
+                      "data": 1500
+                    }
+                    """
+                            ))),
+                    @ApiResponse(responseCode = "404", description = "Müşteri bulunamadı",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/not-found",
+                      "title": "Resource Not Found",
+                      "status": 404,
+                      "detail": "Customer not found with id: 123",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                            ))),
+                    @ApiResponse(responseCode = "400", description = "Geçersiz parametre",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Geçersiz hisse kodu formatı",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/internal",
+                      "title": "Internal Server Error",
+                      "status": 500,
+                      "detail": "Internal server error occurred",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                            )))
+            }
+    )
+    com.infina.hissenet.common.ApiResponse<Integer> getQuantityForStockTransaction(
+            @Parameter(description = "Müşteri ID'si", required = true,
+                    in = ParameterIn.PATH, example = "123")
+            Long customerId,
+            @Parameter(description = "Hisse kodu (örn: THYAO, GARAN)", required = true,
+                    in = ParameterIn.PATH, example = "THYAO")
+            String stockCode
+    );
+}

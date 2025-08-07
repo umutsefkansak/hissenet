@@ -1,3 +1,22 @@
+/* Dikey sütun: rate ve changePrice alt alta */
+.changeColumn {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+/* Oran (rate) */
+.rateValue {
+  font-size: 14px;
+  /* dilersen farklı renk/boyut verebilirsin */
+}
+
+/* Fiyat farkı (changePrice) */
+.changeValue {
+  font-size: 14px;
+  /* eğer “TL” sonrası küçük ekleme istersen ekle */
+}
+
 .item {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr 1.5fr;
@@ -7,21 +26,75 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-.item:hover { background-color: #f9fafe; }
-.selected { background-color: #e3f2ff; }
+
+.item:hover {
+  background-color: #f9fafe;
+}
+
+.selected {
+  background-color: #e3f2ff;
+}
+
 .column {
   display: flex;
   flex-direction: column;
-       
-}.columnRight { display: flex; flex-direction: column; text-align: right; }
-.nameRow { font-weight: 600; font-size: 16px; color: #333; }
-.textRow { font-size: 14px; color: #666; }
-.priceRow { font-weight: 600; font-size: 16px; color: #333; }
-.changeRow { font-weight: 600; font-size: 16px; }
-.subText { font-size: 13px; color: #999; }
-.positive { color: #2e7d32; }
-.negative { color: #c62828; }
-.item > .column:first-child {
+
+}
+.changeColumnContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* yatayda ortala */
+  justify-content: flex-start; /* üstten başla */
+}
+.columnRight {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.nameRow {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+/* Ok ikonu */
+.icon {
+  margin-right: 8px;
+  flex-shrink: 0;
+  color: inherit;
+}
+.textRow {
+  font-size: 14px;
+  color: #666;
+}
+
+.priceRow {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.changeRow {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.subText {
+  font-size: 13px;
+  color: #999;
+}
+
+.positive {
+  color: #2e7d32;
+}
+
+.negative {
+  color: #c62828;
+}
+
+.item>.column:first-child {
   align-items: flex-start;
   text-align: left;
 }

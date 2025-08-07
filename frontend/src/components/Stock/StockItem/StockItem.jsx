@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './StockItem.module.css';
 import { formatPrice, formatChange, formatRate, isPositive, formatHacim } from '../../../utils/formatters';
+import UpArrow from '../../Icons/UpArrow';
+import DownArrow from '../../Icons/DownArrow';
 
 const StockItem = ({ stock, onSelect, isSelected }) => {
  const {
@@ -43,16 +45,24 @@ const StockItem = ({ stock, onSelect, isSelected }) => {
       </div>
 
       {/* Column: Değişim */}
-      <div className={styles.column}>
+      <div className={styles.changeColumnContainer}>
         <div
           className={`${styles.changeRow} ${
             positive ? styles.positive : styles.negative
           }`}
         >
-          {positive ? '↑' : '↓'} {formatRate(rate)}
-        </div>
-        <div className={styles.subText}>
-          {positive ? '' : ''}{formatChange(changePrice)} TL
+          {positive
+          ? <UpArrow className={styles.icon} />
+          : <DownArrow className={styles.icon} />
+        } 
+         <div className={styles.changeColumn}>
+            <span className={styles.rateValue}>
+              {formatRate(rate)}
+            </span>
+            <span className={styles.changeValue}>
+              {formatChange(changePrice)} TL
+            </span>
+          </div>
         </div>
       </div>
 

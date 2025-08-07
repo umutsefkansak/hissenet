@@ -115,15 +115,15 @@ const Wallet = () => {
       <div className="wallet-modal">
         {/* Header */}
         <div className="modal-header">
-          <div className="tab-buttons">
+          <div className="wallet-tab-buttons">
             <button 
-              className={`tab-button ${activeTab === 'withdraw' ? 'active' : ''}`}
+              className={`wallet-tab-button ${activeTab === 'withdraw' ? 'active' : ''}`}
               onClick={() => setActiveTab('withdraw')}
             >
               Bakiye Çek
             </button>
             <button 
-              className={`tab-button ${activeTab === 'deposit' ? 'active' : ''}`}
+              className={`wallet-tab-button ${activeTab === 'deposit' ? 'active' : ''}`}
               onClick={() => setActiveTab('deposit')}
             >
               Bakiye Yükle

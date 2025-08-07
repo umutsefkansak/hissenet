@@ -30,7 +30,7 @@
   flex-shrink: 0; 
 }
 
-.tab-buttons {
+.wallet-tab-buttons {
   display: flex;
   gap: 8px; 
   background: #e9ecef;
@@ -38,7 +38,7 @@
   padding: 4px;
 }
 
-.tab-button {
+.wallet-tab-button {
   padding: 12px 24px;
   border: none;
   background: transparent;
@@ -51,12 +51,12 @@
   position: relative;
 }
 
-.tab-button:hover {
+.wallet-tab-button:hover {
   color: #495057;
   background: rgba(255, 255, 255, 0.7);
 }
 
-.tab-button.active {
+.wallet-tab-button.active {
   color: #fff;
   background: #1e3a8a;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);

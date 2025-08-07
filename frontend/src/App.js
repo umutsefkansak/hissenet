@@ -20,6 +20,7 @@ import TransactionHistory  from './pages/TransactionHistory/TransactionHistory';
 import { useState, useEffect } from 'react';
 
 import './App.css';
+import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
 
 function AppContent() {
   const location = useLocation();
@@ -40,8 +41,8 @@ function AppContent() {
         <Route path="/individual-customer" element={<IndividualCustomer />} />
         <Route path="/corporate-customer" element={<CorporateCustomer />} />
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
-        <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
-        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/employee-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
+        <Route path="/wallet/:customerId?" element={<Wallet />} />
         <Route path="/portfolio/:customerId?" element={<Portfolio />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />

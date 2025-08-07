@@ -241,8 +241,8 @@ const Navbar = () => {
                       </Link>
                     </li>
 
-                    <li className={`drawer-menu-item ${isActiveMenu('/user-management') ? 'active' : ''}`}>
-                      <Link to="/user-management" className="drawer-menu-link" onClick={closeDrawer}>
+                    <li className={`drawer-menu-item ${isActiveMenu('/employee-management') ? 'active' : ''}`}>
+                      <Link to="/employee-management" className="drawer-menu-link" onClick={closeDrawer}>
                         <div className="drawer-menu-header">
                           <div className="drawer-menu-left">
                         <span className="drawer-menu-icon">

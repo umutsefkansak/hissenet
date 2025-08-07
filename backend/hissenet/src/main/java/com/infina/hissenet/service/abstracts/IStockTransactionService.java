@@ -31,4 +31,7 @@ public interface IStockTransactionService {
      * @param portfolioId Hedef portföy ID'si
      */
     void updatePortfolioIdForStockTransactions(Long transactionId, Long portfolioId);
+
+
+    Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode);
 }

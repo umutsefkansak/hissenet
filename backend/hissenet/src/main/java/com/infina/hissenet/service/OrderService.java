@@ -318,5 +318,12 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	public BigDecimal getTotalTradeVolume() {
 	    return orderRepository.getTotalTradeVolume();
 	}
+	
+	@Transactional(readOnly = true)
+	public Long getTodayOrderCount() {
+	    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+	    LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
+	    return orderRepository.countTodayOrders(startOfDay, endOfDay);
+	}
 
 }

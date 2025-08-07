@@ -10,7 +10,7 @@ const TradePanel = ({ stock, onBack }) => {
     const [totalInput, setTotalInput] = useState('');
     const [price, setPrice] = useState(''); // Limit fiyat
 
-    const customerId = 45; // Şimdilik sabit
+    const customerId = 68; // Şimdilik sabit
 
     useEffect(() => {
         setPrice(stock.lastPrice?.toFixed(2) || '');

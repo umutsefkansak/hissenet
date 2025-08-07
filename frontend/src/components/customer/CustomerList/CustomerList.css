@@ -2,7 +2,7 @@
   padding: 20px;
   background: white;
   border-radius: 8px;
-  width: 70vw;
+  width: 80vw;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin: 0 auto; 
 }
@@ -177,27 +177,26 @@
 }
 
 .btn-view {
-  background: rgba(50, 223, 93, 0.51);
-  color:rgb(14, 119, 40);
+  background: rgb(50, 86, 207); /* rgba yerine rgb kullan */
+  color: rgb(255, 255, 255);
   box-shadow: 0 1px 4px rgba(0, 123, 255, 0.1);
 }
 
 .btn-view:hover {
-  background: rgba(22, 177, 61, 0.4);
+  background: rgb(42, 95, 243); /* rgba yerine rgb kullan */
   transform: translateY(-1px);
- }
+}
  
- .btn-update {
-  background: rgba(207, 146, 97, 0.47);
-  color:rgb(114, 56, 8);
+.btn-update {
+  background: rgb(255, 138, 4); /* rgba yerine rgb kullan */
+  color: rgb(255, 255, 255);
   box-shadow: 0 1px 4px rgba(253, 126, 20, 0.1);
- }
+}
  
- .btn-update:hover {
-  background: rgba(156, 83, 23, 0.48);
+.btn-update:hover {
+  background: rgb(255, 150, 63); /* rgba yerine rgb kullan */
   transform: translateY(-1px);
- }
-
+}
 .customer-list-loading {
  text-align: center;
  padding: 40px;

@@ -70,6 +70,64 @@
   box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
 }
 
+.welcome-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(29, 36, 49, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-modal-card {
+  background: linear-gradient(135deg, #1a2a55 0%, #3b82f6 100%);
+  color: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(30, 41, 59, 0.18);
+  padding: 40px 32px 32px 32px;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+  position: relative;
+  border: 1.5px solid rgba(255,255,255,0.12);
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.welcome-desc {
+  font-size: 1.1rem;
+  margin-bottom: 32px;
+  color: #e0e7ef;
+  font-weight: 400;
+}
+
+.welcome-login-btn {
+  background: linear-gradient(90deg, #e6e3e3 0%, #2b3a6b 100%);
+  color: #fadbdb !important;
+  border: none;
+  border-radius: 25px;
+  padding: 16px 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(255, 94, 98, 0.15);
+  transition: background 0.2s, transform 0.2s, color 0.2s;
+  margin-top: 8px;
+}
+.welcome-login-btn:hover {
+  background: linear-gradient(90deg, #ff9966 0%, #db1417 100%);
+  color: #f1efef !important;
+  transform: translateY(-2px) scale(1.03);
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
   .home-content {
@@ -94,6 +152,21 @@
   
   .btn {
     padding: 10px 25px;
+  }
+
+  .welcome-modal-card {
+    min-width: 0;
+    padding: 24px 10px 20px 10px;
+  }
+  .welcome-title {
+    font-size: 1.3rem;
+  }
+  .welcome-desc {
+    font-size: 1rem;
+  }
+  .welcome-login-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
   }
 }
 

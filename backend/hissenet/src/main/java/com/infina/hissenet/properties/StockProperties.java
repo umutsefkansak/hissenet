@@ -41,7 +41,17 @@ public class StockProperties {
 
     public static class Scheduler {
         private final Publish publish = new Publish();
+        private Publish borsaIstanbulPublish = new Publish();
+
         public Publish getPublish() { return publish; }
+
+        public Publish getBorsaIstanbulPublish() {
+            return borsaIstanbulPublish;
+        }
+
+        public void setBorsaIstanbulPublish(Publish borsaIstanbulPublish) {
+            this.borsaIstanbulPublish = borsaIstanbulPublish;
+        }
 
         public static class Publish {
             private String topic;

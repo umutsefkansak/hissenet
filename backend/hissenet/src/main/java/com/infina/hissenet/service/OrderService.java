@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.exception.stock.StockNotFoundException;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
@@ -68,43 +69,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		Customer customer = customerService.findById(request.customerId())
 				.orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
 
+		if (request.price() == null || request.quantity() == null) {
+			throw new IllegalArgumentException("Price and quantity must not be null");
+		}
+
 		Order order = orderMapper.toEntity(request);
 		order.setCustomer(customer);
 
-		BigDecimal totalAmount = null;
-		if (request.price() != null && request.quantity() != null) {
-			totalAmount = request.price().multiply(request.quantity());
-			order.setTotalAmount(totalAmount);
-		}
+		BigDecimal totalAmount = request.price().multiply(request.quantity());
+		order.setTotalAmount(totalAmount);
 
 		try {
 			if (request.category() == OrderCategory.MARKET) {
-				if (request.type() != null && request.quantity() != null && request.price() != null) {
-					handleWalletTransaction(request, totalAmount);
-					order.setStatus(OrderStatus.FILLED);
-				} else {
-					order.setStatus(OrderStatus.REJECTED);
-				}
+				processMarketOrder(request, order, totalAmount);
 			} else if (request.category() == OrderCategory.LIMIT) {
-				if (request.price() == null || request.type() == null || request.quantity() == null) {
-					order.setStatus(OrderStatus.REJECTED);
-				} else {
-					BigDecimal marketPrice = stockCacheService.getCachedByCode(request.stockCode()).lastPrice();
-					boolean isValid = false;
-
-					if (request.type() == OrderType.BUY && marketPrice.compareTo(request.price()) <= 0) {
-						isValid = true;
-					} else if (request.type() == OrderType.SELL && marketPrice.compareTo(request.price()) >= 0) {
-						isValid = true;
-					}
-
-					if (isValid) {
-						handleWalletTransaction(request, totalAmount);
-						order.setStatus(OrderStatus.FILLED);
-					} else {
-						order.setStatus(OrderStatus.OPEN);
-					}
-				}
+				processLimitOrder(request, order, totalAmount);
 			} else {
 				order.setStatus(OrderStatus.REJECTED);
 			}
@@ -113,16 +92,45 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		}
 
 		Order saved = save(order);
+
 		if (saved.getStatus() == OrderStatus.FILLED) {
 			try {
 				stockTransactionService.createTransactionFromOrder(saved);
 			} catch (Exception e) {
-				System.err.println("StockTransaction oluşturulamadı: " + e.getMessage());
+				throw new StockNotFoundException(request.stockCode());
 			}
 		}
+
 		return orderMapper.toResponse(saved);
 	}
+	private void processMarketOrder(OrderCreateRequest request, Order order, BigDecimal totalAmount) {
+		if (request.type() != null) {
+			handleWalletTransaction(request, totalAmount);
+			order.setStatus(OrderStatus.FILLED);
+		} else {
+			order.setStatus(OrderStatus.REJECTED);
+		}
+	}
 
+	private void processLimitOrder(OrderCreateRequest request, Order order, BigDecimal totalAmount) {
+		if (request.price() == null || request.type() == null || request.quantity() == null) {
+			order.setStatus(OrderStatus.REJECTED);
+			return;
+		}
+
+		BigDecimal marketPrice = stockCacheService.getCachedByCode(request.stockCode()).lastPrice();
+		boolean isValid = switch (request.type()) {
+			case BUY -> marketPrice.compareTo(request.price()) <= 0;
+			case SELL -> marketPrice.compareTo(request.price()) >= 0;
+		};
+
+		if (isValid) {
+			handleWalletTransaction(request, totalAmount);
+			order.setStatus(OrderStatus.FILLED);
+		} else {
+			order.setStatus(OrderStatus.OPEN);
+		}
+	}
 	private void handleWalletTransaction(OrderCreateRequest request, BigDecimal totalAmount) {
 		BigDecimal commission = totalAmount.multiply(COMMISSION_RATE);
 

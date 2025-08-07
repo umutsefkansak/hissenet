@@ -72,10 +72,17 @@ public class CombinedCacheService implements ICombinedCacheService {
                         .map(HisseFiyatEntry::closePrice)
                         .orElse(null));
 
-        BigDecimal lastPrice   = s.lastprice();
-        BigDecimal changePrice = (openPrice != null && lastPrice != null)
-                ? lastPrice.subtract(openPrice).setScale(2, RoundingMode.HALF_UP)
-                : null;
+        BigDecimal lastPrice = s.lastprice();
+        BigDecimal changePrice = null;
+//        BigDecimal changePrice = (openPrice != null && lastPrice != null)
+//                ? lastPrice.subtract(openPrice).setScale(2, RoundingMode.HALF_UP)
+//                : null;
+        if (openPrice != null & s.rate() != null) {
+             changePrice = openPrice
+                    .multiply(s.rate())
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        }
+
 
         return new CombinedStockData(
                 code,

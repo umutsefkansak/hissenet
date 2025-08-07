@@ -21,6 +21,12 @@ public interface RoleMapper {
     @Mapping(target = "active", source = "isActive", defaultValue = "true")
     Role toEntity(RoleCreateRequest createRoleDto);
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     @Mapping(target = "employees", source = "employees", qualifiedByName = "mapEmployeesToResponse")
     RoleResponse toDto(Role role);
 

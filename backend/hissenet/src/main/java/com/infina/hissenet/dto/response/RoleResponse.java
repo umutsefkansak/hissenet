@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public record RoleResponse(
+        Long id,
         String name,
         String description,
         Boolean isActive,

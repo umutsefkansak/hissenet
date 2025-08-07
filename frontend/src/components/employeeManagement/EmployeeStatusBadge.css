@@ -1,0 +1,23 @@
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-badge.status-active {
+    background: #16a34a;
+    color: white;
+}
+
+.status-badge.status-inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Eğer başka durumlar varsa */
+.status-badge.status-pending {
+    background: #fef3c7;
+    color: #d97706;
+}

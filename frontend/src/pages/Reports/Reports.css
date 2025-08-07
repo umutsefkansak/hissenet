@@ -18,7 +18,7 @@
   flex: 1;
   padding: 12px 16px;
   border: none;
-  background: transparent;
+  background-color: #fff;
   color: #64748b;
   font-weight: 500;
   cursor: pointer;
@@ -27,11 +27,12 @@
 }
 
 .tab-button:hover {
-  background-color: #f1f5f9;
+  background-color: #7f99dd;
+  color: #fff;
 }
 
 .tab-button.active {
-  background-color: #2563eb;
+  background-color: #152853;
   color: white;
 }
 
@@ -103,7 +104,7 @@
 
 .download-btn {
   padding: 8px 16px;
-  background-color: #059669;
+  background-color: #dc2626;
   color: white;
   border: none;
   border-radius: 6px;
@@ -114,15 +115,15 @@
 }
 
 .download-btn:hover {
-  background-color: #047857;
+  background-color: #b91c1c;
 }
 
 .download-btn:last-child {
-  background-color: #2563eb;
+  background-color: #059669;
 }
 
 .download-btn:last-child:hover {
-  background-color: #1e40af;
+  background-color: #047857;
 }
 
 /* Transaction Table */

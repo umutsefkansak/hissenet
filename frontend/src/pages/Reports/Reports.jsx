@@ -278,12 +278,6 @@ const Reports = () => {
           Müşteri Bazlı İşlem Raporu
         </button>
         <button 
-          className={`tab-button ${activeTab === 'portfolio' ? 'active' : ''}`}
-          onClick={() => setActiveTab('portfolio')}
-        >
-          Portföy Değer Raporu
-        </button>
-        <button 
           className={`tab-button ${activeTab === 'popular' ? 'active' : ''}`}
           onClick={() => setActiveTab('popular')}
         >

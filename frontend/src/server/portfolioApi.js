@@ -1,4 +1,4 @@
-import api from '../server/api';
+import api from './api';
 
 export const portfolioApi = {
   // Get customer portfolios

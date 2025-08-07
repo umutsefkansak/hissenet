@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import VerificationCode from './pages/VerificationCode/VerificationCode';
 import NewPassword from './pages/NewPassword/NewPassword';
 import Wallet from './pages/Wallet';
+import Portfolio from './pages/Portfolio/Portfolio';
 import ToastContainer from './components/Toast/ToastContainer';
 import IndividualCustomer from './pages/CreateCustomer/Individual/IndividualCustomer';
 import CorporateCustomer from './pages/CreateCustomer/Corporate/CorporateCustomer';
@@ -21,10 +22,14 @@ import './App.css';
 
 function AppContent() {
   const location = useLocation();
+  
+  // Drawer'ın gözükmeyeceği sayfalar
+  const authPages = ['/login', '/forgot-password', '/verification-code', '/new-password'];
+  const isAuthPage = authPages.includes(location.pathname);
 
   return (
-    <div className="App">
-      <Navbar />
+    <div className={`App ${isAuthPage ? 'auth-page' : ''}`}>
+      {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -38,6 +43,7 @@ function AppContent() {
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
         <Route path="/wallet" element={<Wallet />} />
+        <Route path="/portfolio/:customerId?" element={<Portfolio />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />

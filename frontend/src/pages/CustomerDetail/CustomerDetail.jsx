@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { customerApi } from '../../services/api/customerApi';
-import { walletApi } from '../../services/api/walletApi';
-import { orderApi } from '../../services/api/orderApi';
+import { walletApi } from '../../server/wallet';
+import { orderApi } from '../../server/order';
+import { getCustomerById } from '../../server/customer';
+
 import './CustomerDetail.css';
 
 const CustomerDetailPage = () => {
@@ -19,7 +20,7 @@ const CustomerDetailPage = () => {
       try {
         setLoading(true);
         
-        const customerResult = await customerApi.getCustomerById(id);
+        const customerResult = await getCustomerById(id);
         setCustomer(customerResult.data);
         
         const balanceResult = await walletApi.getCustomerWalletBalance(id);
@@ -65,6 +66,20 @@ const CustomerDetailPage = () => {
     return walletBalance;
   };
 
+  // TC Kimlik No maskeleme fonksiyonu
+  const maskTcNumber = (tcNumber) => {
+    if (!tcNumber) return 'Belirtilmemiş';
+    
+    const tcString = tcNumber.toString();
+    if (tcString.length !== 11) return tcNumber;
+    
+    // İlk 9 haneyi * ile maskele, son 2 haneyi göster
+    const maskedPart = '*'.repeat(9);
+    const lastTwoDigits = tcString.slice(-2);
+    
+    return `${maskedPart}${lastTwoDigits}`;
+  };
+
   const getOrderTypeText = (type) => {
     switch (type) {
       case 'BUY':
@@ -93,20 +108,6 @@ const CustomerDetailPage = () => {
 
   const handleBack = () => {
     navigate('/customers');
-  };
-
-  const handleUpdateInfo = () => {
-    console.log('Bilgileri güncelle');
-  };
-
-  const handleExportPDF = () => {
-    console.log('PDF olarak dışa aktar');
-  };
-
-  const handleDeactivateCustomer = () => {
-    if (window.confirm('Bu müşteriyi pasif yapmak istediğinizden emin misiniz?')) {
-      console.log('Müşteri pasif yapıldı');
-    }
   };
 
   if (loading) {
@@ -150,18 +151,13 @@ const CustomerDetailPage = () => {
 
   return (
     <div className="customer-detail-page">
-      <div className="page-header">
-        <div className="header-content">
-          <button className="back-button" onClick={handleBack}>
-            ← Geri Dön
-          </button>
-          <h1>{customer.firstName} {customer.lastName} İşlem Detayları</h1>
-        </div>
-      </div>
 
       <div className="customer-detail-content">
         
         <div className="info-section">
+        <button className="back-button" onClick={handleBack}>
+            ← Geri Dön
+          </button>
           <h3>Genel Bilgiler</h3>
           <div className="info-grid">
             <div className="info-item">
@@ -170,7 +166,7 @@ const CustomerDetailPage = () => {
             </div>
             <div className="info-item">
               <label>T.C. Kimlik No:</label>
-              <span>{customer.tcNumber}</span>
+              <span>{maskTcNumber(customer.tcNumber)}</span>
             </div>
             <div className="info-item">
               <label>Telefon:</label>
@@ -253,17 +249,7 @@ const CustomerDetailPage = () => {
         </div>
       </div>
 
-      <div className="action-buttons">
-        <button className="btn-primary" onClick={handleUpdateInfo}>
-          Bilgileri Güncelle
-        </button>
-        <button className="btn-primary" onClick={handleExportPDF}>
-          PDF Olarak Dışa Aktar
-        </button>
-        <button className="btn-secondary" onClick={handleDeactivateCustomer}>
-          Müşteriyi Pasif Yap
-        </button>
-      </div>
+  
     </div>
   );
 };

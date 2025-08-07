@@ -6,6 +6,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +23,11 @@ const ForgotPassword = () => {
       const result = await sendPasswordChangeToken(email);
       
       if (result.success) {
-        window.showToast('Şifre değiştirme linki e-posta adresinize gönderildi!', 'success', 3000);
+        setSuccess(true);
         setEmail(''); // Form'u temizle
+        setTimeout(() => {
+          setSuccess(false);
+        }, 3000);
       } else {
         // API error response'u string'e çevir
         const errorMessage = typeof result.error === 'object' 
@@ -40,7 +44,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="forgot-password-container">
-      <div className="forgot-password-card">
+      <div className={`forgot-password-card ${success ? 'success' : ''}`}>
         <div className="forgot-password-header">
           <div className="email-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -54,29 +58,42 @@ const ForgotPassword = () => {
           </p>
         </div>
 
-        <form className="forgot-password-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">E-posta Adresi</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ornek@email.com"
-              className="form-input"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="error-message">
-              {error}
+        {success ? (
+          <div className="success-message">
+            <div className="success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22,4 12,14.01 9,11.01"/>
+              </svg>
             </div>
-          )}
+            <h2>E-posta Gönderildi!</h2>
+            <p>Şifre değiştirme linki e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.</p>
+          </div>
+        ) : (
+          <form className="forgot-password-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">E-posta Adresi</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ornek@email.com"
+                className="form-input"
+                required
+              />
+            </div>
 
-          <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? 'Gönderiliyor...' : 'Şifre Değiştirme Linki Gönder'}
-          </button>
-        </form>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" className="submit-button" disabled={loading}>
+              {loading ? 'Gönderiliyor...' : 'Şifre Değiştirme Linki Gönder'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

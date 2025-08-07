@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
+import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +23,14 @@ public class OrderScheduler {
     private final OrderRepository orderRepository;
     private final IWalletService walletService;
     private final ICacheManagerService stockCacheService;
+    private final IStockTransactionService stockTransactionService;
 
     public OrderScheduler(OrderRepository orderRepository, IWalletService walletService,
-                          ICacheManagerService stockCacheService) {
+                          ICacheManagerService stockCacheService, IStockTransactionService stockTransactionService) {
         this.orderRepository = orderRepository;
         this.walletService = walletService;
         this.stockCacheService = stockCacheService;
+        this.stockTransactionService = stockTransactionService;
     }
 
     @Transactional
@@ -70,6 +73,7 @@ public class OrderScheduler {
                     }
 
                     orderRepository.save(order);
+                    stockTransactionService.createTransactionFromOrder(order);
                 }
 
             } catch (Exception e) {

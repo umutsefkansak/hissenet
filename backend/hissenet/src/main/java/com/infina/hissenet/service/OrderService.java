@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -8,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
+import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +48,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final IWalletService walletService;
 	private final ICacheManagerService stockCacheService;
 	private final WalletRepository walletRepository;
+	private final IStockTransactionService stockTransactionService;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-			OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
-			WalletRepository walletRepository) {
+                        OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+                        WalletRepository walletRepository, IStockTransactionService stockTransactionService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -55,7 +60,8 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
 		this.walletRepository = walletRepository;
-	}
+        this.stockTransactionService = stockTransactionService;
+    }
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateRequest request) {
@@ -107,6 +113,13 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		}
 
 		Order saved = save(order);
+		if (saved.getStatus() == OrderStatus.FILLED) {
+			try {
+				stockTransactionService.createTransactionFromOrder(saved);
+			} catch (Exception e) {
+				System.err.println("StockTransaction oluşturulamadı: " + e.getMessage());
+			}
+		}
 		return orderMapper.toResponse(saved);
 	}
 
@@ -142,12 +155,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-	    List<Order> orders = findAll();
+	    List<Order> orders = orderRepository.findAllByCreatedAtDesc();
 
 	    return orders.stream().map(order -> {
-	        Long customerId = order.getCustomer().getId();  
+	        Long customerId = order.getCustomer().getId();
+	        LocalDateTime createdAt = order.getCreatedAt();
 
-	        BigDecimal blockedBalance = walletRepository.findBlockedBalanceByCustomerId(customerId).orElse(BigDecimal.ZERO);
+	        BigDecimal blockedBalance = BigDecimal.ZERO;
+
+	        if (order.getStatus() == OrderStatus.FILLED) {
+	            LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
+
+	            if (LocalDateTime.now().isBefore(tPlus2)) {
+	                blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+	            }
+	        }
 
 	        return new OrderResponse(
 	            order.getId(),
@@ -166,6 +188,21 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	            blockedBalance
 	        );
 	    }).toList();
+	}
+
+	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
+	    int businessDaysAdded = 0;
+	    LocalDateTime result = startDateTime;
+
+	    while (businessDaysAdded < 2) {
+	        result = result.plusDays(1);
+	        DayOfWeek day = result.getDayOfWeek();
+	        if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+	            businessDaysAdded++;
+	        }
+	    }
+
+	    return result;
 	}
 
 	@Transactional(readOnly = true)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TradePanel.module.css';
 import { formatPrice } from '../../utils/formatters';
-import { orderApi } from '../../services/api/orderApi';
+import { orderApi } from '../../server/order';
 
 const TradePanel = ({ stock, onBack }) => {
     const [type, setType] = useState("BUY"); // BUY | SELL

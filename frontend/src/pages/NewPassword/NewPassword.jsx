@@ -96,7 +96,21 @@ const NewPassword = () => {
     return requirements;
   };
 
+  const getPasswordStrength = (password) => {
+    if (password.length === 0) return 0;
+    
+    let strength = 0;
+    if (password.length >= 8) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[a-z]/.test(password)) strength += 1;
+    if (/\d/.test(password)) strength += 1;
+    if (/[!@#$%^&*]/.test(password)) strength += 1;
+    
+    return Math.min(strength, 4);
+  };
+
   const requirements = validatePassword(password);
+  const passwordStrength = getPasswordStrength(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,6 +179,27 @@ const NewPassword = () => {
                 {showPassword ? "👁️" : "👁️‍🗨️"}
               </button>
             </div>
+            {/* Password Strength Indicator */}
+            {password.length > 0 && (
+              <div className="password-strength">
+                {[1, 2, 3, 4].map((level) => (
+                  <div
+                    key={level}
+                    className={`strength-bar ${
+                      passwordStrength >= level
+                        ? passwordStrength <= 1
+                          ? 'weak'
+                          : passwordStrength <= 2
+                          ? 'medium'
+                          : passwordStrength <= 3
+                          ? 'strong'
+                          : 'very-strong'
+                        : ''
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group">

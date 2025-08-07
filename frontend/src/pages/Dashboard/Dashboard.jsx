@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
 import PopularStocks from "../../components/PopularStocks/PopularStocks";
 import Bist100Card from "../../components/Bist100/Bist100";
-import { orderApi } from "../../services/api/orderApi";
+import { orderApi } from "../../server/order";
 
 const Dashboard = () => {
   const [dailyVolume, setDailyVolume] = useState(null);
@@ -42,7 +42,7 @@ const Dashboard = () => {
       <div className="summaryCards">
 
          <Bist100Card />
- 
+
         <div className="card">
           <span className="cardTitle">BIST 100</span>
           <span className="cardValue">Günlük İşlem<br />147</span>
@@ -60,7 +60,7 @@ const Dashboard = () => {
       </div>
 
       <div className="bottomSection">
-      
+
     <PopularStocks  className="noMaxWidth"/>
 
 

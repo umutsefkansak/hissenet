@@ -25,6 +25,11 @@
   }
 }
 
+/* Auth sayfaları için drawer gizleme */
+.App.auth-page {
+  margin-left: 0 !important;
+}
+
 /* Mobile'da margin yok */
 @media (max-width: 768px) {
   .App {

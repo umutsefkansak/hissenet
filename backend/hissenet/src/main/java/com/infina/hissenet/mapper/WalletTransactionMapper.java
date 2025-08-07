@@ -6,11 +6,9 @@ import com.infina.hissenet.dto.response.WalletTransactionResponse;
 import com.infina.hissenet.entity.WalletTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface WalletTransactionMapper {
-    WalletTransactionMapper INSTANCE = Mappers.getMapper(WalletTransactionMapper.class);
 
     @Mapping(target = "wallet", ignore = true)
     @Mapping(target = "transactionStatus", constant = "PENDING")

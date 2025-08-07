@@ -18,6 +18,7 @@ import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCompletedException;
+import com.infina.hissenet.exception.transaction.UnauthorizedOperationException;
 import com.infina.hissenet.exception.wallet.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -133,6 +134,17 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleRiskAssessmentException(RiskAssessmentException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
         problem.setTitle("Risk Assessment Error");
+        problem.setType(URI.create("https://www.hissenet.com/errors/risk-assessment"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
+    // 403 Forbiden
+    @ExceptionHandler({
+          UnauthorizedOperationException.class
+    })
+    public ProblemDetail forbiddenException(RuntimeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Forbidden Error");
         problem.setType(URI.create("https://www.hissenet.com/errors/risk-assessment"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;

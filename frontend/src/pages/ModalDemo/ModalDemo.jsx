@@ -1,6 +1,6 @@
 // src/pages/ModalDemo/ModalDemo.jsx
 import React, { useState } from 'react';
-import Modal from '../../components/Modal/Modal';
+import Modal from '../../components/common/Modal/Modal';
 
 export default function ModalDemo() {
   const [modalConfig, setModalConfig] = useState(null);

@@ -1,6 +1,6 @@
 import React from 'react';
 import DashboardCard from '../common/Card/DashboardCard';
-
+import UsersIcon from '../Icons/UsersIcon';
 export default function ActiveCustomerCard() {
 
   const activeCustomerCount = 1000;
@@ -10,8 +10,8 @@ export default function ActiveCustomerCard() {
       title="Aktif Müşteri"
       value={activeCustomerCount.toLocaleString()}
       subtitle=""
-      iconVariant="users"
-      icon={<div style={{ fontSize: 20 }}>👥</div>}
+      iconVariant="active-users"
+      icon={<UsersIcon  width={24} height={24} />}
     />
   );
 }

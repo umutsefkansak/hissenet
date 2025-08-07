@@ -1,0 +1,38 @@
+/* PopularStockItem.module.css */
+.row {
+  transition: background 0.2s;
+}
+.row:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.code {
+  font-weight: 600;
+}
+
+.price {
+  font-feature-settings: "tnum"; 
+}
+
+.change, .rate {
+  align-items: center;
+  font-weight: 500;
+}
+
+.icon {
+ margin-right: 0.25em;
+  flex-shrink: 0;
+}
+
+.value {
+  margin-left: 0.1rem;
+}
+
+/* Renkler */
+.positive {
+  color: #2ea44f; /* yeşil ton */
+}
+
+.negative {
+  color: #cf222e; /* kırmızı ton */
+}

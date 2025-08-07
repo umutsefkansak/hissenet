@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { portfolioApi } from '../../server/portfolioApi';
 import { walletApi } from '../../server/wallet';
 import './Portfolio.css';
@@ -7,6 +7,7 @@ import { FaChevronLeft, FaChevronRight, FaExchangeAlt } from 'react-icons/fa';
 
 const Portfolio = () => {
   const { customerId = '68' } = useParams(); // Default to 68 for testing
+  const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
   const [stockTransactions, setStockTransactions] = useState([]);
@@ -319,7 +320,12 @@ const Portfolio = () => {
               <option value="create-new">+ Yeni Portföy Oluştur</option>
             </select>
           </div>
-          <button className="cash-transaction-btn">Nakit İşlemler</button>
+          <button 
+            className="cash-transaction-btn"
+            onClick={() => navigate(`/wallet/${customerId}`)}
+          >
+            Nakit İşlemler
+          </button>
         </div>
       </div>
 

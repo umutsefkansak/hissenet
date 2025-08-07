@@ -23,7 +23,26 @@
   align-items: center;
   gap: 20px;
 }
-
+.export-button {
+  background: #1e3a8a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.export-button:hover {
+  background: #274bb6;
+}
+.export-menu {
+  min-width: 160px;
+}
+.export-menu-item:hover {
+  background: #f0f0f0;
+}
 .back-button {
   background: #1e3a8a;
   border: none;
@@ -60,7 +79,7 @@
   overflow: hidden;
   margin-bottom: 24px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1500px;
 }
 
 .info-section,

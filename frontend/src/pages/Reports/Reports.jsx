@@ -308,8 +308,8 @@ const Reports = () => {
           <p className="report-date">{getTodayFormatted()}</p>
         </div>
         <div className="header-right">
-          <button className="download-btn" onClick={generatePDF}>İndir ></button>
-          <button className="download-btn" onClick={generateExcel}>Excel İndir ></button>
+          <button className="download-btn" onClick={generatePDF}>İndir </button>
+          <button className="download-btn" onClick={generateExcel}>Excel İndir </button>
         </div>
       </div>
 

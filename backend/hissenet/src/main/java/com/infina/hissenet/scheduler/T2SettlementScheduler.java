@@ -15,7 +15,7 @@ public class T2SettlementScheduler {
         this.stockTransactionService = stockTransactionService;
     }
 
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 5 17 * * MON-FRI")   // test icin 1 dklık @Scheduled(cron = "0 */1 * * * ?")
     public void processT2Settlements() {
         walletService.processT2Settlements();
         stockTransactionService.processStockSettlements();

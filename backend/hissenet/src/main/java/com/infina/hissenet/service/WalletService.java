@@ -15,6 +15,7 @@ import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.repository.WalletTransactionRepository;
 import com.infina.hissenet.service.abstracts.IWalletService;
+import com.infina.hissenet.utils.DateUtils;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.infina.hissenet.utils.DateUtils.calculateT2SettlementDate;
 
 
 @Service
@@ -35,7 +38,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     private final CustomerRepository customerRepository;
     private final WalletTransactionRepository walletTransactionRepository;
 
-    public WalletService(WalletRepository walletRepository,WalletMapper walletMapper, CustomerRepository customerRepository, WalletTransactionRepository walletTransactionRepository){
+    public WalletService(WalletRepository walletRepository, WalletMapper walletMapper, CustomerRepository customerRepository, WalletTransactionRepository walletTransactionRepository){
         super(walletRepository);
         this.walletRepository=walletRepository;
         this.walletMapper=walletMapper;
@@ -82,7 +85,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setSource("EXTERNAL");
             transaction.setDestination("WALLET");
-            transaction.setSettlementDate(LocalDateTime.now().plusMinutes(1)); // T+2 gün
+            transaction.setSettlementDate(calculateT2SettlementDate(LocalDateTime.now())); // T+2 gün
 
             wallet.addTransaction(transaction);
         } else {
@@ -120,7 +123,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setSource("WALLET");
             transaction.setDestination("EXTERNAL");
-            transaction.setSettlementDate(LocalDateTime.now().plusMinutes(1)); // T+2 gün
+            transaction.setSettlementDate(calculateT2SettlementDate(LocalDateTime.now())); // T+2 gün
 
             wallet.addTransaction(transaction);
         } else {
@@ -172,7 +175,7 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
         }
 
         transaction.setTransactionStatus(TransactionStatus.SETTLED);
-        transaction.setSettlementDate(LocalDateTime.now());
+        transaction.setSettlementDate(calculateT2SettlementDate(LocalDateTime.now()));
 
         walletTransactionRepository.save(transaction);
         update(wallet);

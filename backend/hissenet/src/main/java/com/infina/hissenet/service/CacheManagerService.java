@@ -37,7 +37,7 @@ public class CacheManagerService implements ICacheManagerService {
      */
     @SuppressWarnings("unchecked")
     public List<CombinedStockData> getAllCached() {
-        Cache cache = cacheManager.getCache(CombinedCacheService.CACHE_NAME);
+        Cache cache = cacheManager.getCache(BorsaIstanbulCacheService.CACHE_NAME);
         if (cache == null) return List.of();
         List<CombinedStockData> all =
                 cache.get(CACHE_KEY, List.class);

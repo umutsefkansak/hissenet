@@ -68,12 +68,17 @@ stock:
       topic: /topic/prices
       rate: 30s
       initial-delay: 0s
+    borsa-istanbul-publish:
+      topic: /topic/bist100
+      initial-delay: 0s
+      rate: 30s
 
 collectapi:
   apikey: ${COLLECTAPI_APIKEY}
-  base-url: https://api.collectapi.com
+  base-url: https://api.collectapi.com/economy
   endpoints:
-    stocks: /economy/hisseSenedi
+    stocks: /hisseSenedi
+    borsaIstanbul: /borsaIstanbul
 
 infina:
   api:

@@ -42,7 +42,7 @@ function AppContent() {
         <Route path="/customer-transactions" element={<div className="page-content">Müşteri İşlemleri Sayfası</div>} />
         <Route path="/reports" element={<div className="page-content">Raporlar Sayfası</div>} />
         <Route path="/user-management" element={<div className="page-content">Kullanıcı Yönetimi Sayfası</div>} />
-        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/wallet/:customerId?" element={<Wallet />} />
         <Route path="/portfolio/:customerId?" element={<Portfolio />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { WalletBalance, DepositForm, WithdrawForm } from '../../components/wallet';
 import { walletApi } from '../../server/wallet';
 import './Wallet.css';
 
 const Wallet = () => {
+  const { customerId = '68' } = useParams(); // Default to 68 if no parameter
   const [activeTab, setActiveTab] = useState('deposit');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,18 +14,7 @@ const Wallet = () => {
   const [blockedBalance, setBlockedBalance] = useState(0);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-  const [customerId, setCustomerId] = useState(null);
   const [iban, setIban] = useState(''); 
-
-  useEffect(() => {
-    const storedCustomerId = localStorage.getItem('customerId');
-    if (storedCustomerId) {
-      setCustomerId(parseInt(storedCustomerId));
-    } else {
-      setCustomerId(68);
-      localStorage.setItem('customerId', '68');
-    }
-  }, []);
 
   useEffect(() => {
     if (customerId) {

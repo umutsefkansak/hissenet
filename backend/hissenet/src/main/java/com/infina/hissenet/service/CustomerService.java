@@ -3,10 +3,13 @@ package com.infina.hissenet.service;
 
 import com.infina.hissenet.constants.CustomerConstants;
 import com.infina.hissenet.dto.common.CustomerDto;
-import com.infina.hissenet.dto.request.*;
+import com.infina.hissenet.dto.request.CorporateCustomerCreateRequest;
+import com.infina.hissenet.dto.request.CorporateCustomerUpdateRequest;
+import com.infina.hissenet.dto.request.IndividualCustomerCreateRequest;
+import com.infina.hissenet.dto.request.IndividualCustomerUpdateRequest;
+import com.infina.hissenet.entity.CorporateCustomer;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.IndividualCustomer;
-import com.infina.hissenet.entity.CorporateCustomer;
 import com.infina.hissenet.event.CustomerCreatedEvent;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.customer.EmailAlreadyExistsException;

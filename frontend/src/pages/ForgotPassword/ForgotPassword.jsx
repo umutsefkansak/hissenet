@@ -31,8 +31,8 @@ const ForgotPassword = () => {
       } else {
         // API error response'u string'e çevir
         const errorMessage = typeof result.error === 'object' 
-          ? result.error.message || result.error.detail || 'Şifre değiştirme linki gönderilemedi.'
-          : result.error || 'Şifre değiştirme linki gönderilemedi.';
+          ? result.error.message || result.error.detail || 'Şifre sıfırlama linki gönderilemedi.'
+          : result.error || 'Şifre sıfırlama linki gönderilemedi.';
         setError(errorMessage);
       }
     } catch (error) {
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
           </div>
           <h1 className="forgot-password-title">Şifremi Unuttum</h1>
           <p className="forgot-password-description">
-            E-posta adresinizi girin, size şifre değiştirme linki gönderelim.
+            E-posta adresinizi girin, size şifre sıfırlama linki gönderelim.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
               </svg>
             </div>
             <h2>E-posta Gönderildi!</h2>
-            <p>Şifre değiştirme linki e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.</p>
+            <p>Şifre sıfırlama linki e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.</p>
           </div>
         ) : (
           <form className="forgot-password-form" onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
             )}
 
             <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? 'Gönderiliyor...' : 'Şifre Değiştirme Linki Gönder'}
+              {loading ? 'Gönderiliyor...' : 'Şifre Sıfırlama Linki Gönder'}
             </button>
           </form>
         )}

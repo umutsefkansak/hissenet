@@ -1,6 +1,5 @@
 package com.infina.hissenet.service;
 
-import com.infina.hissenet.dto.response.BorsaIstanbulResult;
 import com.infina.hissenet.dto.response.CombinedStockData;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import org.springframework.cache.Cache;
@@ -8,7 +7,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 
 @Service

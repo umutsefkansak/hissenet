@@ -1,9 +1,5 @@
 package com.infina.hissenet.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.infina.hissenet.dto.request.AccountCreateRequest;
 import com.infina.hissenet.dto.request.AccountUpdateRequest;
 import com.infina.hissenet.dto.response.AccountResponse;
@@ -15,6 +11,9 @@ import com.infina.hissenet.mapper.AccountMapper;
 import com.infina.hissenet.repository.AccountRepository;
 import com.infina.hissenet.service.abstracts.IAccountService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AccountService extends GenericServiceImpl<Account, Long> implements IAccountService{

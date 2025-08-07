@@ -2,13 +2,17 @@ package com.infina.hissenet.service;
 
 import com.infina.hissenet.constants.MailConstants;
 import com.infina.hissenet.dto.request.*;
-import com.infina.hissenet.dto.response.*;
+import com.infina.hissenet.dto.response.CodeSendResponse;
+import com.infina.hissenet.dto.response.CodeVerifyResponse;
+import com.infina.hissenet.dto.response.MailSendResponse;
+import com.infina.hissenet.dto.response.PasswordChangeTokenResponse;
 import com.infina.hissenet.exception.mail.MailException;
-import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.service.abstracts.IEmailTemplateService;
 import com.infina.hissenet.service.abstracts.IEmployeeService;
 import com.infina.hissenet.service.abstracts.IMailService;
 import com.infina.hissenet.service.abstracts.IVerificationService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +21,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.data.redis.core.RedisTemplate;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class MailService implements IMailService {

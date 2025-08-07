@@ -20,27 +20,24 @@
   flex-wrap: wrap;
 }
 
+.summaryCards > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .card {
   flex: 1;
-  min-width: 180px;
+  min-width: 0;
   padding: 1.25rem;
   border-radius: 12px;
   background-color: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  height: 110px; 
-}
-
-.cardValue {
-  font-size: 22px;
-  font-weight: bold;
-  color: #222;
-  line-height: 1.4;
-  margin-top: 0.3rem;
+  height: 110px;
 }
 
 .cardTitle {
@@ -58,23 +55,28 @@
 }
 
 .bottomSection {
-  flex: 1;              
   display: flex;
-  flex-wrap: nowrap;
   gap: 2rem;
-  overflow: auto; 
+  margin-top: 2rem;
 }
+
+.bottomSection > * {
+  flex: 1;
+  max-width: 50%;
+}
+
 .noMaxWidth {
   max-width: none !important;
 }
+
 .popularStocks,
 .recentTransactions {
-  flex: 0 0 50%;
-  max-width: 50%;
   background-color: #ffffff;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .popularStocks h3,
@@ -126,7 +128,7 @@
 }
 
 .viewAll:hover {
-  color: #0056b3;
+  color:  #003366;
 }
 
 .recentTransactions ul {
@@ -146,7 +148,8 @@
   border-collapse: collapse;
 }
 
-.transactionsTable td {
+.transactionsTable td,
+.transactionsTable th {
   padding: 0.4rem 0.5rem;
   font-size: 14px;
   border-bottom: 1px solid #eee;
@@ -191,7 +194,7 @@
 
 .dashboardModalCloseButton {
   margin-top: 1.5rem;
-  background-color: #051d2c; 
+  background-color: #051d2c;
   color: white;
   border: none;
   padding: 0.5rem 1rem;

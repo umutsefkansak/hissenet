@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { walletApi } from '../../server/wallet';
 import { orderApi } from '../../server/order';
 import { getCustomerById } from '../../server/customer';
-
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import './CustomerDetail.css';
 
 const CustomerDetailPage = () => {
@@ -14,6 +15,7 @@ const CustomerDetailPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -35,7 +37,7 @@ const CustomerDetailPage = () => {
         setLoading(false);
       }
     };
-
+    
     if (id) {
       fetchCustomerData();
     }
@@ -148,10 +150,30 @@ const CustomerDetailPage = () => {
       </div>
     );
   }
+  const handleExportExcel = () => {
+    if (!orders.length) return;
+    const worksheet = XLSX.utils.json_to_sheet(
+      orders.map(order => ({
+        Tarih: formatDate(order.createdAt),
+        Hisse: order.stockCode,
+        'Emir Türü': getOrderTypeText(order.type),
+        Durum: getOrderStatusText(order.status),
+        Adet: order.quantity,
+        Fiyat: order.price,
+        'Toplam Tutar': order.totalAmount
+      }))
+    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'İşlemler');
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const file = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(file, `islem_gecmisi_${customer.firstName}_${customer.lastName}.xlsx`);
+    setExportMenuOpen(false);
+  };
+
 
   return (
     <div className="customer-detail-page">
-
       <div className="customer-detail-content">
         
         <div className="info-section">
@@ -198,6 +220,14 @@ const CustomerDetailPage = () => {
               </span>
             </div>
           </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <button
+            className="export-button"
+            onClick={handleExportExcel}
+          >
+            İşlem Geçmişini İndir
+          </button>
         </div>
 
         <div className="transaction-section">

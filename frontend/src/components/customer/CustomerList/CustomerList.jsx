@@ -90,7 +90,7 @@ const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) =>
             placeholder="Müşteri adının ilk harfini yazın..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="search-input-customer"
           />
           {searchTerm && (
             <button 

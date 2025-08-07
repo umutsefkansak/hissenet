@@ -3,12 +3,14 @@
   font-family: "Segoe UI", sans-serif;
   color: #1f1f1f;
   background-color: #fafafa;
+  min-height: 100vh;
 }
 
 .title {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .summaryCards {
@@ -56,15 +58,19 @@
 }
 
 .bottomSection {
+  flex: 1;              
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 2rem;
+  overflow: auto; 
 }
-
+.noMaxWidth {
+  max-width: none !important;
+}
 .popularStocks,
 .recentTransactions {
-  flex: 1;
-  min-width: 350px;
+  flex: 0 0 50%;
+  max-width: 50%;
   background-color: #ffffff;
   padding: 1.5rem;
   border-radius: 12px;

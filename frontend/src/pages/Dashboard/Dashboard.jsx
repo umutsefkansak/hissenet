@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
+import PopularStocks from "../../components/PopularStocks/PopularStocks";
+import Bist100Card from "../../components/Bist100/Bist100";
 import { orderApi } from "../../services/api/orderApi";
 
 const Dashboard = () => {
@@ -38,6 +40,9 @@ const Dashboard = () => {
       <h1 className="title">Hoş Geldiniz</h1>
 
       <div className="summaryCards">
+
+         <Bist100Card />
+ 
         <div className="card">
           <span className="cardTitle">BIST 100</span>
           <span className="cardValue">Günlük İşlem<br />147</span>
@@ -55,45 +60,9 @@ const Dashboard = () => {
       </div>
 
       <div className="bottomSection">
-        <div className="popularStocks">
-          <h3>Popüler Hisseler</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Hisseler</th>
-                <th>Akrşel</th>
-                <th>+ktl.*</th>
-                <th>€</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>THYAO</td>
-                <td>250,55 €</td>
-                <td className="green">+3,12</td>
-                <td className="green">+1,26%</td>
-              </tr>
-              <tr>
-                <td>TTKOM</td>
-                <td>28,84 €</td>
-                <td className="green">+0,47</td>
-                <td className="green">+1,65%</td>
-              </tr>
-              <tr>
-                <td>BIST 100</td>
-                <td>9.845 €</td>
-                <td className="red">-1,8%</td>
-                <td className="red">-1,37%</td>
-              </tr>
-              <tr>
-                <td>ARCLK</td>
-                <td>14,15 €</td>
-                <td className="red">-0,111</td>
-                <td className="red">-0,76%</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      
+    <PopularStocks  className="noMaxWidth"/>
+
 
         <div className="recentTransactions">
           <div className="transactionsHeader">

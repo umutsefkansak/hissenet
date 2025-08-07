@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { orderApi } from '../server/orderApi';
+import { orderApi } from '../server/order';
 
 export default function usePopularStockCodes() {
   const [codes, setCodes] = useState([]);

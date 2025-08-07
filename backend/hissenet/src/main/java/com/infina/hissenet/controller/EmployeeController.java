@@ -3,6 +3,7 @@ package com.infina.hissenet.controller;
 import java.util.List;
 
 import com.infina.hissenet.dto.request.ForgotPasswordRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,17 @@ public class EmployeeController implements EmployeeControllerDoc {
 	public ApiResponse<Void> changePassword(@Valid @RequestBody ForgotPasswordRequest request){
 		service.changePassword(request);
 		return ApiResponse.ok("Password changed successfully");
+	}
+
+	@GetMapping("/pageable")
+	public ApiResponse<Page<EmployeeResponse>> getAllEmployeesPageable(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "id") String sortBy,
+			@RequestParam(defaultValue = "asc") String sortDir) {
+
+		Page<EmployeeResponse> employees = service.getAllEmployeesPageable(page, size, sortBy, sortDir);
+		return ApiResponse.ok("Employees retrieved successfully", employees);
 	}
 
 }

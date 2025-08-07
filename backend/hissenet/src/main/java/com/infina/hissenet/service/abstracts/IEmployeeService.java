@@ -3,6 +3,7 @@ package com.infina.hissenet.service.abstracts;
 import java.util.List;
 
 import com.infina.hissenet.dto.request.ForgotPasswordRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.infina.hissenet.dto.request.EmployeeCreateRequest;
@@ -74,5 +75,7 @@ public interface IEmployeeService extends UserDetailsService {
     Boolean existsByEmail(String email);
 
     void changePassword(ForgotPasswordRequest request);
-   
+
+    Page<EmployeeResponse> getAllEmployeesPageable(int page, int size, String sortBy, String sortDir);
+
 }

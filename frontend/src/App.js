@@ -20,6 +20,7 @@ import TransactionHistory  from './pages/TransactionHistory/TransactionHistory';
 import { useState, useEffect } from 'react';
 
 import './App.css';
+import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
 
 function AppContent() {
   const location = useLocation();

@@ -12,12 +12,17 @@ import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.repository.RoleRepository;
 import com.infina.hissenet.service.abstracts.IEmployeeService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -83,11 +88,24 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
             existing.setEmergencyContactPhone(request.emergencyContactPhone());
         }
 
-        // Update roles if provided
-        if (request.roleIds() != null && !request.roleIds().isEmpty()) {
-            List<Role> roles = roleRepository.findAllById(request.roleIds());
-            existing.setRoles(Set.copyOf(roles));
+        if (request.roleIds() != null) {
+            System.out.println("Updating roles for employee " + existing.getId() + " with roleIds: " + request.roleIds());
+
+            if (request.roleIds().isEmpty()) {
+                System.out.println("Clearing all roles for employee " + existing.getId());
+                existing.setRoles(new HashSet<>());
+            } else {
+                List<Role> roles = roleRepository.findAllById(request.roleIds());
+                if (roles.size() != request.roleIds().size()) {
+                    System.err.println("Warning: Some role IDs not found. Requested: " + request.roleIds() + ", Found: " + roles.size());
+                }
+                System.out.println("Setting roles: " + roles.stream().map(Role::getName).toList());
+                existing.setRoles(new HashSet<>(roles));
+            }
+        } else {
+            System.out.println("No role update requested for employee " + existing.getId());
         }
+
 
         Employee updated = update(existing);
         return employeeMapper.toResponse(updated);
@@ -130,5 +148,15 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
            employee.setPassword(encoder.encode(request.password()));
        }
        save(employee);
+    }
+
+    public Page<EmployeeResponse> getAllEmployeesPageable(int page, int size, String sortBy, String sortDir) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ?
+                Sort.Direction.DESC : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<Employee> employeePage = findAll(pageable);
+
+        return employeePage.map(employeeMapper::toResponse);
     }
 }

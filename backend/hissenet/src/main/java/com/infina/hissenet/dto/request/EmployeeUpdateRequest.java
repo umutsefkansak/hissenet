@@ -33,7 +33,7 @@ public record EmployeeUpdateRequest(
 	    @Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "Invalid emergency contact phone number")
 	    String emergencyContactPhone,
 
-	    Set<@NotNull(message = "Role ID cannot be null") Long> roleIds
+	    Set<Long> roleIds
 	    
 ) {
 

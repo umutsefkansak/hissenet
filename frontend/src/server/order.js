@@ -80,5 +80,13 @@ export const orderApi = {
       throw new Error('Tüm emirler getirilemedi');
     }
     return response.json();
+  },
+  
+  getTodayOrderCount: async () => {
+    const response = await fetch(`${BASE_URL}/today/count`);
+    if (!response.ok) {
+      throw new Error('Bugünkü toplam emir sayısı alınamadı');
+    }
+    return response.json();
   }
 };

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { portfolioApi } from '../../server/portfolioApi';
 import { walletApi } from '../../server/wallet';
 import './Portfolio.css';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaExchangeAlt } from 'react-icons/fa';
 
 const Portfolio = () => {
   const { customerId = '68' } = useParams(); // Default to 68 for testing
@@ -17,6 +17,36 @@ const Portfolio = () => {
   const [activeTab, setActiveTab] = useState('portfolio'); // 'portfolio' veya 'history'
   const [historyPage, setHistoryPage] = useState(0);
   const [portfolioPage, setPortfolioPage] = useState(0);
+  const [moveModal, setMoveModal] = useState({ open: false, transactionId: null });
+  const [moveTargetPortfolio, setMoveTargetPortfolio] = useState('');
+  const [moveLoading, setMoveLoading] = useState(false);
+  const [moveError, setMoveError] = useState('');
+
+  const riskProfileOptions = [
+    { value: 'CONSERVATIVE', label: 'Muhafazakar' },
+    { value: 'MODERATE', label: 'Orta Risk' },
+    { value: 'AGGRESSIVE', label: 'Agresif' },
+    { value: 'VERY_AGGRESSIVE', label: 'Çok Agresif' },
+  ];
+  const portfolioTypeOptions = [
+    { value: 'ACTIVE', label: 'Aktif' },
+    { value: 'PASSIVE', label: 'Pasif' },
+    { value: 'BALANCED', label: 'Dengeli' },
+    { value: 'AGGRESSIVE', label: 'Agresif' },
+    { value: 'CONSERVATIVE', label: 'Muhafazakar' },
+    { value: 'SECTOR_FOCUSED', label: 'Sektör Odaklı' },
+    { value: 'INDEX_TRACKING', label: 'Endeks Takip' },
+    { value: 'DIVIDEND_FOCUSED', label: 'Temettü Odaklı' },
+  ];
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    portfolioName: '',
+    description: '',
+    riskProfile: 'MODERATE',
+    portfolioType: 'ACTIVE',
+  });
+  const [createError, setCreateError] = useState('');
+  const [createLoading, setCreateLoading] = useState(false);
 
   // Fetch portfolios and wallet balance on component mount
   useEffect(() => {
@@ -93,6 +123,56 @@ const Portfolio = () => {
     } catch (err) {
       console.error('Error fetching stock transactions:', err);
       setStockTransactions([]);
+    }
+  };
+
+  const handleCreatePortfolio = async (e) => {
+    e.preventDefault();
+    setCreateError('');
+    if (!createForm.portfolioName.trim()) {
+      setCreateError('Portföy adı zorunlu!');
+      return;
+    }
+    setCreateLoading(true);
+    try {
+      const payload = {
+        portfolioName: createForm.portfolioName,
+        description: createForm.description,
+        riskProfile: createForm.riskProfile,
+        portfolioType: createForm.portfolioType,
+      };
+      await portfolioApi.createPortfolio(customerId, payload);
+      await fetchPortfolios();
+      // Yeni portföyü seçili yap
+      setTimeout(() => {
+        if (portfolios && portfolios.length > 0) {
+          const last = portfolios[portfolios.length - 1];
+          setSelectedPortfolio(last);
+        }
+      }, 300);
+      setShowCreateModal(false);
+      setCreateForm({ portfolioName: '', description: '', riskProfile: 'MODERATE', portfolioType: 'ACTIVE' });
+    } catch (err) {
+      setCreateError('Portföy oluşturulamadı.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleMoveTransaction = async () => {
+    if (!moveTargetPortfolio) return;
+    setMoveLoading(true);
+    setMoveError('');
+    try {
+      await portfolioApi.moveStockTransactionToPortfolio(moveModal.transactionId, moveTargetPortfolio);
+      setMoveModal({ open: false, transactionId: null });
+      setMoveTargetPortfolio('');
+      await fetchPortfolios();
+      if (selectedPortfolio) await fetchStockTransactions(selectedPortfolio.id);
+    } catch (err) {
+      setMoveError('Taşıma işlemi başarısız.');
+    } finally {
+      setMoveLoading(false);
     }
   };
 
@@ -219,11 +299,15 @@ const Portfolio = () => {
         </div>
         <div className="header-right">
           <div className="portfolio-selector">
-            <select 
-              value={selectedPortfolio.id} 
+            <select
+              value={selectedPortfolio ? selectedPortfolio.id : ''}
               onChange={(e) => {
-                const portfolio = portfolios.find(p => p.id === parseInt(e.target.value));
-                setSelectedPortfolio(portfolio);
+                if (e.target.value === 'create-new') {
+                  setShowCreateModal(true);
+                } else {
+                  const portfolio = portfolios.find(p => p.id === parseInt(e.target.value));
+                  setSelectedPortfolio(portfolio);
+                }
               }}
               className="portfolio-dropdown"
             >
@@ -232,11 +316,83 @@ const Portfolio = () => {
                   {portfolio.portfolioName}
                 </option>
               ))}
+              <option value="create-new">+ Yeni Portföy Oluştur</option>
             </select>
           </div>
           <button className="cash-transaction-btn">Nakit İşlemler</button>
         </div>
       </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h2>Yeni Portföy Oluştur</h2>
+            <form onSubmit={handleCreatePortfolio} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <input
+                type="text"
+                placeholder="Portföy Adı"
+                value={createForm.portfolioName}
+                onChange={e => setCreateForm(f => ({ ...f, portfolioName: e.target.value }))}
+                required
+              />
+              <textarea
+                placeholder="Açıklama"
+                value={createForm.description}
+                onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))}
+                rows={2}
+              />
+              <select
+                value={createForm.riskProfile}
+                onChange={e => setCreateForm(f => ({ ...f, riskProfile: e.target.value }))}
+              >
+                {riskProfileOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <select
+                value={createForm.portfolioType}
+                onChange={e => setCreateForm(f => ({ ...f, portfolioType: e.target.value }))}
+              >
+                {portfolioTypeOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {createError && <div style={{ color: 'red', fontSize: 14 }}>{createError}</div>}
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button type="button" onClick={() => setShowCreateModal(false)} className="modal-cancel-btn">İptal</button>
+                <button type="submit" className="modal-create-btn" disabled={createLoading}>
+                  {createLoading ? 'Oluşturuluyor...' : 'Oluştur'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {moveModal.open && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h2>İşlemi Başka Portföye Taşı</h2>
+            <select
+              value={moveTargetPortfolio}
+              onChange={e => setMoveTargetPortfolio(e.target.value)}
+              style={{ marginBottom: 16 }}
+            >
+              <option value="">Portföy Seçiniz</option>
+              {portfolios.filter(p => p.id !== selectedPortfolio.id).map(p => (
+                <option key={p.id} value={p.id}>{p.portfolioName}</option>
+              ))}
+            </select>
+            {moveError && <div style={{ color: 'red', fontSize: 14 }}>{moveError}</div>}
+            <div style={{ display: 'flex', gap: 12, marginTop: 8, justifyContent: 'center' }}>
+              <button type="button" onClick={() => setMoveModal({ open: false, transactionId: null })} className="modal-cancel-btn">İptal</button>
+              <button type="button" className="modal-create-btn" onClick={handleMoveTransaction} disabled={!moveTargetPortfolio || moveLoading}>
+                {moveLoading ? 'Taşınıyor...' : 'Taşı'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Portfolio Summary Cards */}
       <div className="portfolio-summary">
@@ -349,7 +505,7 @@ const Portfolio = () => {
                           <td>
                             <div className="stock-info">
                               <span className="stock-symbol">{transaction.stockCode}</span>
-                            </div>f
+                            </div>
                           </td>
                           <td>{formatCurrency(transaction.currentPrice)}</td>
                           <td>{formatCurrency(transaction.price)}</td>
@@ -361,6 +517,16 @@ const Portfolio = () => {
                           </td>
                           <td>{transaction.quantity.toLocaleString()}</td>
                           <td>{formatCurrency(currentValue)}</td>
+                          <td style={{textAlign:'center'}}>
+                            <button
+                              className="move-portfolio-btn"
+                              title="Başka portföye taşı"
+                              onClick={() => setMoveModal({ open: true, transactionId: transaction.id })}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2563eb', fontSize: 18 }}
+                            >
+                              <FaExchangeAlt />
+                            </button>
+                          </td>
                         </tr>
                       );
                     })}

@@ -80,7 +80,32 @@
   .card-value.negative {
     color: #dc3545;
   }
+.summary-card .dashboard-card {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
   
+  .summary-card .dashboard-card .card-header {
+    margin-bottom: 12px;
+  }
+  
+  .summary-card .dashboard-card .card-title {
+    font-size: 14px;
+    color: #4a5568;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+  
+  .summary-card .dashboard-card .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+  }
   /* Responsive için */
   @media (max-width: 768px) {
     .summary-cards {
@@ -193,7 +218,7 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 900;
 }
 
 .customer-type {

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AuthModal.css';
 
-export function CodeVerificationModal({ isOpen, onClose, onConfirm }) {
+export function CodeVerificationModal({ isOpen, onClose, onConfirm,  maxAttempts, attemptsLeft }) {
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const inputs = useRef([]);
 
@@ -24,7 +24,6 @@ export function CodeVerificationModal({ isOpen, onClose, onConfirm }) {
     if (val && i < 5) inputs.current[i+1]?.focus();
   };
 
-  // Yapıştırma (paste) olayı
   const handlePaste = (e) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData('Text').replace(/\D/g, ''); // sadece rakamlar
@@ -57,6 +56,11 @@ export function CodeVerificationModal({ isOpen, onClose, onConfirm }) {
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         <h2 className="ham-title">E-posta Doğrulama</h2>
         <p>Müşterinin mail adresine gönderilen kodu girin:</p>
+         {(maxAttempts != null) && (
+           <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 4 }}>
+            Kalan hak: <b>{attemptsLeft != null ? attemptsLeft : '-'}/{maxAttempts}</b>
+          </p>
+        )}
         <div style={{ display:'flex', gap:8, justifyContent:'center', margin:'1rem 0' }}>
           {digits.map((d,i) => (
             <input

@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* navbar ve drawer’dan üstte olmalı */
+  z-index: 1000; /* navbar ve drawer’dan üstte olmalı */
 }
 
 .auth-modal {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { walletApi } from '../../server/wallet';
 import { orderApi } from '../../server/order';
 import { getCustomerById } from '../../server/customer';
+import { portfolioApi } from '../../server/portfolioApi';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import './CustomerDetail.css';
@@ -12,6 +13,7 @@ const CustomerDetailPage = () => {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [portfolioValue, setPortfolioValue] = useState(0);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,16 +23,25 @@ const CustomerDetailPage = () => {
     const fetchCustomerData = async () => {
       try {
         setLoading(true);
+        const [customerResult, balanceResult, ordersResult, portfoliosResult] = await Promise.all([
+          getCustomerById(id),
+          walletApi.getCustomerWalletBalance(id),
+          orderApi.getOrdersByCustomerId(id),
+          portfolioApi.getCustomerPortfolios(id)
+        ]);
         
-        const customerResult = await getCustomerById(id);
         setCustomer(customerResult.data);
-        
-        const balanceResult = await walletApi.getCustomerWalletBalance(id);
         setWalletBalance(balanceResult.data);
-        
-        const ordersResult = await orderApi.getOrdersByCustomerId(id);
         setOrders(ordersResult.data || []);
         
+        const portfolios = portfoliosResult.data || [];
+        const totalPortfolioValue = portfolios.reduce((total, portfolio) => {
+          return total + (portfolio.totalValue || 0);
+        }, 0);
+        
+        setPortfolioValue(totalPortfolioValue);
+        
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -57,25 +68,58 @@ const CustomerDetailPage = () => {
   };
 
   const getRiskProfile = () => {
-    return 'Düşük';
+    if (!customer || !customer.riskProfile) {
+      return 'Belirtilmemiş';
+    }
+    
+    switch (customer.riskProfile.toUpperCase()) {
+      case 'CONSERVATIVE':
+        return 'Muhafazakar';
+      case 'MODERATE':
+        return 'Orta Risk';
+      case 'AGGRESSIVE':
+        return 'Agresif';
+      case 'VERY_AGGRESSIVE':
+        return 'Çok Agresif';
+      default:
+        return customer.riskProfile;
+    }
+  };
+  const getRiskProfileClass = (customer) => {
+    if (!customer || !customer.riskProfile) {
+      return 'unknown';
+    }
+    
+    switch (customer.riskProfile.toUpperCase()) {
+      case 'CONSERVATIVE':
+        return 'conservative';
+      case 'MODERATE':
+        return 'moderate';
+      case 'AGGRESSIVE':
+        return 'aggressive';
+      case 'VERY_AGGRESSIVE':
+        return 'very-aggressive';
+      default:
+        return 'unknown';
+    }
   };
 
   const getPortfolioValue = () => {
-    return 180000;
+    return portfolioValue;
   };
 
   const getCurrentBalance = () => {
     return walletBalance;
   };
 
-  // TC Kimlik No maskeleme fonksiyonu
+
   const maskTcNumber = (tcNumber) => {
     if (!tcNumber) return 'Belirtilmemiş';
     
     const tcString = tcNumber.toString();
     if (tcString.length !== 11) return tcNumber;
     
-    // İlk 9 haneyi * ile maskele, son 2 haneyi göster
+
     const maskedPart = '*'.repeat(9);
     const lastTwoDigits = tcString.slice(-2);
     
@@ -97,6 +141,10 @@ const CustomerDetailPage = () => {
     switch (status) {
       case 'PENDING':
         return 'Beklemede';
+      case 'OPEN':
+        return 'Beklemede';
+      case 'FILLED':
+        return 'Onaylandı';
       case 'COMPLETED':
         return 'Tamamlandı';
       case 'CANCELLED':
@@ -109,7 +157,7 @@ const CustomerDetailPage = () => {
   };
 
   const handleBack = () => {
-    navigate('/customers');
+    navigate('/reports');
   };
 
   if (loading) {
@@ -206,7 +254,9 @@ const CustomerDetailPage = () => {
             </div>
             <div className="info-item">
               <label>Risk Profili:</label>
-              <span className="risk-profile low">{getRiskProfile()}</span>
+              <span className={`risk-profile ${getRiskProfileClass(customer)}`}>
+                {getRiskProfile(customer)}
+              </span>
             </div>
             <div className="info-item">
               <label>Toplam Portföy Değeri:</label>

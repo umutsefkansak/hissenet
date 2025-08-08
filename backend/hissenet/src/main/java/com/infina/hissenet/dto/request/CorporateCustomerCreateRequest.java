@@ -10,12 +10,14 @@ import java.time.LocalDate;
 
 public record CorporateCustomerCreateRequest(
         @UniqueValue(type = UniqueValueType.CUSTOMER_EMAIL)
-        @Email @NotBlank String email,
-        @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
+        @Email(message = "{validation.email.invalid}")
+        @NotBlank(message = "{validation.email.required}") String email,
+        @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "{validation.phone.invalid}") String phone,
         String nationality,
-        @NotBlank String companyName,
+        @NotBlank(message = "{validation.company.name.required}") String companyName,
         @UniqueValue(type = UniqueValueType.TAX_NUMBER)
-        @Pattern(regexp = "^[0-9]{10}$") String taxNumber,
+        @Pattern(regexp = "^[0-9]{10}$", message = "{validation.tax.number.invalid}") String taxNumber,
+
         String tradeRegistryNumber,
         LocalDate establishmentDate,
         String sector,
@@ -23,9 +25,9 @@ public record CorporateCustomerCreateRequest(
         String authorizedPersonTitle,
         String website,
         BigDecimal commissionRate,
-        @Pattern(regexp = "^\\+?[0-9]{10,15}$") String authorizedPersonPhone,
-        @Pattern(regexp = "^[1-9][0-9]{10}$") String authorizedPersonTcNumber,
-        @Email String authorizedPersonEmail,
+        @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "{validation.phone.invalid}") String authorizedPersonPhone,
+        @Pattern(regexp = "^[1-9][0-9]{10}$", message = "{validation.tc.number.invalid}") String authorizedPersonTcNumber,
+        @Email(message = "{validation.email.invalid}") String authorizedPersonEmail,
         String taxOffice
 
 ) {}

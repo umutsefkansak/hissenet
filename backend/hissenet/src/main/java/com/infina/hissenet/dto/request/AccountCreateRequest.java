@@ -7,19 +7,19 @@ import jakarta.validation.constraints.Size;
 
 public record AccountCreateRequest(
 		
-		@NotBlank(message = "Kullanıcı adı boş olamaz.")
-        @Size(min = 3, max = 50, message = "Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.")
+		@NotBlank(message = "{validation.username.required}")
+        @Size(min = 3, max = 50, message = "{validation.username.size}")
         String username,
 
-        @NotBlank(message = "Şifre boş olamaz.")
-        @Size(min = 8, max = 60, message = "Şifre en az 8, en fazla 60 karakter olmalıdır.")
+        @NotBlank(message = "{validation.password.required}")
+        @Size(min = 8, max = 60, message = "{validation.password.size}")
         @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-            message = "Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir."
+            message = "{validation.password.pattern}"
         )
         String passwordHash,
 
-        @NotNull(message = "Çalışan ID'si belirtilmelidir.")
+        @NotNull(message = "{validation.employee.id.required}")
         Long employeeId
         
 ) {

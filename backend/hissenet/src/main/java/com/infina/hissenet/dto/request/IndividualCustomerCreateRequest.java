@@ -13,14 +13,25 @@ import java.time.LocalDate;
 
 public record IndividualCustomerCreateRequest(
         @UniqueValue(type = UniqueValueType.CUSTOMER_EMAIL)
-        @Email @NotBlank String email,
-        @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
+        @Email(message = "{validation.email.invalid}")
+        @NotBlank(message = "{validation.email.required}")
+        String email,
+
+        @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "{validation.phone.invalid}")
+        String phone,
+
         String nationality,
-        @NotBlank String firstName,
+        @NotBlank(message = "{validation.first.name.required}")
+        String firstName,
+
         String middleName,
-        @NotBlank String lastName,
+
+        @NotBlank(message = "{validation.last.name.required}")
+        String lastName,
+
         @UniqueValue(type = UniqueValueType.TC_NUMBER)
-        @Pattern(regexp = "^[1-9][0-9]{10}$") String tcNumber,
+        @Pattern(regexp = "^[1-9][0-9]{10}$", message = "{validation.tc.number.invalid}")
+        String tcNumber,
         @MinAge(18)
         LocalDate birthDate,
         String birthPlace,
@@ -30,8 +41,8 @@ public record IndividualCustomerCreateRequest(
         String profession,
         String educationLevel,
         RiskProfile riskProfile,
-        @DecimalMin(value = "0.0", message = "Commission rate cannot be negative")
-        @DecimalMax(value = "5.0", message = "Commission rate cannot exceed 5%")
+        @DecimalMin(value = "0.0", message = "{validation.commission.negative}")
+        @DecimalMax(value = "5.0", message = "{validation.commission.max}")
         BigDecimal commissionRate,
         IncomeRange incomeRange
 ) {}

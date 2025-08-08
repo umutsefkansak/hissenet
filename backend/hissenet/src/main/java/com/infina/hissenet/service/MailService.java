@@ -14,6 +14,7 @@ import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.exception.mail.MailException;
 import com.infina.hissenet.service.abstracts.*;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,11 +77,10 @@ public class MailService implements IMailService {
             mailSender.send(message);
 
             logger.info("Email sent successfully: {} -> {}", fromEmail, request.to());
-            return MailSendResponse.success(MailConstants.Messages.MAIL_SENT_SUCCESS);
-
+            return MailSendResponse.success(MessageUtils.getMessage("mail.send.success"));
         } catch (Exception e) {
             logger.error("Error sending email: {} -> {}", fromEmail, request.to(), e);
-            throw new MailException(MailConstants.Messages.MAIL_SEND_ERROR + e.getMessage(), e);
+            throw new MailException(MessageUtils.getMessage("mail.send.error") + e.getMessage(), e);
         }
     }
 
@@ -110,7 +110,7 @@ public class MailService implements IMailService {
                     fromEmail, request.email(), maxAttempts, expiryMinutes);
 
             return CodeSendResponse.success(
-                    MailConstants.Messages.VERIFICATION_CODE_SENT,
+                    MessageUtils.getMessage("mail.verification.code.sent"),
                     maxAttempts,
                     expiryMinutes,
                     request.email()
@@ -118,7 +118,7 @@ public class MailService implements IMailService {
 
         } catch (Exception e) {
             logger.error("Error sending verification code: {} -> {}", fromEmail, request.email(), e);
-            throw new MailException(MailConstants.Messages.VERIFICATION_CODE_SEND_ERROR + e.getMessage(), e);
+            throw new MailException(MessageUtils.getMessage("mail.verification.code.send.error") + e.getMessage(), e);
         }
     }
 
@@ -184,7 +184,7 @@ public class MailService implements IMailService {
             } else if (identificationNumber.length() == 10) {
                 customerDto = customerService.getCustomerByTaxNumber(identificationNumber);
             } else {
-                throw new IllegalArgumentException("Invalid identification number format");
+                throw new IllegalArgumentException(MessageUtils.getMessage("mail.identification.invalid.format"));
             }
 
             CodeSendRequest codeRequest = new CodeSendRequest(
@@ -201,7 +201,7 @@ public class MailService implements IMailService {
         } catch (Exception e) {
             logger.error("Error sending verification code for identification: {}",
                     request.identificationNumber(), e);
-            throw new MailException("Failed to send verification code using identification number: " + e.getMessage(), e);
+            throw new MailException(MessageUtils.getMessage("mail.identification.send.failed") + e.getMessage(), e);
         }
     }
 
@@ -238,23 +238,19 @@ public class MailService implements IMailService {
 
             MimeMessage message = createMimeMessage(request.email(), subject, content, request.email());
             mailSender.send(message);
-            
-            logger.info("Password change token sent: {} -> {} (Token: {})", 
+
+            logger.info("Password change token sent: {} -> {} (Token: {})",
                     fromEmail, request.email(), token);
-            
+
             return PasswordChangeTokenResponse.success(
-                    MailConstants.Messages.PASSWORD_CHANGE_TOKEN_SENT
+                    MessageUtils.getMessage("mail.password.change.token.sent")
             );
-            
+
         } catch (Exception e) {
             logger.error("Error sending password change token: {} -> {}", fromEmail, request.email(), e);
-            throw new MailException(MailConstants.Messages.PASSWORD_CHANGE_TOKEN_SEND_ERROR + e.getMessage(), e);
+            throw new MailException(MessageUtils.getMessage("mail.password.change.token.send.error") + e.getMessage(), e);
         }
     }
-
-
-
-
 
 
 
@@ -266,7 +262,7 @@ public class MailService implements IMailService {
         try {
             helper.setFrom(fromEmail, fromName);
         } catch (UnsupportedEncodingException e) {
-            throw new MailException("Error setting email sender: " + e.getMessage(), e);
+            throw new MailException(MessageUtils.getMessage("mail.send.error") + e.getMessage(), e);
         }
 
         helper.setTo(to);

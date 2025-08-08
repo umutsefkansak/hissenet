@@ -6,15 +6,15 @@ import jakarta.validation.constraints.Size;
 
 public record AccountPasswordChangeRequest(
 		
-		@NotBlank(message = "Yeni şifre boş olamaz.")
-	    @Size(min = 8, max = 60, message = "Yeni şifre en az 8, en fazla 60 karakter olmalıdır.")
+		@NotBlank(message = "{validation.new.password.required}")
+	    @Size(min = 8, max = 60, message = "{validation.new.password.size}")
 	    @Pattern(
 	        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-	        message = "Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir."
+	        message = "{validation.password.pattern}"
 	    )
 	    String newPassword,
 
-	    @NotBlank(message = "Şifre onayı boş olamaz.")
+	    @NotBlank(message = "{validation.confirm.password.required}")
 	    String confirmNewPassword
 	    
 ) {

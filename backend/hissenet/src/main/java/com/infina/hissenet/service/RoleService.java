@@ -63,7 +63,7 @@ public class RoleService extends GenericServiceImpl<Role, Long> implements IRole
     public Optional<RoleResponse> getRoleByName(String name) {
         Optional<Role> roleOpt = roleRepository.findByName(name);
         if (roleOpt.isEmpty()) {
-            throw new RoleNotFoundException("Role not found with name: " + name);
+            throw new RoleNotFoundException(name);
         }
         return roleOpt.map(roleMapper::toDto);
     }

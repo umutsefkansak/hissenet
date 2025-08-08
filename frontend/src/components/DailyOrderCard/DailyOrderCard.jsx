@@ -24,7 +24,7 @@ export default function DailyOrderCard() {
       title="Günlük İşlem"
       value={todayOrderCount !== null ? todayOrderCount : "Yükleniyor..."}
       subtitle=""
-      iconVariant="trend-up"
+      iconVariant="daily"
       icon={<BiBarChartAlt2 size={24} />}
     />
   );

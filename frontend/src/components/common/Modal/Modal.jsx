@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MODAL_VARIANTS } from './variantConfig';
-import Button from './Button';
+import Button from './button/Button';
 import styles from './Modal.module.css';
 
 export default function Modal({

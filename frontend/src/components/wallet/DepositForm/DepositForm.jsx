@@ -21,15 +21,7 @@ const DepositForm = ({ amount, setAmount, loading, onSubmit }) => {
         </div>
       </div>
 
-      <div className="info-section">
-        <h4>Bakiye Yükleme Bilgileri</h4>
-        <ul>
-          <li>Bakiye yükleme işlemi anında gerçekleşir</li>
-          <li>Minimum yükleme tutarı 10 TL'dir</li>
-          <li>Maksimum günlük yükleme limiti 50.000 TL'dir</li>
-          <li>Yüklenen tutar hesabınıza hemen aktarılır</li>
-        </ul>
-      </div>
+    
     </div>
   );
 };

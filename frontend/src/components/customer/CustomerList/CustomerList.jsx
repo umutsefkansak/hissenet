@@ -7,11 +7,12 @@ import MostActiveStockCard from '../../MostActiveStock/MostActiveStock';
 import EditButton from '../../common/Button/EditButton';
 import './CustomerList.css';
 
-const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) => {
+const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
   const navigate = useNavigate();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const shouldShowCards = !loading && !error;
 
   const getCustomerType = (customer) => {
     return customer.customerType === 'INDIVIDUAL' ? 'Bireysel' : 'Kurumsal';
@@ -77,18 +78,20 @@ const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) =>
 
   return (
     <div className="customer-list">
-      {/* Summary Cards */}
-      <div className="summary-cards">
-        <div className="summary-card">
-          <TodayTotalTradeVolumeCard />
+      {/* Summary Cards - sadece gerekli olduğunda göster */}
+      {shouldShowCards && (
+        <div className="summary-cards">
+          <div className="summary-card">
+            <TodayTotalTradeVolumeCard />
+          </div>
+          <div className="summary-card">
+            <ActiveCustomerCard />
+          </div>
+          <div className="summary-card">
+            <MostActiveStockCard />
+          </div>
         </div>
-        <div className="summary-card">
-          <ActiveCustomerCard />
-        </div>
-        <div className="summary-card">
-          <MostActiveStockCard />
-        </div>
-      </div>
+      )}
 
       <div className="customer-list-header">
         <h2>Müşteri Listesi</h2>

@@ -224,22 +224,19 @@ const CustomerDetailPage = () => {
     
     const pdf = new jsPDF();
     
-    // NotoSans font'u ekle
     pdf.addFont('/fonts/NotoSans-Regular.ttf', 'NotoSans', 'normal');
     pdf.setFont('NotoSans');
     
-    // Başlık
     pdf.setFontSize(18);
     pdf.setTextColor(30, 55, 72);
     pdf.text('Müşteri İşlem Geçmişi', 20, 30);
     
-    // Müşteri bilgileri
+    
     pdf.setFontSize(12);
     pdf.setTextColor(74, 85, 104);
     pdf.text(`Müşteri: ${customer.firstName} ${customer.lastName}`, 20, 45);
     pdf.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 55);
     
-    // Tablo başlıkları
     const headers = ['Tarih', 'Hisse', 'Emir Türü', 'Durum', 'Adet', 'Fiyat', 'Toplam'];
     const startY = 75;
     let currentY = startY;
@@ -248,7 +245,6 @@ const CustomerDetailPage = () => {
     pdf.setTextColor(255, 255, 255);
     pdf.setFillColor(30, 58, 138);
     
-    // Header row
     headers.forEach((header, index) => {
       const x = 20 + (index * 25);
       pdf.rect(x, currentY - 8, 25, 8, 'F');
@@ -257,7 +253,6 @@ const CustomerDetailPage = () => {
     
     currentY += 8;
     
-    // Data rows
     pdf.setTextColor(45, 55, 72);
     orders.forEach((order, rowIndex) => {
       if (currentY > 250) {

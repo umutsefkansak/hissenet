@@ -31,7 +31,6 @@ const Wallet = () => {
     try {
       setLoading(true);
       
-      // Tüm bakiye bilgilerini paralel olarak çek
       const [balanceData, availableData, blockedData] = await Promise.all([
         walletApi.getWalletBalance(customerId),
         walletApi.getAvailableBalance(customerId),
@@ -59,7 +58,6 @@ const Wallet = () => {
       return;
     }
 
-    // Gerçek available balance ile kontrol
     if (activeTab === 'withdraw') {
       if (!iban) {
         setMessage('Lütfen IBAN bilgisini girin');
@@ -89,7 +87,7 @@ const Wallet = () => {
       setMessageType('success');
       setAmount('');
       setIban('');
-      fetchWalletData(); // Bakiye bilgilerini yenile
+      fetchWalletData(); 
     } catch (error) {
       console.error('İşlem hatası:', error);
       setMessage(error.message || 'Bir hata oluştu');
@@ -113,7 +111,7 @@ const Wallet = () => {
   return (
     <div className={styles.walletPage}>
       <div className={styles.walletModal}>
-        {/* Header */}
+        
         <div className={styles.modalHeader}>
           <div className={styles.walletTabButtons}>
             <button 

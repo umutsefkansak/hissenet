@@ -12,7 +12,7 @@ public class MarketHourService {
     private static final LocalTime MARKET_OPEN= LocalTime.of(10, 0);
     private static final LocalTime MARKET_CLOSE = LocalTime.of(18, 0);
     private static  final LocalTime ORDER_COLLECTION_START = LocalTime.of(9, 30);
-    private static  final  LocalTime ORDER_COLLECTION = LocalTime.of(18, 0);
+    private static  final  LocalTime ORDER_COLLECTION_END = LocalTime.of(17, 30);
 
     public boolean isMarketOpen(){
         LocalDateTime now = LocalDateTime.now();
@@ -28,10 +28,10 @@ public class MarketHourService {
         LocalDateTime now = LocalDateTime.now();
         LocalTime currentTime = now.toLocalTime();
         DayOfWeek dayOfWeek = now.getDayOfWeek();
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek== DayOfWeek.MONDAY){
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek== DayOfWeek.SUNDAY){
             return false;
         }
-        return currentTime.isBefore(ORDER_COLLECTION) && currentTime.isAfter(ORDER_COLLECTION_START);
+        return currentTime.isBefore(ORDER_COLLECTION_END) && currentTime.isAfter(ORDER_COLLECTION_START);
     }
 
 

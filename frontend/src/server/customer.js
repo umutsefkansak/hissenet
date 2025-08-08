@@ -26,6 +26,16 @@ export const createCorporateCustomer = async (customerData) => {
     }
 };
 
+export const getCustomerByEmail = async (email) => {
+  try {
+    const response = await api.get(`/customers/email/${encodeURIComponent(email)}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get customer by email error:', error);
+    throw error;
+  }
+};
+
 export const getAllCustomers = async () => {
     try {
         const response = await api.get('/customers');

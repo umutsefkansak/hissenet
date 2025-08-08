@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+*.zip
+*.tar
+*.pt
+*.pdf
+*.csv
+*.xlsx
+*.md
+Embed/
+Preprocessing/
+backend/
+frontend/
+logs/
+.git/

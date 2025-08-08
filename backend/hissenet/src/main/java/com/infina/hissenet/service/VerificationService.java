@@ -13,6 +13,7 @@ import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
 import com.infina.hissenet.entity.VerificationData;
 import com.infina.hissenet.service.abstracts.IVerificationService;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,13 +129,13 @@ public class VerificationService implements IVerificationService {
         int currentCount = countStr != null ? Integer.parseInt(countStr) : 0;
 
         if (currentCount >= maxCodesPerDay) {
-            throw new MailRateLimitException(MailConstants.Messages.DAILY_LIMIT_EXCEEDED);
+            throw new MailRateLimitException(MessageUtils.getMessage("mail.daily.limit.exceeded"));
         }
 
         VerificationData data = getVerificationData(email);
         if (data != null && data.isBlocked() &&
                 data.getBlockedAt().isAfter(LocalDateTime.now().minusHours(1))) {
-            throw new VerificationCodeException(MailConstants.Messages.TOO_MANY_WRONG_ATTEMPTS);
+            throw new VerificationCodeException(MessageUtils.getMessage("mail.too.many.wrong.attempts"));
         }
     }
 
@@ -153,7 +154,7 @@ public class VerificationService implements IVerificationService {
             redisTemplate.opsForValue().set(key, json, expiryMinutes, TimeUnit.MINUTES);
         } catch (JsonProcessingException e) {
             logger.error("Error storing verification data: {}", email, e);
-            throw new VerificationCodeException("Failed to store verification code");
+            throw new VerificationCodeException(MessageUtils.getMessage("verification.code.store.failed"));
         }
     }
 
@@ -172,7 +173,7 @@ public class VerificationService implements IVerificationService {
             return data;
         } catch (JsonProcessingException e) {
             logger.error("Error reading verification data: {}", email, e);
-            throw new VerificationCodeException("Failed to read verification code");
+            throw new VerificationCodeException(MessageUtils.getMessage("verification.code.read.failed"));
         }
     }
 
@@ -284,7 +285,7 @@ public class VerificationService implements IVerificationService {
 
         } catch (Exception e) {
             logger.error("Error generating password change token for: {}", email, e);
-            throw new VerificationCodeException("Failed to generate password change token");
+            throw new VerificationCodeException(MessageUtils.getMessage("verification.password.token.generate.failed"));
         }
     }
 
@@ -306,7 +307,7 @@ public class VerificationService implements IVerificationService {
 
         } catch (Exception e) {
             logger.error("Error verifying password change token: {}", request.token(), e);
-            throw new VerificationCodeException("Failed to verify password change token");
+            throw new VerificationCodeException(MessageUtils.getMessage("verification.password.token.generate.failed"));
         }
     }
 

@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
 
+import Chatbot from './components/Chatbot/Chatbot';
 import CustomerHome from './pages/CustomerHome/CustomerHome';
 
 function AppContent() {
@@ -64,8 +65,22 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Chatbot />
     </Router>
   );
 }
 
 export default App;
+
+/*
+import Chatbot from './components/Chatbot/Chatbot';
+
+function App() {
+  return (
+    <div className="App">
+      <Chatbot />
+    </div>
+  );
+}
+
+export default App;*/

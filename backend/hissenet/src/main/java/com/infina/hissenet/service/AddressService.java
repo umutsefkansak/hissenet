@@ -99,7 +99,7 @@ public class AddressService extends GenericServiceImpl<Address, Long> implements
     public AddressResponse getPrimaryAddressByCustomerId(Long customerId) {
         return addressRepository.findByCustomerIdAndIsPrimaryTrue(customerId)
                 .map(addressMapper::toDto)
-                .orElseThrow(() -> new AddressNotFoundException("No primary address found for customer ID: " + customerId));
+                .orElseThrow(() -> new AddressNotFoundException("address.primary.not.found", customerId));
     }
 
 

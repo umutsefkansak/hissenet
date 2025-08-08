@@ -1,5 +1,6 @@
 package com.infina.hissenet.validation;
 
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
@@ -23,6 +24,14 @@ public class MinAgeValidator implements ConstraintValidator<MinAge, LocalDate> {
         LocalDate today = LocalDate.now();
         int age = Period.between(birthDate, today).getYears();
 
-        return age >= minAge;
+        if (age < minAge) {
+            context.disableDefaultConstraintViolation();
+            String customMessage = MessageUtils.getMessage("validation.age.min", minAge);
+            context.buildConstraintViolationWithTemplate(customMessage)
+                    .addConstraintViolation();
+            return false;
+        }
+
+        return true;
     }
 }

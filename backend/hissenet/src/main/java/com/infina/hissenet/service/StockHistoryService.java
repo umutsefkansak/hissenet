@@ -11,6 +11,7 @@ import com.infina.hissenet.repository.StockHistoryRepository;
 import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.service.abstracts.IStockHistoryService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class StockHistoryService extends GenericServiceImpl<StockHistory, Long> 
     @Transactional
     public StockHistoryResponse createStockHistory(StockHistoryCreateRequest request) {
         Stock stock = stockRepository.findById(request.stockId())
-                .orElseThrow(() -> new NotFoundException("Stock not found: " + request.stockId()));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.not.found", request.stockId())));
         StockHistory entity = historyMapper.toEntity(request, stock);
         StockHistory saved  = historyRepository.save(entity);
         return historyMapper.toResponse(saved);
@@ -43,7 +44,7 @@ public class StockHistoryService extends GenericServiceImpl<StockHistory, Long> 
 
     public StockHistoryResponse getStockHistory(Long id) {
         StockHistory history = historyRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("StockHistory not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.history.not.found", id)));
         return historyMapper.toResponse(history);
     }
 
@@ -57,7 +58,7 @@ public class StockHistoryService extends GenericServiceImpl<StockHistory, Long> 
     @Transactional
     public StockHistoryResponse updateStockHistory(Long id, StockHistoryUpdateRequest request) {
         StockHistory existing = historyRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("StockHistory not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.history.not.found", id)));
         historyMapper.updateEntityFromDto(request, existing);
         StockHistory updated = historyRepository.save(existing);
         return historyMapper.toResponse(updated);
@@ -66,7 +67,7 @@ public class StockHistoryService extends GenericServiceImpl<StockHistory, Long> 
     @Transactional
     public void deleteStockHistory(Long id) {
         if (!historyRepository.existsById(id)) {
-            throw new NotFoundException("StockHistory not found: " + id);
+            throw new NotFoundException(MessageUtils.getMessage("stock.history.not.found", id));
         }
         historyRepository.deleteById(id);
     }

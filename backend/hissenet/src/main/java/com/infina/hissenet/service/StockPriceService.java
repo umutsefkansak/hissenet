@@ -11,6 +11,7 @@ import com.infina.hissenet.repository.StockPriceRepository;
 import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.service.abstracts.IStockPriceService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class StockPriceService extends GenericServiceImpl<StockPrice, Long> impl
     @Transactional
     public StockPriceResponse createStockPrice(StockPriceCreateRequest request) {
         Stock stock = stockRepository.findById(request.stockId())
-                .orElseThrow(() -> new NotFoundException("Stock not found: " + request.stockId()));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.not.found", request.stockId())));
         StockPrice entity = priceMapper.toEntity(request, stock);
         StockPrice saved  = priceRepository.save(entity);
         return priceMapper.toResponse(saved);
@@ -43,7 +44,7 @@ public class StockPriceService extends GenericServiceImpl<StockPrice, Long> impl
 
     public StockPriceResponse getStockPrice(Long id) {
         StockPrice price = priceRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("StockPrice not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.price.not.found", id)));
         return priceMapper.toResponse(price);
     }
 
@@ -57,7 +58,7 @@ public class StockPriceService extends GenericServiceImpl<StockPrice, Long> impl
     @Transactional
     public StockPriceResponse updateStockPrice(Long id, StockPriceUpdateRequest request) {
         StockPrice existing = priceRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("StockPrice not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.price.not.found", id)));
         priceMapper.updateEntityFromDto(request, existing);
         StockPrice updated = priceRepository.save(existing);
         return priceMapper.toResponse(updated);
@@ -66,7 +67,7 @@ public class StockPriceService extends GenericServiceImpl<StockPrice, Long> impl
     @Transactional
     public void deleteStockPrice(Long id) {
         if (!priceRepository.existsById(id)) {
-            throw new NotFoundException("StockPrice not found: " + id);
+            throw new NotFoundException(MessageUtils.getMessage("stock.price.not.found", id));
         }
         priceRepository.deleteById(id);
     }

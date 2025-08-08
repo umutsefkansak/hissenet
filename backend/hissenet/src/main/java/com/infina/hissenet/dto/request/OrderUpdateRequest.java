@@ -5,8 +5,8 @@ import com.infina.hissenet.entity.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 
 public record OrderUpdateRequest(
-		
-		@NotNull(message = "Emir durumu boş olamaz")
+
+        @NotNull(message = "{validation.order.status.required}")
         OrderStatus status
         
 ) {

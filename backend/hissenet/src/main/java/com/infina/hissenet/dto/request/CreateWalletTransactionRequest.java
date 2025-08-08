@@ -9,19 +9,19 @@ import java.math.BigDecimal;
 
 public record CreateWalletTransactionRequest(
 
-        @NotNull(message = "Wallet ID cannot be null")
+        @NotNull(message = "{validation.wallet.id.required}")
         Long walletId,
 
-        @NotNull(message = "Amount cannot be null")
-        @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
+        @NotNull(message = "{validation.amount.required}")
+        @DecimalMin(value = "0.01", message = "{validation.amount.min}")
         BigDecimal amount,
 
-        @NotNull(message = "Transaction type cannot be null")
+        @NotNull(message = "{validation.transaction.type.required}")
         TransactionType transactionType,
 
 
 
-        @DecimalMin(value = "0.0", message = "Fee amount cannot be negative")
+        @DecimalMin(value = "0.0", message = "{validation.fee.amount.min}")
         BigDecimal feeAmount,
 
         String source,

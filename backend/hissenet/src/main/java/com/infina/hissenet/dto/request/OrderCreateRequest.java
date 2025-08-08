@@ -9,24 +9,24 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 public record OrderCreateRequest(
-		
-		@NotNull(message = "Müşteri ID'si boş olamaz")
+
+        @NotNull(message = "{validation.customer.id.required}")
         Long customerId,
 
-        @NotNull(message = "Emir türü (category) boş olamaz")
+        @NotNull(message = "{validation.order.category.required}")
         OrderCategory category,
 
-        @NotNull(message = "İşlem tipi (type) boş olamaz")
+        @NotNull(message = "{validation.order.type.required}")
         OrderType type,
-        
-        @NotNull(message = "Hissenin kodu boş olamaz")
+
+        @NotNull(message = "{validation.stock.code.required}")
         String stockCode,
 
-        @NotNull(message = "Adet bilgisi boş olamaz")
-        @DecimalMin(value = "0.0001", message = "Adet en az 0.0001 olmalıdır")
+        @NotNull(message = "{validation.quantity.required}")
+        @DecimalMin(value = "0.0001", message = "{validation.quantity.min}")
         BigDecimal quantity,
 
-        @DecimalMin(value = "0.0001", inclusive = false, message = "Fiyat pozitif olmalıdır")
+        @DecimalMin(value = "0.0001", inclusive = false, message = "{validation.price.positive}")
         BigDecimal price
         
 ) {

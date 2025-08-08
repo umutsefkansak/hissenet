@@ -1,11 +1,13 @@
 package com.infina.hissenet.exception.riskassessment;
 
+import com.infina.hissenet.utils.MessageUtils;
+
 public class IncompleteAssessmentException extends RiskAssessmentException {
-    public IncompleteAssessmentException(String message) {
-        super(message);
+    public IncompleteAssessmentException(String messageKey, Object... args) {
+        super(MessageUtils.getMessage(messageKey, args));
     }
 
     public IncompleteAssessmentException(int expectedQuestions, int providedAnswers) {
-        super("All questions must be answered. Expected: " + expectedQuestions + ", Provided: " + providedAnswers);
+        super(MessageUtils.getMessage("risk.assessment.incomplete", expectedQuestions, providedAnswers));
     }
 }

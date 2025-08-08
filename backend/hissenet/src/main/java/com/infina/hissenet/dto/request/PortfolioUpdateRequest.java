@@ -7,19 +7,19 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record PortfolioUpdateRequest(
-    @NotBlank(message = "Portföy adı boş olamaz")
-    @Size(min = 2, max = 100, message = "Portföy adı 2-100 karakter arasında olmalıdır")
-    String portfolioName,
-    
-    @Size(max = 500, message = "Açıklama 500 karakterden uzun olamaz")
-    String description,
-    
-    @NotNull(message = "Risk profili boş olamaz")
-    RiskProfile riskProfile,
-    
-    @NotNull(message = "Portföy türü boş olamaz")
-    PortfolioType portfolioType,
-    
-    @NotNull(message = "Aktiflik durumu boş olamaz")
-    Boolean isActive
-) {} 
+        @NotBlank(message = "{validation.portfolio.name.required}")
+        @Size(min = 2, max = 100, message = "{validation.portfolio.name.size}")
+        String portfolioName,
+
+        @Size(max = 500, message = "{validation.portfolio.description.size}")
+        String description,
+
+        @NotNull(message = "{validation.risk.profile.required}")
+        RiskProfile riskProfile,
+
+        @NotNull(message = "{validation.portfolio.type.required}")
+        PortfolioType portfolioType,
+
+        @NotNull(message = "{validation.portfolio.active.status.required}")
+        Boolean isActive
+) {}

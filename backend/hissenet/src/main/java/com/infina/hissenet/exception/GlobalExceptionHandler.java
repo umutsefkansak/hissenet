@@ -22,6 +22,7 @@ import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledExce
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCompletedException;
 import com.infina.hissenet.exception.transaction.UnauthorizedOperationException;
 import com.infina.hissenet.exception.wallet.*;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -46,7 +47,7 @@ public class GlobalExceptionHandler {
     })
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Resource Not Found");
+        problem.setTitle(MessageUtils.getMessage("error.title.not.found"));
         problem.setType(URI.create("https://www.hissenet.com/errors/not-found"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -60,8 +61,8 @@ public class GlobalExceptionHandler {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
-        problem.setTitle("Validation Error");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, MessageUtils.getMessage("common.validation.failed"));
+        problem.setTitle(MessageUtils.getMessage("error.title.validation"));
         problem.setType(URI.create("https://www.hissenet.com/errors/validation"));
         problem.setProperty("errors", errors);
         problem.setProperty("timestamp", LocalDateTime.now());
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RoleAlreadyExistsException.class, InsufficientBalanceException.class, TransactionAlreadyCancelledException.class, TransactionAlreadyCompletedException.class, WalletAlreadyExistsException.class, WalletNotActiveException.class, EmailAlreadyExistsException.class, TcNumberAlreadyExistsException.class, TaxNumberAlreadyExistsException.class})
     public ProblemDetail handleConflict(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-        problem.setTitle("Conflict Error");
+        problem.setTitle(MessageUtils.getMessage("error.title.conflict"));
         problem.setType(URI.create("https://www.hissenet.com/errors/conflict"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -81,8 +82,8 @@ public class GlobalExceptionHandler {
     // 500 - Internal Server Error
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        problem.setTitle("Internal Server Error");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, MessageUtils.getMessage("common.internal.error"));
+        problem.setTitle(MessageUtils.getMessage("error.title.internal"));
         problem.setType(URI.create("https://www.hissenet.com/errors/internal"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -92,7 +93,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LoginException.class)
     public ProblemDetail unauthorizedException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        problem.setTitle("Unauthorized");
+        problem.setTitle(MessageUtils.getMessage("error.title.unauthorized"));
         problem.setType(URI.create("https://www.hissenet.com/errors/unauthorized"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -102,7 +103,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RateLimitException.class, WalletLimitExceededException.class, MailRateLimitException.class})
     public ProblemDetail rateLimitException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
-        problem.setTitle("Too Many Requests");
+        problem.setTitle(MessageUtils.getMessage("error.title.rate.limit"));
         problem.setType(URI.create("https://www.hissenet.com/errors/rate-limit"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -111,8 +112,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({WalletLockedException.class, IllegalStateException.class})
     public ProblemDetail lockedException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.LOCKED, ex.getMessage());
-        problem.setTitle("Too Many Requests");
-        problem.setType(URI.create("https://www.hissenet.com/errors/rate-limit"));
+        problem.setTitle(MessageUtils.getMessage("error.title.locked"));
+        problem.setType(URI.create("https://www.hissenet.com/errors/locked"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }
@@ -121,7 +122,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MailException.class, VerificationCodeException.class})
     public ProblemDetail handleMailException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
-        problem.setTitle("Mail Processing Error");
+        problem.setTitle(MessageUtils.getMessage("error.title.mail.processing"));
         problem.setType(URI.create("https://www.hissenet.com/errors/mail-processing"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -135,18 +136,18 @@ public class GlobalExceptionHandler {
     })
     public ProblemDetail handleRiskAssessmentException(RiskAssessmentException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
-        problem.setTitle("Risk Assessment Error");
+        problem.setTitle(MessageUtils.getMessage("error.title.risk.assessment"));
         problem.setType(URI.create("https://www.hissenet.com/errors/risk-assessment"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }
     // 403 Forbiden
     @ExceptionHandler({
-          UnauthorizedOperationException.class
+            UnauthorizedOperationException.class
     })
     public ProblemDetail forbiddenException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
-        problem.setTitle("Forbidden Error");
+        problem.setTitle(MessageUtils.getMessage("error.title.forbidden"));
         problem.setType(URI.create("https://www.hissenet.com/errors/forbidden"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
@@ -158,7 +159,7 @@ public class GlobalExceptionHandler {
     })
     public ProblemDetail badRequestException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problem.setTitle("Forbidden Error");
+        problem.setTitle(MessageUtils.getMessage("error.title.bad.request"));
         problem.setType(URI.create("https://www.hissenet.com/errors/bad-request"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;

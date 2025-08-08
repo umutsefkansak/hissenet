@@ -1,7 +1,6 @@
 package com.infina.hissenet.service;
 
 import com.infina.hissenet.dto.response.StockTransactionResponse;
-import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.StockTransaction;
@@ -9,6 +8,7 @@ import com.infina.hissenet.entity.enums.OrderType;
 import com.infina.hissenet.entity.enums.StockTransactionType;
 import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.exception.common.NotFoundException;
+import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.exception.transaction.UnauthorizedOperationException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.StockTransactionRepository;
@@ -20,12 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
@@ -35,14 +31,18 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private final ICacheManagerService cacheManagerService;
     private final StockTransactionMapper mapper;
     private final CustomerService customerService;
+    private final CommonFinancialService commonFinancialService;
 
-    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, ICacheManagerService cacheManagerService, StockTransactionMapper mapper, CustomerService customerService) {
+
+    public StockTransactionService(JpaRepository<StockTransaction, Long> repository, StockTransactionRepository stockTransactionRepository, PortfolioService portfolioService, ICacheManagerService cacheManagerService, StockTransactionMapper mapper, CustomerService customerService, CommonFinancialService commonFinancialService) {
         super(repository);
         this.stockTransactionRepository = stockTransactionRepository;
         this.portfolioService = portfolioService;
         this.cacheManagerService = cacheManagerService;
         this.mapper = mapper;
         this.customerService = customerService;
+        this.commonFinancialService = commonFinancialService;
+
     }
 
     // Order oluştuğunda otomatik StockTransaction oluştur
@@ -82,6 +82,18 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         BigDecimal commission = order.getTotalAmount().multiply(commissionRate);
         transaction.setCommission(commission);
 
+        if(order.getType()== OrderType.SELL){
+            try{
+             Integer currentQuantity=  getQuantityForStockTransactionWithStream(order.getCustomer().getId(),transaction.getStockCode());
+            // fifoService.processFIFOForSell(order.getCustomer().getId(),transaction.getStockCode(),currentQuantity);
+             if(order.getQuantity().intValue()>currentQuantity){
+                 throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+             }
+            }catch (RuntimeException e){
+                throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+            }
+        }
+
         save(transaction);
         portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
     }
@@ -93,23 +105,9 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
 
     public List<StockTransactionResponse> getAllBuyTransactions(Long portfolioId) {
-        List<StockTransaction> allTransactions = stockTransactionRepository.findByPortfolioId(portfolioId);
-
-        List<StockTransaction> filteredTransactions = allTransactions.stream()
-                .filter(tx -> tx.getTransactionType() == StockTransactionType.BUY)
-                .filter(tx -> tx.getTransactionStatus() == TransactionStatus.SETTLED)
-                .toList();
-
-        Map<String, List<StockTransaction>> groupedByStockCode = filteredTransactions.stream()
-                .collect(Collectors.groupingBy(StockTransaction::getStockCode));
-
-        List<StockTransactionResponse> mergedResponses = new ArrayList<>(groupedByStockCode.size());
-
-        for (Map.Entry<String, List<StockTransaction>> entry : groupedByStockCode.entrySet()) {
-            mergedResponses.add(mergeTransactions(entry.getValue()));
-        }
-
-        return mergedResponses;
+        List<StockTransactionResponse> list = commonFinancialService.getAllBuyTransactions(portfolioId);
+        portfolioService.updatePortfolioValues(portfolioId);
+        return list;
     }
 
     @Transactional
@@ -142,62 +140,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
 
     private StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
-        if (transactions == null || transactions.isEmpty()) {
-            throw new IllegalArgumentException("Transactions list cannot be null or empty");
-        }
-
-        StockTransaction baseTx = transactions.get(0);
-        StockTransactionResponse baseResponse = mapper.toResponse(baseTx);
-
-        int totalQuantity = 0;
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        BigDecimal totalCommission = BigDecimal.ZERO;
-        BigDecimal totalTax = BigDecimal.ZERO;
-        BigDecimal totalOtherFees = BigDecimal.ZERO;
-        BigDecimal totalPriceAmount = BigDecimal.ZERO;
-
-        for (StockTransaction tx : transactions) {
-            int quantity = tx.getQuantity();
-            totalQuantity += quantity;
-            totalAmount = totalAmount.add(tx.getTotalAmount());
-            totalCommission = totalCommission.add(tx.getCommission());
-            totalTax = totalTax.add(tx.getTax());
-            totalOtherFees = totalOtherFees.add(tx.getOtherFees());
-
-            BigDecimal price = tx.getPrice();
-            if (price != null) {
-                totalPriceAmount = totalPriceAmount.add(price.multiply(BigDecimal.valueOf(quantity)));
-            }
-        }
-
-        BigDecimal averagePrice = totalQuantity > 0
-                ? totalPriceAmount.divide(BigDecimal.valueOf(totalQuantity), 4, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
-
-        return new StockTransactionResponse(
-                baseResponse.id(),
-                baseResponse.portfolioId(),
-                baseResponse.portfolioName(),
-                baseResponse.stockCode(),
-                baseResponse.orderId(),
-                baseResponse.transactionType(),
-                baseResponse.transactionStatus(),
-                totalQuantity,
-                averagePrice,
-                totalAmount,
-                totalCommission,
-                totalTax,
-                totalOtherFees,
-                baseResponse.marketOrderType(),
-                baseResponse.limitPrice(),
-                baseResponse.executionPrice(),
-                baseResponse.currentPrice(),
-                baseResponse.transactionDate(),
-                baseResponse.settlementDate(),
-                baseResponse.notes(),
-                baseResponse.createdAt(),
-                baseResponse.updatedAt()
-        );
+       return commonFinancialService.mergeTransactions(transactions);
     }
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
         StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException("Stock "));
@@ -213,18 +156,13 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     }
     // aktif hisse adedini döndüren methot
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {
-        Customer customer = customerService.findById(customerId)
-                .orElseThrow(() -> new NotFoundException("Customer not found with id: " + customerId));
-
-        return customer.getPortfolios().stream()
-                .flatMap(portfolio -> portfolio.getTransactions().stream())
-                .filter(transaction ->
-                        stockCode.equals(transaction.getStockCode()) &&
-                                TransactionStatus.SETTLED.equals(transaction.getTransactionStatus()) &&
-                                StockTransactionType.BUY.equals(transaction.getTransactionType())
-                )
-                .mapToInt(StockTransaction::getQuantity)
-                .sum();
+        return commonFinancialService.getQuantityForStockTransactionWithStream(customerId, stockCode);
+    }
+    public List<StockTransactionResponse> list(Long customerId, String stockCode, int sellQuantity){
+        List<StockTransaction> list=stockTransactionRepository.findByCustomerIdAndStockCodeAndTypeAndStatusIn(
+                customerId,stockCode,StockTransactionType.BUY,TransactionStatus.SETTLED
+        );
+        return list.stream().map(mapper::toResponse).toList();
     }
 
 }

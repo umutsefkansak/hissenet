@@ -1,7 +1,6 @@
 package com.infina.hissenet.scheduler;
 
 import com.infina.hissenet.entity.StockTransaction;
-import com.infina.hissenet.service.PortfolioService;
 import com.infina.hissenet.service.StockTransactionService;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IPortfolioService;
@@ -13,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 @Component
 public class StockTransactionScheduler {
     private static final Logger logger = LoggerFactory.getLogger(StockTransactionScheduler.class);

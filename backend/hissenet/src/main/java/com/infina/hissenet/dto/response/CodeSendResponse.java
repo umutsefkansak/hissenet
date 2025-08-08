@@ -6,9 +6,13 @@ public record CodeSendResponse(
         String message,
 
         int maxAttempts,
-        int expiryMinutes
+        int expiryMinutes,
+        String email
 ) {
     public static CodeSendResponse success(String message, int maxAttempts, int expiryMinutes) {
-        return new CodeSendResponse(true, message, maxAttempts, expiryMinutes);
+        return new CodeSendResponse(true, message, maxAttempts, expiryMinutes, null);
+    }
+    public static CodeSendResponse success(String message, int maxAttempts, int expiryMinutes, String email) {
+        return new CodeSendResponse(true, message, maxAttempts, expiryMinutes,email);
     }
 }

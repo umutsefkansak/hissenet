@@ -3,16 +3,16 @@ import FormInput from '../../Form/FormInput';
 import FormSelect from '../../Form/FormSelect';
 import { educationOptions, genderOptions, nationalityOptions } from '../../../constants/CreateCustomer/formOptions';
 import { useLocation } from '../../../hooks/CreateCustomer/useLocation';
+import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const PersonalInfoSection = ({ formData, handleInputChange, errors }) => {
     const { cities } = useLocation();
 
-
     return (
-        <div className="form-section">
-            <h3 className="section-title">KİŞİSEL BİLGİLER</h3>
+        <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>KİŞİSEL BİLGİLER</h3>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Ad"
                     name="firstName"
@@ -34,7 +34,7 @@ const PersonalInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Anne Adı"
                     name="motherName"
@@ -52,7 +52,7 @@ const PersonalInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="T.C. Kimlik No"
                     name="tcNumber"
@@ -75,7 +75,7 @@ const PersonalInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormSelect
                     label="Doğum Yeri"
                     name="birthPlace"
@@ -99,7 +99,7 @@ const PersonalInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormSelect
                     label="Cinsiyet"
                     name="gender"

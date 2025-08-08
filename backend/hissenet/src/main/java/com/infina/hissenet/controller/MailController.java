@@ -52,6 +52,13 @@ public class MailController implements MailControllerDoc {
         return ApiResponse.ok("Notification sent");
     }
 
+    @PostMapping("/send-verification-by-identification")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ApiResponse<CodeSendResponse> sendVerificationCodeByIdentification(@Valid @RequestBody CustomerIdentificationRequest request) {
+        CodeSendResponse response = mailService.sendVerificationCodeByIdentification(request);
+        return ApiResponse.ok("Verification code sent to customer", response);
+    }
+
     @GetMapping("/check-email-limit/{email}")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ApiResponse<Boolean> checkEmailLimit(@PathVariable String email) {

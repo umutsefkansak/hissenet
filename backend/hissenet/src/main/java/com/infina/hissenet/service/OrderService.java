@@ -97,13 +97,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 		Order saved = save(order);
 
-		if (saved.getStatus() == OrderStatus.FILLED) {
-			try {
-				stockTransactionService.createTransactionFromOrder(saved);
-			} catch (Exception e) {
-				throw new StockNotFoundException(request.stockCode());
-			}
-		}
+		stockTransactionService.createTransactionFromOrder(saved);
 
 		return orderMapper.toResponse(saved);
 	}

@@ -17,6 +17,7 @@ import com.infina.hissenet.exception.riskassessment.InvalidAnswerException;
 import com.infina.hissenet.exception.riskassessment.RiskAssessmentException;
 import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
+import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCompletedException;
 import com.infina.hissenet.exception.transaction.UnauthorizedOperationException;
@@ -146,7 +147,19 @@ public class GlobalExceptionHandler {
     public ProblemDetail forbiddenException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
         problem.setTitle("Forbidden Error");
-        problem.setType(URI.create("https://www.hissenet.com/errors/risk-assessment"));
+        problem.setType(URI.create("https://www.hissenet.com/errors/forbidden"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
+    }
+
+    // 400 Bad Request
+    @ExceptionHandler({
+            InsufficientStockException.class
+    })
+    public ProblemDetail badRequestException(RuntimeException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Forbidden Error");
+        problem.setType(URI.create("https://www.hissenet.com/errors/bad-request"));
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;
     }

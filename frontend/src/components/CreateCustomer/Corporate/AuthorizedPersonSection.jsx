@@ -1,12 +1,13 @@
 import React from 'react';
 import FormInput from '../../Form/FormInput';
+import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const AuthorizedPersonSection = ({ formData, handleInputChange, errors }) => {
     return (
-        <div className="form-section">
-            <h3 className="section-title">YETKİLİ KİŞİ BİLGİLERİ</h3>
+        <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>YETKİLİ KİŞİ BİLGİLERİ</h3>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Adı Soyadı"
                     name="authorizedPersonName"
@@ -29,24 +30,25 @@ const AuthorizedPersonSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
-                <div className="form-group">
+            <div className={styles.formRow}>
+                <div className={styles.formComponentGroup}>
                     <label htmlFor="authorizedPersonPhone">
-                        Cep Telefonu <span className="required">*</span>
+                        Cep Telefonu <span className={styles.required}>*</span>
                     </label>
-                    <div className={`phone-input-container ${errors.authorizedPersonPhone ? 'error' : ''}`}>
-                        <span className="phone-prefix">+90</span>
+                    <div className={`${styles.phoneInputContainer} ${errors.authorizedPersonPhone ? styles.error : ''}`}>
+                        <span className={styles.phonePrefix}>+90</span>
                         <input
                             type="tel"
                             id="authorizedPersonPhone"
                             name="authorizedPersonPhone"
                             value={formData.authorizedPersonPhone}
                             onChange={handleInputChange}
-                            className={errors.authorizedPersonPhone ? 'error phone-input' : 'phone-input'}
+                            className={`${errors.authorizedPersonPhone ? styles.error : ''} ${styles.phoneInput}`}
                             placeholder="5XX XXX XX XX"
                             maxLength="10"
                         />
                     </div>
+                    {errors.authorizedPersonPhone && <span className={styles.errorText}>{errors.authorizedPersonPhone}</span>}
                 </div>
 
                 <FormInput

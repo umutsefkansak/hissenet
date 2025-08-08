@@ -1,8 +1,9 @@
+/* Toast.module.css */
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000;
+  z-index: 99999; /* Daha yüksek z-index */
   min-width: 320px;
   max-width: 450px;
   padding: 20px 25px;
@@ -15,28 +16,28 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
-.toast.show {
+.show {
   transform: translateX(0);
 }
 
-.toast.hide {
+.hide {
   transform: translateX(100%);
 }
 
-.toast-content {
+.toastContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.toast-message {
+.toastMessage {
   flex: 1;
   margin-right: 10px;
   font-size: 14px;
   font-weight: 500;
 }
 
-.toast-close {
+.toastClose {
   background: none;
   border: none;
   font-size: 18px;
@@ -46,31 +47,48 @@
   transition: opacity 0.2s ease;
 }
 
-.toast-close:hover {
+.toastClose:hover {
   opacity: 1;
 }
 
 /* Toast types */
-.toast.success {
+.success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
-.toast.error {
+.error {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
 
-.toast.info {
+.info {
   background-color: #d1ecf1;
   color: #0c5460;
   border: 1px solid #bee5eb;
 }
 
-.toast.warning {
+.warning {
   background-color: #fff3cd;
   color: #856404;
   border: 1px solid #ffeaa7;
-} 
+}
+
+/* Container için stiller */
+.toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.toastContainer .toast {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-bottom: 10px;
+  pointer-events: auto;
+}

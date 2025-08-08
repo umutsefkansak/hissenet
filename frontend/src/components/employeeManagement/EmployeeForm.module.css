@@ -1,5 +1,5 @@
 /* Clean & Minimal Employee Form Styles */
-.employee-form {
+.employeeForm {
     background: #ffffff;
     border-radius: 0;
     padding: 0;
@@ -13,7 +13,7 @@
     margin: 0;
 }
 
-.form-header {
+.formHeader {
     padding: 32px 32px 0 32px;
     background: #ffffff;
     color: #111827;
@@ -22,7 +22,7 @@
     position: relative;
 }
 
-.form-header h3 {
+.formHeader h3 {
     margin: 0;
     font-size: 24px;
     font-weight: 700;
@@ -31,26 +31,26 @@
     letter-spacing: -0.025em;
 }
 
-.form-content {
+.formContent {
     padding: 32px;
     background: #ffffff;
 }
 
-.form-row {
+.formRow {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     margin-bottom: 24px;
 }
 
-.form-group {
+.formGroup {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
     position: relative;
 }
 
-.form-group label {
+.formGroup label {
     font-size: 14px;
     font-weight: 600;
     color: #374151;
@@ -59,7 +59,8 @@
     text-align: left;
 }
 
-.form-group input {
+.formGroup input,
+.formGroup select {
     height: 48px;
     padding: 0 16px;
     border: 1px solid #d1d5db;
@@ -71,24 +72,28 @@
     font-weight: 400;
 }
 
-.form-group input:focus {
+.formGroup input:focus,
+.formGroup select:focus {
     outline: none;
     border-color: #6b7280;
     box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
     background-color: #ffffff;
 }
 
-.form-group input:hover:not(:focus) {
+.formGroup input:hover:not(:focus),
+.formGroup select:hover:not(:focus) {
     border-color: #9ca3af;
 }
 
-.form-group input.error {
+.formGroup input.error,
+.formGroup select.error {
     border-color: #ef4444;
     background-color: #fef2f2;
     animation: shake 0.5s ease-in-out;
 }
 
-.form-group input.error:focus {
+.formGroup input.error:focus,
+.formGroup select.error:focus {
     border-color: #ef4444;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
@@ -99,7 +104,7 @@
     75% { transform: translateX(4px); }
 }
 
-.error-text {
+.errorText {
     color: #ef4444;
     font-size: 12px;
     margin-top: 6px;
@@ -109,12 +114,12 @@
     gap: 4px;
 }
 
-.error-text::before {
+.errorText::before {
     content: '⚠';
     font-size: 12px;
 }
 
-.form-actions {
+.formActions {
     padding: 24px 32px 32px;
     background: #fafbfc;
     display: flex;
@@ -123,8 +128,9 @@
     margin-top: 0;
     border-top: 1px solid #f3f4f6;
 }
-.btn-cancel,
-.btn-submit {
+
+.btnCancel,
+.btnSubmit {
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 14px;
@@ -135,37 +141,37 @@
     position: relative;
 }
 
-.btn-cancel {
+.btnCancel {
     background: #ffffff;
     border: 1px solid #d1d5db;
     color: #6b7280;
 }
 
-.btn-cancel:hover {
+.btnCancel:hover {
     background: #f9fafb;
     border-color: #9ca3af;
     color: #4b5563;
 }
 
-.btn-submit {
+.btnSubmit {
     background: #e8f4f8;
     border: 1px solid #e8f4f8;
     color: #0d47a1;
 }
 
-.btn-submit:hover:not(:disabled) {
+.btnSubmit:hover:not(:disabled) {
     background: #ddeef5;
     border-color: #ddeef5;
     color: #0d47a1;
 }
 
-.btn-submit:disabled,
-.btn-cancel:disabled {
+.btnSubmit:disabled,
+.btnCancel:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.loading-spinner {
+.loadingSpinner {
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -175,7 +181,7 @@
     animation: spin 0.8s linear infinite;
 }
 
-.employee-form-loading {
+.employeeFormLoading {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -185,7 +191,7 @@
     background: #ffffff;
 }
 
-.employee-form-loading .loading-spinner {
+.employeeFormLoading .loadingSpinner {
     width: 40px;
     height: 40px;
     border: 3px solid #f3f4f6;
@@ -200,7 +206,7 @@
     100% { transform: rotate(360deg); }
 }
 
-.employee-form-loading p {
+.employeeFormLoading p {
     color: #6b7280;
     font-size: 16px;
     margin: 0;
@@ -208,7 +214,7 @@
 }
 
 /* Clean Role Selection */
-.roles-section {
+.rolesSection {
     margin-top: 32px;
     padding: 24px;
     background: #f9fafb;
@@ -216,21 +222,21 @@
     border: 1px solid #e5e7eb;
 }
 
-.roles-title {
+.rolesTitle {
     margin: 0 0 16px 0;
     font-size: 16px;
     font-weight: 600;
     color: #374151;
 }
 
-.selected-roles-tags {
+.selectedRolesTags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 16px;
 }
 
-.role-tag {
+.roleTag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -243,7 +249,7 @@
     animation: fadeIn 0.3s ease;
 }
 
-.role-tag-remove {
+.roleTagRemove {
     background: rgba(25, 118, 210, 0.2);
     border: none;
     color: #1976d2;
@@ -259,17 +265,17 @@
     transition: all 0.2s ease;
 }
 
-.role-tag-remove:hover {
+.roleTagRemove:hover {
     background-color: rgba(25, 118, 210, 0.3);
 }
 
-.roles-grid {
+.rolesGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 8px;
 }
 
-.role-item {
+.roleItem {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -283,30 +289,30 @@
     font-weight: 500;
 }
 
-.role-item:hover {
+.roleItem:hover {
     border-color: #9ca3af;
     background: #f9fafb;
 }
 
-.role-item.selected {
+.roleItem.selected {
     border-color: #1976d2;
     background: #e3f2fd;
     color: #1976d2;
     font-weight: 600;
 }
 
-.role-item input[type="checkbox"] {
+.roleItem input[type="checkbox"] {
     margin: 0;
     width: 16px;
     height: 16px;
     accent-color: #1976d2;
 }
 
-.role-name {
+.roleName {
     user-select: none;
 }
 
-.no-roles {
+.noRoles {
     color: #9ca3af;
     font-style: italic;
     margin: 0;
@@ -315,8 +321,8 @@
     font-size: 14px;
 }
 
-.roles-loading,
-.roles-empty {
+.rolesLoading,
+.rolesEmpty {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -327,14 +333,14 @@
     gap: 8px;
 }
 
-.roles-loading .loading-spinner {
+.rolesLoading .loadingSpinner {
     width: 20px;
     height: 20px;
     border: 2px solid #f3f4f6;
     border-top-color: #6b7280;
 }
 
-.roles-empty {
+.rolesEmpty {
     background: #ffffff;
     border: 1px dashed #d1d5db;
     border-radius: 8px;
@@ -352,7 +358,7 @@
 }
 
 /* Clean Phone Input Styling */
-.phone-input-container {
+.phoneInputContainer {
     display: flex;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -362,17 +368,17 @@
     background: white;
 }
 
-.phone-input-container:focus-within {
+.phoneInputContainer:focus-within {
     outline: none;
     border-color: #6b7280;
     box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
 }
 
-.phone-input-container:hover:not(:focus-within) {
+.phoneInputContainer:hover:not(:focus-within) {
     border-color: #9ca3af;
 }
 
-.phone-prefix {
+.phonePrefix {
     background: #f9fafb;
     padding: 12px 16px;
     border-right: 1px solid #d1d5db;
@@ -385,33 +391,34 @@
     justify-content: center;
 }
 
-.phone-input {
+.phoneInput {
     flex: 1;
-    border: none;
+    border: none !important;
     outline: none;
     padding: 12px 16px;
     font-size: 16px;
     background: white;
     color: #111827;
     font-weight: 400;
+    height: auto !important;
 }
 
-.phone-input::placeholder {
+.phoneInput::placeholder {
     color: #9ca3af;
     font-weight: 400;
 }
 
-.phone-input.error {
-    background: #fef2f2;
+.phoneInput.error {
+    background: #fef2f2 !important;
 }
 
-.phone-input-container.error {
+.phoneInputContainer.error {
     border-color: #ef4444;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
     animation: shake 0.5s ease-in-out;
 }
 
-.phone-input-container.error .phone-prefix {
+.phoneInputContainer.error .phonePrefix {
     background: #fef2f2;
     color: #ef4444;
     border-right-color: #ef4444;
@@ -419,54 +426,54 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .employee-form {
+    .employeeForm {
         margin: 0;
         border-radius: 0;
     }
 
-    .form-row {
+    .formRow {
         grid-template-columns: 1fr;
         gap: 20px;
     }
 
-    .form-header {
+    .formHeader {
         padding: 24px 24px 0;
     }
 
-    .form-header h3 {
+    .formHeader h3 {
         font-size: 20px;
         padding-bottom: 20px;
     }
 
-    .form-content {
+    .formContent {
         padding: 24px;
     }
 
-    .form-actions {
+    .formActions {
         padding: 20px 24px 24px;
         flex-direction: column;
     }
 
-    .btn-cancel,
-    .btn-submit {
+    .btnCancel,
+    .btnSubmit {
         width: 100%;
         padding: 14px 24px;
     }
 
-    .roles-section {
+    .rolesSection {
         margin-top: 24px;
         padding: 20px;
     }
 
-    .roles-grid {
+    .rolesGrid {
         grid-template-columns: 1fr;
     }
 
-    .selected-roles-tags {
+    .selectedRolesTags {
         gap: 6px;
     }
 
-    .role-tag {
+    .roleTag {
         padding: 6px 12px;
         font-size: 12px;
     }

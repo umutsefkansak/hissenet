@@ -73,5 +73,35 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
             @Param("sellType") StockTransactionType sellType
     );
 
+    // FIFO için: Müşterinin belirli bir hisse için BUY transaction'larını tarih sırasına göre getir
+    @Query("SELECT st FROM StockTransaction st " +
+           "JOIN st.portfolio p " +
+           "WHERE p.customer.id = :customerId " +
+           "AND st.stockCode = :stockCode " +
+           "AND st.transactionType = :transactionType " +
+           "AND st.transactionStatus = :status " +
+           "ORDER BY st.transactionDate ASC")
+    List<StockTransaction> findByCustomerIdAndStockCodeAndTypeOrderByTransactionDateAsc(
+            @Param("customerId") Long customerId,
+            @Param("stockCode") String stockCode,
+            @Param("transactionType") StockTransactionType transactionType,
+            @Param("status") TransactionStatus status
+    );
+
+    // FIFO için: Müşterinin belirli bir hisse için belirli status'lerdeki transaction'ları getir
+    @Query("SELECT st FROM StockTransaction st " +
+            "JOIN st.portfolio p " +
+            "WHERE p.customer.id = :customerId " +
+            "AND st.stockCode = :stockCode " +
+            "AND st.transactionType = :transactionType " +
+            "AND st.transactionStatus IN :statuses " +
+            "ORDER BY st.createdAt ASC")
+    List<StockTransaction> findByCustomerIdAndStockCodeAndTypeAndStatusIn(
+            @Param("customerId") Long customerId,
+            @Param("stockCode") String stockCode,
+            @Param("transactionType") StockTransactionType transactionType,
+            @Param("statuses") TransactionStatus statuses
+    );
+
 
 }

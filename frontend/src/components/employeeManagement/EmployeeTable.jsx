@@ -2,9 +2,11 @@ import EmployeeStatusBadge from './EmployeeStatusBadge';
 import './EmployeeTable.css';
 import React, { useState, useEffect } from 'react';
 import { roleApi } from '../../server/roles';
+import Modal from '../common/Modal/Modal';
 
 const EmployeeTable = ({ employees, onEdit, onDelete, loading }) => {
     const [roleMap, setRoleMap] = useState(new Map());
+    const [modalConfig, setModalConfig] = useState(null);
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -34,6 +36,24 @@ const EmployeeTable = ({ employees, onEdit, onDelete, loading }) => {
         if (!dateString) return '-';
         const date = new Date(dateString);
         return date.toLocaleDateString('tr-TR');
+    };
+
+    const closeModal = () => setModalConfig(null);
+    const handleDeleteClick = (employee) => {
+        const employeeName = `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || 'Bu personel';
+
+        setModalConfig({
+            variant: 'warning',
+            title: 'Personel Silme Onayı',
+            message: `${employeeName} adlı personeli silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`,
+            cancelText: 'Vazgeç',
+            confirmText: 'Sil',
+            onConfirm: () => {
+                closeModal();
+                onDelete(employee);
+            },
+            onClose: closeModal,
+        });
     };
 
     if (loading) {
@@ -122,7 +142,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, loading }) => {
                                     </button>
                                     <button
                                         className="delete-button"
-                                        onClick={() => onDelete(employee)}
+                                        onClick={() => handleDeleteClick(employee)}
                                     >
                                         Sil
                                     </button>
@@ -133,6 +153,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, loading }) => {
                     </tbody>
                 </table>
             </div>
+            {modalConfig && <Modal {...modalConfig} />}
         </div>
     );
 };

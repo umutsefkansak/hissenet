@@ -222,16 +222,19 @@ const CustomerDetailPage = () => {
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <button
-            className="export-button"
-            onClick={handleExportExcel}
-          >
-            İşlem Geçmişini İndir
-          </button>
+       
         </div>
 
         <div className="transaction-section">
-          <h3>İşlem Geçmişi</h3>
+          <div className="transaction-header">
+            <h3 className='transaction-title'>İşlem Geçmişi</h3>
+            <button
+              className="export-button"
+              onClick={handleExportExcel}
+            >
+              İndir
+            </button>
+          </div>
           <div className="transaction-table-container">
             <table className="transaction-table">
               <thead>

@@ -407,6 +407,32 @@
   font-size: 24px;
   font-weight: 700;
 }
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.transaction-title {
+  margin: 0;
+  color: #2d3748;
+  font-size: 20px;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.transaction-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: #007bff;
+  border-radius: 2px;
+}
 
 .error-container p {
   color: #4a5568;

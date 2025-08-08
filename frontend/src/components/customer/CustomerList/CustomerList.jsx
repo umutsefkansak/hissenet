@@ -73,6 +73,22 @@ const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) =>
 
   return (
     <div className="customer-list">
+      {/* Summary Cards */}
+      <div className="summary-cards">
+        <div className="summary-card">
+          <h3>Bugünkü İşlem Hacmi</h3>
+          <p className="card-value">₺ 3.250.000</p>
+        </div>
+        <div className="summary-card">
+          <h3>Yeni Müşteri Sayısı</h3>
+          <p className="card-value">5</p>
+        </div>
+        <div className="summary-card">
+          <h3>En Çok İşlem Gören Hisse</h3>
+          <p className="card-value negative">▼ 1,2 %</p>
+        </div>
+      </div>
+
       <div className="customer-list-header">
         <h2>Müşteri Listesi</h2>
         <span className="customer-count">Toplam: {filteredCustomers.length} müşteri</span>

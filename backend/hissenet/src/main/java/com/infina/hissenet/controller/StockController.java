@@ -5,6 +5,7 @@ import com.infina.hissenet.dto.request.StockCreateRequest;
 import com.infina.hissenet.dto.request.StockUpdateRequest;
 import com.infina.hissenet.dto.response.StockResponse;
 import com.infina.hissenet.service.abstracts.IStockService;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,20 +26,20 @@ public class StockController {
     @PostMapping
     public ResponseEntity<ApiResponse<StockResponse>> createStock(@Valid @RequestBody StockCreateRequest request) {
         StockResponse response = stockService.createStock(request);
-        ApiResponse<StockResponse> apiResponse = ApiResponse.created("Stock created successfully", response);
+        ApiResponse<StockResponse> apiResponse = ApiResponse.created(MessageUtils.getMessage("stock.created.successfully"),  response);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
     @GetMapping("/{id}")
     public ApiResponse<StockResponse> getStockById(@PathVariable Long id) {
         StockResponse response = stockService.getStock(id);
-        return ApiResponse.ok("Stock fetched successfully", response);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.fetched.successfully"),  response);
     }
 
     @GetMapping
     public ApiResponse<List<StockResponse>> listStocks() {
         List<StockResponse> list = stockService.getAllStocks();
-        return ApiResponse.ok("Stocks listed successfully", list);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.listed.successfully"),  list);
     }
 
     @PutMapping("/{id}")
@@ -47,12 +48,12 @@ public class StockController {
             @Valid @RequestBody StockUpdateRequest request
     ) {
         StockResponse response = stockService.updateStock(id, request);
-        return ApiResponse.ok("Stock updated successfully", response);
+        return ApiResponse.ok( MessageUtils.getMessage("stock.updated.successfully"), response);
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteStock(@PathVariable Long id) {
         stockService.deleteStock(id);
-        return ApiResponse.ok("Stock deleted successfully");
+        return ApiResponse.ok(MessageUtils.getMessage("stock.deleted.successfully"));
     }
 }

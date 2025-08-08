@@ -8,9 +8,13 @@ DEBUG = True
 
 SECRET_KEY = 'secret_key'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'chat/static'),]
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',            
     'django.contrib.auth',             
     'django.contrib.contenttypes',     
@@ -22,6 +26,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware', 
     'django.middleware.common.CommonMiddleware',
@@ -30,6 +35,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware', 
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000',
+                        'http://127.0.0.1:3000']
 
 ROOT_URLCONF = 'chatbot_api.urls'
 
@@ -70,7 +78,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/app.log'),
+            'filename': os.path.join(BASE_DIR, 'logs/chatbot.log'),
             'formatter': 'verbose',
             'encoding': "utf-8", 
         },

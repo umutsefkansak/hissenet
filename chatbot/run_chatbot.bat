@@ -1,5 +1,5 @@
 @echo off
-cd /d D:\Downloaded\Infina\HisseNetChatbot
+cd ./
 call .venv\Scripts\activate
 python manage.py runserver
 pause

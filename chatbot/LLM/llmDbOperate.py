@@ -6,10 +6,8 @@ from Database.database import readDBUri, connectMongo, getCollection
 def connectDatabase():
     uri: str   = readDBUri()
     db         = connectMongo(uri=uri)
-    collection = getCollection(db=db)
-
-    return collection
-
+    return getCollection(db=db)
+    
 def getLlmResponse(message):
     collection = connectDatabase()
     return asyncio.run(searchVector(query=message, collection=collection))

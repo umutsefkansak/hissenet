@@ -19,7 +19,82 @@ const CustomerDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(5);
+  
+  const [sortConfig, setSortConfig] = useState({
+    key: 'createdAt',
+    direction: 'desc'
+  });
 
+
+  const sortOrders = (orders, key, direction) => {
+    return [...orders].sort((a, b) => {
+      let aValue = a[key];
+      let bValue = b[key];
+
+      // Date sorting
+      if (key === 'createdAt') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+
+      if (key === 'quantity' || key === 'price' || key === 'totalAmount') {
+        aValue = parseFloat(aValue);
+        bValue = parseFloat(bValue);
+      }
+
+      if (direction === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  };
+
+
+  const handleSort = (key) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+    }));
+    setCurrentPage(1); 
+  };
+
+  // Get sorted and paginated orders
+  const getSortedAndPaginatedOrders = () => {
+    const sortedOrders = sortOrders(orders, sortConfig.key, sortConfig.direction);
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    return sortedOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  };
+
+  // Pagination functions
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  
+  const SortIndicator = ({ columnKey }) => {
+    if (sortConfig.key !== columnKey) {
+      return <span className="sort-indicator">↕</span>;
+    }
+    return (
+      <span className={`sort-indicator ${sortConfig.direction === 'asc' ? 'asc' : 'desc'}`}>
+        {sortConfig.direction === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
@@ -282,125 +357,214 @@ const CustomerDetailPage = () => {
     setExportDropdownOpen(false);
   };
 
+  const renderCustomerInfo = () => {
+    if (customer.customerType === 'INDIVIDUAL') {
+      return (
+        <>
+          <div className="info-item">
+            <label>Ad Soyad:</label>
+            <span>{customer.firstName} {customer.lastName}</span>
+          </div>
+          <div className="info-item">
+            <label>T.C. Kimlik No:</label>
+            <span>{maskTcNumber(customer.tcNumber)}</span>
+          </div>
+          <div className="info-item">
+            <label>Telefon:</label>
+            <span>{customer.phone}</span>
+          </div>
+          <div className="info-item">
+            <label>E-posta:</label>
+            <span>{customer.email}</span>
+          </div>
+          <div className="info-item">
+            <label>Müşteri Tipi:</label>
+            <span className={`customer-type ${customer.customerType.toLowerCase()}`}>
+              {getCustomerType(customer)}
+            </span>
+          </div>
+          <div className="info-item">
+            <label>Risk Profili:</label>
+            <span className={`risk-profile ${getRiskProfileClass(customer)}`}>
+              {getRiskProfile(customer)}
+            </span>
+          </div>
+          <div className="info-item">
+            <label>Toplam Portföy Değeri:</label>
+            <span className="portfolio-value">{getPortfolioValue().toLocaleString('tr-TR')} ₺</span>
+          </div>
+          <div className="info-item">
+            <label>Mevcut Bakiye:</label>
+            <span className="current-balance">
+              {getCurrentBalance().toLocaleString('tr-TR')} ₺
+              <span className="balance-status">✓</span>
+            </span>
+          </div>
+        </>
+      );
+    } else {
+      // Kurumsal müşteri için
+      return (
+        <>
+          <div className="info-item">
+            <label>Yetkili Kişi:</label>
+            <span>{customer.authorizedPersonName}</span>
+          </div>
+          <div className="info-item">
+            <label>Şirket Adı:</label>
+            <span>{customer.companyName}</span>
+          </div>
+          <div className="info-item">
+            <label>Telefon:</label>
+            <span>{customer.phone}</span>
+          </div>
+          <div className="info-item">
+            <label>E-posta:</label>
+            <span>{customer.email}</span>
+          </div>
+          <div className="info-item">
+            <label>Müşteri Tipi:</label>
+            <span className={`customer-type ${customer.customerType.toLowerCase()}`}>
+              {getCustomerType(customer)}
+            </span>
+          </div>
+          <div className="info-item">
+            <label>Risk Profili:</label>
+            <span className={`risk-profile ${getRiskProfileClass(customer)}`}>
+              {getRiskProfile(customer)}
+            </span>
+          </div>
+          <div className="info-item">
+            <label>Toplam Portföy Değeri:</label>
+            <span className="portfolio-value">{getPortfolioValue().toLocaleString('tr-TR')} ₺</span>
+          </div>
+          <div className="info-item">
+            <label>Mevcut Bakiye:</label>
+            <span className="current-balance">
+              {getCurrentBalance().toLocaleString('tr-TR')} ₺
+              <span className="balance-status">✓</span>
+            </span>
+          </div>
+        </>
+      );
+    }
+  };
 
   return (
     <div className="customer-detail-page">
       <div className="customer-detail-content">
         
         <div className="info-section">
-        <button className="back-button" onClick={handleBack}>
+          <button className="back-button" onClick={handleBack}>
             ← Geri Dön
           </button>
           <h3>Genel Bilgiler</h3>
           <div className="info-grid">
-            <div className="info-item">
-              <label>Ad Soyad:</label>
-              <span>{customer.firstName} {customer.lastName}</span>
-            </div>
-            <div className="info-item">
-              <label>T.C. Kimlik No:</label>
-              <span>{maskTcNumber(customer.tcNumber)}</span>
-            </div>
-            <div className="info-item">
-              <label>Telefon:</label>
-              <span>{customer.phone}</span>
-            </div>
-            <div className="info-item">
-              <label>E-posta:</label>
-              <span>{customer.email}</span>
-            </div>
-            <div className="info-item">
-              <label>Müşteri Tipi:</label>
-              <span className={`customer-type ${customer.customerType.toLowerCase()}`}>
-                {getCustomerType(customer)}
-              </span>
-            </div>
-            <div className="info-item">
-              <label>Risk Profili:</label>
-              <span className={`risk-profile ${getRiskProfileClass(customer)}`}>
-                {getRiskProfile(customer)}
-              </span>
-            </div>
-            <div className="info-item">
-              <label>Toplam Portföy Değeri:</label>
-              <span className="portfolio-value">{getPortfolioValue().toLocaleString('tr-TR')} ₺</span>
-            </div>
-            <div className="info-item">
-              <label>Mevcut Bakiye:</label>
-              <span className="current-balance">
-                {getCurrentBalance().toLocaleString('tr-TR')} ₺
-                <span className="balance-status">✓</span>
-              </span>
-            </div>
+            {renderCustomerInfo()}
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-       
         </div>
-
+  
         <div className="transaction-section">
-        <div className="transaction-header">
-              <h3 className='transaction-title'>İşlem Geçmişi</h3>
-              <div className="export-dropdown">
-                <button
-                  className="export-icon-button"
-                  onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7,10 12,15 17,10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                </button>
-                
-                {exportDropdownOpen && (
-                  <div className="export-dropdown-menu">
-                    <button 
-                      className="export-dropdown-item"
-                      onClick={handleExportExcel}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10,9 9,9 8,9"/>
-                      </svg>
-                      Excel İndir
-                    </button>
-                    <button 
-                      className="export-dropdown-item"
-                      onClick={handleExportPDF}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10,9 9,9 8,9"/>
-                      </svg>
-                      PDF İndir
-                    </button>
-                  </div>
-                )}
-              </div>
+          <div className="transaction-header">
+            <h3 className='transaction-title'>İşlem Geçmişi</h3>
+            <div className="export-dropdown">
+              <button
+                className="export-icon-button"
+                onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </button>
+              
+              {exportDropdownOpen && (
+                <div className="export-dropdown-menu">
+                  <button 
+                    className="export-dropdown-item"
+                    onClick={handleExportExcel}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                      <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    Excel İndir
+                  </button>
+                  <button 
+                    className="export-dropdown-item"
+                    onClick={handleExportPDF}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                      <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    PDF İndir
+                  </button>
+                </div>
+              )}
             </div>
+          </div>
+          
           <div className="transaction-table-container">
             <table className="transaction-table">
               <thead>
                 <tr>
-                  <th>Tarih</th>
-                  <th>Hisse</th>
-                  <th>Emir Türü</th>
-                  <th>Durum</th>
-                  <th>Adet</th>
-                  <th>Fiyat</th>
-                  <th>Toplam Tutar</th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('createdAt')}
+                  >
+                    Tarih <SortIndicator columnKey="createdAt" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('stockCode')}
+                  >
+                    Hisse <SortIndicator columnKey="stockCode" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('type')}
+                  >
+                    Emir Türü <SortIndicator columnKey="type" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('status')}
+                  >
+                    Durum <SortIndicator columnKey="status" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('quantity')}
+                  >
+                    Adet <SortIndicator columnKey="quantity" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('price')}
+                  >
+                    Fiyat <SortIndicator columnKey="price" />
+                  </th>
+                  <th 
+                    className="sortable-header"
+                    onClick={() => handleSort('totalAmount')}
+                  >
+                    Toplam Tutar <SortIndicator columnKey="totalAmount" />
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {orders.length > 0 ? (
-                  orders.map((order) => (
+                {getSortedAndPaginatedOrders().length > 0 ? (
+                  getSortedAndPaginatedOrders().map((order) => (
                     <tr key={order.id}>
                       <td>{formatDate(order.createdAt)}</td>
                       <td>{order.stockCode}</td>
@@ -429,10 +593,50 @@ const CustomerDetailPage = () => {
               </tbody>
             </table>
           </div>
+  
+          {/* Pagination */}
+          {orders.length > ordersPerPage && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                {((currentPage - 1) * ordersPerPage) + 1} - {Math.min(currentPage * ordersPerPage, orders.length)} / {orders.length} işlem
+              </div>
+              <div className="pagination-controls">
+                <button 
+                  className="pagination-button"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="15,18 9,12 15,6"/>
+                  </svg>
+                </button>
+                
+                <div className="page-numbers">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      className={`page-number ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => goToPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                
+                <button 
+                  className="pagination-button"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9,18 15,12 9,6"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-  
     </div>
   );
 };

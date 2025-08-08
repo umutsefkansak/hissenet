@@ -1,7 +1,9 @@
 package com.infina.hissenet.exception.customer;
 
-public class EmailAlreadyExistsException  extends RuntimeException {
-    public EmailAlreadyExistsException(String name) {
-        super("Email already exists: " + name);
+import com.infina.hissenet.utils.MessageUtils;
+
+public class EmailAlreadyExistsException extends RuntimeException {
+    public EmailAlreadyExistsException(String email) {
+        super(MessageUtils.getMessage("customer.email.already.exists", email));
     }
 }

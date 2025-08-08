@@ -2,6 +2,7 @@ package com.infina.hissenet.controller;
 
 import java.util.List;
 
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,7 +37,8 @@ public class AccountController implements AccountControllerDoc {
 	@PostMapping
 	public ResponseEntity<ApiResponse<AccountResponse>> createAccount(
 			@Valid @RequestBody AccountCreateRequest request) {
-		ApiResponse<AccountResponse> response = ApiResponse.created("Account created successfully",
+		ApiResponse<AccountResponse> response = ApiResponse.created(
+				MessageUtils.getMessage("account.created.successfully"),
 				service.createAccount(request));
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
@@ -45,26 +47,26 @@ public class AccountController implements AccountControllerDoc {
 	@PutMapping("/{id}")
 	public ApiResponse<AccountResponse> updateAccount(@PathVariable Long id,
 			@Valid @RequestBody AccountUpdateRequest request) {
-		return ApiResponse.ok("Account updated successfully", service.updateAccount(id, request));
+		return ApiResponse.ok(MessageUtils.getMessage("account.updated.successfully"), service.updateAccount(id, request));
 	}
 
 	@Override
 	@GetMapping("/{id}")
 	public ApiResponse<AccountResponse> getAccount(@PathVariable Long id) {
-		return ApiResponse.ok("Account retrieved successfully", service.getAccountById(id));
+		return ApiResponse.ok(MessageUtils.getMessage("account.retrieved.successfully"), service.getAccountById(id));
 	}
 
 	@Override
 	@GetMapping
 	public ApiResponse<List<AccountResponse>> getAllAccounts() {
-		return ApiResponse.ok("Accounts retrieved successfully", service.getAllAccounts());
+		return ApiResponse.ok(MessageUtils.getMessage("account.list.retrieved.successfully"),  service.getAllAccounts());
 	}
 
 	@Override
 	@DeleteMapping("/{id}")
 	public ApiResponse<Void> deleteAccount(@PathVariable Long id) {
 		service.deleteAccount(id);
-		return ApiResponse.ok("Account deleted successfully");
+		return ApiResponse.ok(MessageUtils.getMessage("account.deleted.successfully"));
 	}
 
 }

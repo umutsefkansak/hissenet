@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.infina.hissenet.entity.Order;
@@ -67,5 +69,17 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 		    WHERE o.createdAt BETWEEN :start AND :end
 		""")
 		Long countTodayOrders(LocalDateTime start, LocalDateTime end);
+	
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+      update Order o
+         set o.status = com.infina.hissenet.entity.enums.OrderStatus.CANCELED,
+             o.updatedAt = CURRENT_TIMESTAMP
+       where o.status = com.infina.hissenet.entity.enums.OrderStatus.OPEN
+         and o.isDeleted = false
+         and o.createdAt between :start and :end
+    """)
+    void cancelOpenOrdersInRange(@Param("start") LocalDateTime start,
+                                @Param("end")   LocalDateTime end);
 	
 }

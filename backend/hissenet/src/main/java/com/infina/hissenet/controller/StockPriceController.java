@@ -5,6 +5,7 @@ import com.infina.hissenet.dto.request.StockPriceCreateRequest;
 import com.infina.hissenet.dto.request.StockPriceUpdateRequest;
 import com.infina.hissenet.dto.response.StockPriceResponse;
 import com.infina.hissenet.service.abstracts.IStockPriceService;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,19 +24,19 @@ public class StockPriceController {
     @PostMapping
     public ApiResponse<StockPriceResponse> createPrice(@Valid @RequestBody StockPriceCreateRequest request) {
         StockPriceResponse response = stockPriceService.createStockPrice(request);
-        return ApiResponse.created("Stock price created successfully", response);
+        return ApiResponse.created(MessageUtils.getMessage("stock.price.created.successfully"), response);
     }
 
     @GetMapping("/{id}")
     public ApiResponse<StockPriceResponse> getPriceById(@PathVariable Long id) {
         StockPriceResponse response = stockPriceService.getStockPrice(id);
-        return ApiResponse.ok("Stock price fetched successfully", response);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.price.fetched.successfully"),response);
     }
 
     @GetMapping
     public ApiResponse<List<StockPriceResponse>> listPrices() {
         List<StockPriceResponse> list = stockPriceService.getAllStockPrices();
-        return ApiResponse.ok("Stock prices listed successfully", list);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.price.listed.successfully"), list);
     }
 
     @PutMapping("/{id}")
@@ -44,12 +45,12 @@ public class StockPriceController {
             @Valid @RequestBody StockPriceUpdateRequest request
     ) {
         StockPriceResponse response = stockPriceService.updateStockPrice(id, request);
-        return ApiResponse.ok("Stock price updated successfully", response);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.price.updated.successfully"), response);
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deletePrice(@PathVariable Long id) {
         stockPriceService.deleteStockPrice(id);
-        return ApiResponse.ok("Stock price deleted successfully", null);
+        return ApiResponse.ok(MessageUtils.getMessage("stock.price.deleted.successfully"), null);
     }
 }

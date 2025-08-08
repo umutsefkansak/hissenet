@@ -6,11 +6,11 @@ import jakarta.validation.constraints.Size;
 
 public record AccountUpdateRequest(
 		 
-		@NotBlank(message = "Kullanıcı adı boş olamaz.")
-	    @Size(min = 3, max = 50, message = "Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.")
+		@NotBlank(message = "{validation.username.required}")
+	    @Size(min = 3, max = 50, message = "{validation.username.size}")
 	    String username,
 
-	    @NotNull(message = "Çalışan ID'si belirtilmelidir.")
+	    @NotNull(message = "{validation.employee.id.required}")
 	    Long employeeId
 	    
 ) {

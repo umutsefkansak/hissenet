@@ -6,6 +6,7 @@ import com.infina.hissenet.controller.doc.CustomerControllerDoc;
 import com.infina.hissenet.dto.common.CustomerDto;
 import com.infina.hissenet.dto.request.*;
 import com.infina.hissenet.service.abstracts.ICustomerService;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class CustomerController implements CustomerControllerDoc {
     public ResponseEntity<ApiResponse<CustomerDto>> createIndividualCustomer(
             @Valid @RequestBody IndividualCustomerCreateRequest dto) {
         CustomerDto createdCustomer = customerService.createIndividualCustomer(dto);
-        ApiResponse<CustomerDto> response = ApiResponse.ok("Individual customer created successfully", createdCustomer);
+        ApiResponse<CustomerDto> response = ApiResponse.ok(MessageUtils.getMessage("customer.individual.created.successfully"), createdCustomer);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -38,7 +39,7 @@ public class CustomerController implements CustomerControllerDoc {
     public ApiResponse<CustomerDto> updateIndividualCustomer(
             @PathVariable Long id,
             @Valid @RequestBody IndividualCustomerUpdateRequest dto) {
-        return ApiResponse.ok("Individual customer updated successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.individual.updated.successfully"),
                 customerService.updateIndividualCustomer(id, dto));
     }
 
@@ -46,7 +47,7 @@ public class CustomerController implements CustomerControllerDoc {
     public ResponseEntity<ApiResponse<CustomerDto>> createCorporateCustomer(
             @Valid @RequestBody CorporateCustomerCreateRequest dto) {
         CustomerDto createdCustomer = customerService.createCorporateCustomer(dto);
-        ApiResponse<CustomerDto> response = ApiResponse.ok("Corporate customer created successfully", createdCustomer);
+        ApiResponse<CustomerDto> response = ApiResponse.ok(MessageUtils.getMessage("customer.corporate.created.successfully"),  createdCustomer);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,69 +55,69 @@ public class CustomerController implements CustomerControllerDoc {
     public ApiResponse<CustomerDto> updateCorporateCustomer(
             @PathVariable Long id,
             @Valid @RequestBody CorporateCustomerUpdateRequest dto) {
-        return ApiResponse.ok("Corporate customer updated successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.corporate.updated.successfully"),
                 customerService.updateCorporateCustomer(id, dto));
     }
 
     @GetMapping("/{id}")
     public ApiResponse<CustomerDto> getCustomerById(@PathVariable Long id) {
-        return ApiResponse.ok("Customer retrieved successfully", customerService.getCustomerById(id));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.retrieved.successfully"), customerService.getCustomerById(id));
     }
 
     @GetMapping
     public ApiResponse<List<CustomerDto>> getAllCustomers() {
-        return ApiResponse.ok("All customers retrieved successfully", customerService.getAllCustomers());
+        return ApiResponse.ok(MessageUtils.getMessage("customer.list.retrieved.successfully"), customerService.getAllCustomers());
     }
 
     @GetMapping("/page")
     public ApiResponse<Page<CustomerDto>> getAllCustomersPaged(Pageable pageable) {
-        return ApiResponse.ok("Paged customers retrieved successfully", customerService.getAllCustomers(pageable));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.paged.retrieved.successfully"),  customerService.getAllCustomers(pageable));
     }
 
     @GetMapping("/email/{email}")
     public ApiResponse<CustomerDto> getCustomerByEmail(@PathVariable String email) {
-        return ApiResponse.ok("Customer retrieved successfully", customerService.getCustomerByEmail(email));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.retrieved.successfully"),  customerService.getCustomerByEmail(email));
     }
 
     @GetMapping("/customer-number/{customerNumber}")
     public ApiResponse<CustomerDto> getCustomerByCustomerNumber(@PathVariable String customerNumber) {
-        return ApiResponse.ok("Customer retrieved successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.retrieved.successfully"),
                 customerService.getCustomerByCustomerNumber(customerNumber));
     }
 
 
     @GetMapping("/individual")
     public ApiResponse<List<CustomerDto>> getIndividualCustomers() {
-        return ApiResponse.ok("Individual customers retrieved successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.individual.list.retrieved.successfully"),
                 customerService.getIndividualCustomers());
     }
 
     @GetMapping("/corporate")
     public ApiResponse<List<CustomerDto>> getCorporateCustomers() {
-        return ApiResponse.ok("Corporate customers retrieved successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.corporate.list.retrieved.successfully"),
                 customerService.getCorporateCustomers());
     }
 
 
     @PostMapping("/{id}/verify-kyc")
     public ApiResponse<CustomerDto> verifyKyc(@PathVariable Long id) {
-        return ApiResponse.ok("Customer KYC verified successfully", customerService.verifyKyc(id));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.kyc.verified.successfully"),  customerService.verifyKyc(id));
     }
 
     @PostMapping("/{id}/unverify-kyc")
     public ApiResponse<CustomerDto> unverifyKyc(@PathVariable Long id) {
-        return ApiResponse.ok("Customer KYC unverified successfully", customerService.unverifyKyc(id));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.kyc.unverified.successfully"),  customerService.unverifyKyc(id));
     }
 
     @GetMapping("/kyc-verified")
     public ApiResponse<List<CustomerDto>> getKycVerifiedCustomers() {
-        return ApiResponse.ok("KYC verified customers retrieved successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.kyc.verified.list.retrieved.successfully"),
                 customerService.getKycVerifiedCustomers());
     }
 
     @GetMapping("/kyc-unverified")
     public ApiResponse<List<CustomerDto>> getKycUnverifiedCustomers() {
-        return ApiResponse.ok("KYC unverified customers retrieved successfully",
+        return ApiResponse.ok(MessageUtils.getMessage("customer.kyc.unverified.list.retrieved.successfully"),
                 customerService.getKycUnverifiedCustomers());
     }
 
@@ -124,17 +125,17 @@ public class CustomerController implements CustomerControllerDoc {
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
-        return ApiResponse.ok("Customer deleted successfully");
+        return ApiResponse.ok(MessageUtils.getMessage("customer.deleted.successfully"));
     }
 
 
     @GetMapping("/{id}/exists")
     public ApiResponse<Boolean> existsById(@PathVariable Long id) {
-        return ApiResponse.ok("Customer existence checked", customerService.existsById(id));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.existence.checked"), customerService.existsById(id));
     }
 
     @GetMapping("/email/{email}/exists")
     public ApiResponse<Boolean> existsByEmail(@PathVariable String email) {
-        return ApiResponse.ok("Email existence checked", customerService.existsByEmail(email));
+        return ApiResponse.ok(MessageUtils.getMessage("customer.email.existence.checked"), customerService.existsByEmail(email));
     }
 }

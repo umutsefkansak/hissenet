@@ -1,19 +1,18 @@
 package com.infina.hissenet.validation;
 
 public enum UniqueValueType {
-    EMPLOYEE_EMAIL("This email address is already registered in the system"),
-    CUSTOMER_EMAIL("This email address is already registered in the system"),
-    TAX_NUMBER("This tax number is already registered in the system"),
-    TC_NUMBER("This ID number is already registered in the system");
+    EMPLOYEE_EMAIL("customer.email.already.exists"),
+    CUSTOMER_EMAIL("customer.email.already.exists"),
+    TAX_NUMBER("customer.tax.number.already.exists"),
+    TC_NUMBER("customer.tc.number.already.exists");
 
+    private final String messageKey;
 
-    private final String defaultMessage;
-
-    UniqueValueType(String defaultMessage) {
-        this.defaultMessage = defaultMessage;
+    UniqueValueType(String messageKey) {
+        this.messageKey = messageKey;
     }
 
-    public String getDefaultMessage() {
-        return defaultMessage;
+    public String getMessageKey() {
+        return messageKey;
     }
 }

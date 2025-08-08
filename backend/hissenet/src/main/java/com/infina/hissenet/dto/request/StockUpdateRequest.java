@@ -7,17 +7,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record StockUpdateRequest(
-        @NotBlank
+        @NotBlank(message = "{validation.stock.issuer.name.required}")
         String issuerName,
 
-        @NotNull
+        @NotNull(message = "{validation.currency.required}")
         Currency currency,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.exchange.required}")
         Exchange exchange,
 
         Integer lotSize,
 
-        @NotNull
+        @NotNull(message = "{validation.status.required}")
         Status status
 ) {}

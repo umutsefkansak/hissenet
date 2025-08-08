@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MinAge {
-    String message() default "Customer age cannot be less than {value}";
+    String message() default "validation.age.min";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
     int value() default 18;

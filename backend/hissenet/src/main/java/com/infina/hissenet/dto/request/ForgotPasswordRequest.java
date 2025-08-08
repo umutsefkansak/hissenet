@@ -6,13 +6,14 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record ForgotPasswordRequest(
-        @Email
+        @Email(message = "{validation.email.invalid}")
         String email,
-        @NotBlank(message = "Password is required")
-        @Size(min = 8, max = 64, message = "Password must be between 8 and 64 characters")
+
+        @NotBlank(message = "{validation.password.required}")
+        @Size(min = 8, max = 64, message = "{validation.employee.password.size}")
         @Pattern(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z]).*$",
-                message = "Password must contain at least one uppercase and one lowercase letter"
+                message = "{validation.employee.password.pattern}"
         )
         String password,
         String confirmNewPassword

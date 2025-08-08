@@ -5,6 +5,7 @@ import com.infina.hissenet.controller.doc.AuthControllerDoc;
 import com.infina.hissenet.dto.request.LoginRequest;
 import com.infina.hissenet.dto.response.AuthResponse;
 import com.infina.hissenet.service.AuthService;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -40,14 +41,14 @@ public class AuthController implements AuthControllerDoc {
         AuthResponse response = authService.login(request);
         ResponseCookie cookie = ResponseCookie.from("sessionId", response.sessionId()).path("/").maxAge(response.time())
                 .httpOnly(true).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok("Login Successful", response));
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok(MessageUtils.getMessage("auth.login.successful"),  response));
     }
     // logout
     @DeleteMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@CookieValue(name = "sessionId",required = false) String token){
         authService.logout(token);
         ResponseCookie cookie=ResponseCookie.from("sessionId","").path("/").maxAge(0).httpOnly(true).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok("Logout Successful"));
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(ApiResponse.ok(MessageUtils.getMessage("auth.logout.successful")));
 
     }
 }

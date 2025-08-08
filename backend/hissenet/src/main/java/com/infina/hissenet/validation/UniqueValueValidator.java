@@ -4,6 +4,7 @@ import com.infina.hissenet.repository.EmployeeRepository;
 import com.infina.hissenet.service.CustomerService;
 import com.infina.hissenet.repository.CorporateCustomerRepository;
 import com.infina.hissenet.repository.IndividualCustomerRepository;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
@@ -49,11 +50,14 @@ public class UniqueValueValidator implements ConstraintValidator<UniqueValue, St
         };
 
         if (exists) {
-            // Disable default message
             context.disableDefaultConstraintViolation();
 
-            // Use custom message if provided, otherwise use enum's default message
-            String messageToUse = !customMessage.isEmpty() ? customMessage : type.getDefaultMessage();
+            String messageToUse;
+            if (!customMessage.isEmpty()) {
+                messageToUse = customMessage;
+            } else {
+                messageToUse = MessageUtils.getMessage(type.getMessageKey(), value);
+            }
 
             context.buildConstraintViolationWithTemplate(messageToUse)
                     .addConstraintViolation();

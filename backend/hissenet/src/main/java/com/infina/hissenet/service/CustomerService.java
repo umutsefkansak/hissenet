@@ -21,6 +21,7 @@ import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.IndividualCustomerRepository;
 import com.infina.hissenet.service.abstracts.ICustomerService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -58,14 +59,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
     public CustomerDto createIndividualCustomer(IndividualCustomerCreateRequest createDto) {
 
-        if (customerRepository.existsByEmail(createDto.email())) {
-            throw new EmailAlreadyExistsException(createDto.email());
-        }
-
-
-        if (createDto.tcNumber() != null && individualCustomerRepository.existsByTcNumber(createDto.tcNumber())) {
-            throw new TcNumberAlreadyExistsException(createDto.tcNumber());
-        }
 
         IndividualCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.INDIVIDUAL_CUSTOMER_PREFIX));
@@ -80,14 +73,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
     public CustomerDto createCorporateCustomer(CorporateCustomerCreateRequest createDto) {
 
-        if (customerRepository.existsByEmail(createDto.email())) {
-            throw new EmailAlreadyExistsException(createDto.email());
-        }
-
-
-        if (createDto.taxNumber() != null && corporateCustomerRepository.existsByTaxNumber(createDto.taxNumber())) {
-            throw new TaxNumberAlreadyExistsException(createDto.taxNumber());
-        }
 
         CorporateCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.CORPORATE_CUSTOMER_PREFIX));
@@ -125,7 +110,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     public CustomerDto getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email)
                 .map(customerMapper::toDto)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer found with email: " + email));
+                .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.email", email));
     }
 
     @Override
@@ -133,7 +118,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     public CustomerDto getCustomerByCustomerNumber(String customerNumber) {
         return customerRepository.findByCustomerNumber(customerNumber)
                 .map(customerMapper::toDto)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer found with customer number: " + customerNumber));
+                .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.customer.number", customerNumber));
     }
 
     @Transactional(readOnly = true)
@@ -157,7 +142,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
                 .orElseThrow(() -> new CustomerNotFoundException(id));
 
         if (!(existingCustomer instanceof IndividualCustomer)) {
-            throw new IllegalArgumentException("Customer with id " + id + " is not an individual customer");
+            throw new IllegalArgumentException(MessageUtils.getMessage("customer.not.individual", id));
         }
 
         IndividualCustomer individualCustomer = (IndividualCustomer) existingCustomer;
@@ -186,7 +171,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
                 .orElseThrow(() -> new CustomerNotFoundException(id));
 
         if (!(existingCustomer instanceof CorporateCustomer)) {
-            throw new IllegalArgumentException("Customer with id " + id + " is not a corporate customer");
+            throw new IllegalArgumentException(MessageUtils.getMessage("customer.not.corporate", id));
         }
 
         CorporateCustomer corporateCustomer = (CorporateCustomer) existingCustomer;
@@ -286,7 +271,7 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     public CustomerDto getCustomerByTcNumber(String tcNumber) {
         return individualCustomerRepository.findByTcNumber(tcNumber)
                 .map(customerMapper::toDto)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with identification number: " + tcNumber));
+                .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.tc.number", tcNumber));
     }
 
     @Override
@@ -294,6 +279,6 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     public CustomerDto getCustomerByTaxNumber(String taxNumber) {
         return corporateCustomerRepository.findByTaxNumber(taxNumber)
                 .map(customerMapper::toDto)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with tax number: " + taxNumber));
+                .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.tax.number", taxNumber));
     }
 }

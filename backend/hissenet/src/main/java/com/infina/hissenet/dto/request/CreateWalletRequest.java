@@ -7,15 +7,15 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record CreateWalletRequest(
-        @NotNull(message = "Customer ID cannot be empty")
+        @NotNull(message = "{validation.customer.id.required}")
         Long customerId,
 
-        @NotNull(message = "Balance cannot be empty")
-        @DecimalMin(value = "0.0", message = "Balance cannot be negative")
+        @NotNull(message = "{validation.balance.required}")
+        @DecimalMin(value = "0.0", message = "{validation.balance.min}")
         BigDecimal balance,
 
-        @NotNull(message = "Currency cannot be empty")
-        @Size(min = 3, max = 3, message = "Currency must be 3 characters")
+        @NotNull(message = "{validation.currency.required}")
+        @Size(min = 3, max = 3, message = "{validation.currency.size}")
         String currency,
 
         BigDecimal dailyLimit,

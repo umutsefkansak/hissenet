@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { logout } from '../../../server/auth';
 import logo from '../../../images/logo-white.png';
+import AuthModal from '../../AuthModal/AuthModal';
+import useAuthFlow from '../../../hooks/useAuthFlow';
+import { CodeVerificationModal } from '../../AuthModal/CodeVerificationModal';
 import './Navbar.css';
-
+ 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -13,27 +16,36 @@ const Navbar = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isCustomerSubmenuOpen, setIsCustomerSubmenuOpen] = useState(false);
   const [customerId, setCustomerId] = useState(null);
+ 
+   const {
+    step,         // 'IDLE' | 'ASK_ID' | 'ASK_CODE'
+    start,        // kimlik modalını açar
+    cancel,       // tüm akışı iptal eder
+    confirmIdentity,
+    confirmCode,
+  } = useAuthFlow(() => navigate('/customers'));
 
+  
   const isActiveMenu = (path) => {
     return location.pathname === path;
   };
-
+ 
   useEffect(() => {
     // Check if user is logged in
     const loginStatus = localStorage.getItem('isLogin');
     setIsLoggedIn(loginStatus === 'true');
-
+ 
     // Get customerId from URL params or localStorage
     const urlCustomerId = params.customerId;
     const storedCustomerId = localStorage.getItem('customerId');
     const currentCustomerId = urlCustomerId || storedCustomerId;
-    
+   
     if (currentCustomerId) {
       setCustomerId(currentCustomerId);
       // Store in localStorage for persistence
       localStorage.setItem('customerId', currentCustomerId);
     }
-
+ 
     // Check screen size
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -43,10 +55,10 @@ const Navbar = () => {
         setIsDrawerOpen(false); // Mobile'da kapalı
       }
     };
-
+ 
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-
+ 
     // Listen for storage changes (when login/logout happens in other components)
     const handleStorageChange = (e) => {
       if (e.key === 'isLogin') {
@@ -56,30 +68,30 @@ const Navbar = () => {
         setCustomerId(e.newValue);
       }
     };
-
+ 
     window.addEventListener('storage', handleStorageChange);
-
+ 
     // Also listen for custom events
     const handleLoginChange = () => {
       const loginStatus = localStorage.getItem('isLogin');
       setIsLoggedIn(loginStatus === 'true');
     };
-
+ 
     window.addEventListener('loginStateChanged', handleLoginChange);
-
+ 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('loginStateChanged', handleLoginChange);
       window.removeEventListener('resize', checkScreenSize);
     };
   }, [params.customerId]);
-
+ 
   useEffect(() => {
     if (location.pathname === '/individual-customer' || location.pathname === '/corporate-customer') {
       setIsCustomerSubmenuOpen(true);
     }
   }, [location.pathname]);
-
+ 
   const handleLogout = async () => {
     try {
       // Eğer müşteri girişi yapılmışsa sadece customerId'yi sil
@@ -109,24 +121,24 @@ const Navbar = () => {
       window.showToast('Çıkış yapılırken hata oluştu!', 'error', 3000);
     }
   };
-
+ 
   const toggleDrawer = () => {
     if (isMobile) {
       setIsDrawerOpen(!isDrawerOpen);
     }
   };
-
+ 
   const closeDrawer = () => {
     if (isMobile) {
       setIsDrawerOpen(false);
     }
     setIsCustomerSubmenuOpen(false);
   };
-
+ 
   const toggleCustomerSubmenu = () => {
     setIsCustomerSubmenuOpen(!isCustomerSubmenuOpen);
   };
-
+ 
   // Customer menu items when customerId is available
   const renderCustomerMenuItems = () => (
     <>
@@ -145,7 +157,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/stocks') ? 'active' : ''}`}>
         <Link to="/stocks" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -161,7 +173,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu(`/portfolio/${customerId}`) ? 'active' : ''}`}>
         <Link to={`/portfolio/${customerId}`} className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -180,7 +192,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu(`/wallet/${customerId}`) ? 'active' : ''}`}>
         <Link to={`/wallet/${customerId}`} className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -196,7 +208,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/c') ? 'active' : ''}`}>
         <Link to="/c" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -214,7 +226,7 @@ const Navbar = () => {
       </li>
     </>
   );
-
+ 
   // Admin menu items when no customerId
   const renderAdminMenuItems = () => (
     <>
@@ -233,10 +245,10 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/customers') ? 'active' : ''}`}>
-        <Link to="/customers" className="drawer-menu-link" onClick={closeDrawer}>
-          <div className="drawer-menu-header">
+       <Link to="{location.pathname}" className="drawer-menu-link" onClick={start}>          
+       <div className="drawer-menu-header">
             <div className="drawer-menu-left">
               <span className="drawer-menu-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -251,7 +263,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/individual-customer') || isActiveMenu('/corporate-customer') ? 'active' : ''}`}>
         <div className="drawer-menu-link">
           <div className="drawer-menu-header" onClick={toggleCustomerSubmenu}>
@@ -288,7 +300,7 @@ const Navbar = () => {
           )}
         </div>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/reports') ? 'active' : ''}`}>
         <Link to="/reports" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -304,7 +316,7 @@ const Navbar = () => {
           </div>
         </Link>
       </li>
-
+ 
       <li className={`drawer-menu-item ${isActiveMenu('/employee-management') ? 'active' : ''}`}>
         <Link to="/employee-management" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
@@ -322,7 +334,7 @@ const Navbar = () => {
       </li>
     </>
   );
-
+ 
   return (
     <>
       {/* Mobile Navbar */}
@@ -331,7 +343,7 @@ const Navbar = () => {
           <Link to="/" className="navbar-logo">
             HISSENET
           </Link>
-
+ 
           {/* Desktop Menu */}
           <ul className="nav-menu desktop-menu">
             {isLoggedIn ? (
@@ -348,14 +360,14 @@ const Navbar = () => {
               </li>
             )}
           </ul>
-
+ 
           {/* Mobile Menu Button - Sağda */}
           <button className="mobile-menu-btn" onClick={toggleDrawer}>
             <span className={`hamburger ${isDrawerOpen ? 'active' : ''}`}></span>
           </button>
         </div>
       </nav>
-
+ 
       {/* Drawer Menu */}
       <div className={`drawer-overlay ${isDrawerOpen && isMobile ? 'active' : ''}`} onClick={closeDrawer}></div>
       <div className={`drawer-menu ${isDrawerOpen ? 'open' : ''}`}>
@@ -370,7 +382,7 @@ const Navbar = () => {
             </button>
           )}
         </div>
-
+ 
         <div className="drawer-content">
           {isLoggedIn ? (
             // Giriş yapmış kullanıcı menüsü
@@ -378,7 +390,7 @@ const Navbar = () => {
               <ul className="drawer-menu-list">
                 {customerId ? renderCustomerMenuItems() : renderAdminMenuItems()}
               </ul>
-
+ 
               <div className="drawer-footer">
                 <button onClick={handleLogout} className="drawer-logout-btn">
                   <span className="drawer-menu-icon">
@@ -404,8 +416,18 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      <AuthModal
+        isOpen={step === 'ASK_ID'}
+        onClose={cancel}
+        onConfirm={confirmIdentity}
+      />
+      <CodeVerificationModal
+        isOpen={step === 'ASK_CODE'}
+        onClose={cancel}
+        onConfirm={confirmCode}
+      />
     </>
   );
 };
-
-export default Navbar; 
+ 
+export default Navbar;

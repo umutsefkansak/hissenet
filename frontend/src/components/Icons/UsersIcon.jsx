@@ -1,4 +1,3 @@
-// components/Icons/UsersIcon.jsx
 import * as React from "react";
 
 export default function UsersIcon({ className = '' }) {

@@ -67,9 +67,9 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateRequest request) {
-		if (!marketHourService.canPlaceOrder()){
+		/*if (!marketHourService.canPlaceOrder()){
 			throw new IllegalStateException();
-		}
+		}*/
 		Customer customer = customerService.findById(request.customerId())
 				.orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
 
@@ -102,10 +102,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		return orderMapper.toResponse(saved);
 	}
 	private void processMarketOrder(OrderCreateRequest request, Order order, BigDecimal totalAmount) {
-		if (!marketHourService.isMarketOpen()){
+		/*if (!marketHourService.isMarketOpen()){
 			order.setStatus(OrderStatus.REJECTED);
 			return;
-		}
+		}*/
 		if (request.type() != null) {
 			handleWalletTransaction(request, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
@@ -127,10 +127,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		};
 
 		if (isValid) {
-			if (!marketHourService.isMarketOpen()){
+		/*	if (!marketHourService.isMarketOpen()){
 				order.setStatus(OrderStatus.OPEN);
 				return;
-			}
+			}*/
 			handleWalletTransaction(request, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
 		} else {

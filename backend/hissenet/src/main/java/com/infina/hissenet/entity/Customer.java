@@ -26,7 +26,7 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "customer_type", discriminatorType = DiscriminatorType.STRING)
 @SQLRestriction("is_deleted = false")
-public abstract class Customer extends BaseEntity {
+public class Customer extends BaseEntity {
 
 
     @Column(name = "customer_number", nullable = false, unique = true, length = 20)

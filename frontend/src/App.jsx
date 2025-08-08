@@ -43,13 +43,12 @@ function AppContent() {
         <Route path="/new-customer" element={<div className="page-content">Yeni Müşteri Sayfası</div>} />
         <Route path="/individual-customer" element={<IndividualCustomer />} />
         <Route path="/corporate-customer" element={<CorporateCustomer />} />
-        <Route path="/reports" element={<Reports></Reports>} />
+        <Route path="/reports" element={<CustomerList></CustomerList>} />
         <Route path="/customer-transactions" element={<div className="page-content">Müşteri İşlemleri Sayfası</div>} />
         <Route path="/reports" element={<CustomerList />} />
         <Route path="/employee-management" element={<EmployeeManagementPage />} />
         <Route path="/wallet/:customerId?" element={<Wallet />} />
         <Route path="/portfolio/:customerId?" element={<Portfolio />} />
-        <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />
         <Route path="/dashboard" element={<DashBoard/>} />

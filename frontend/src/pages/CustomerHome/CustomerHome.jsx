@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCustomerById } from '../../server/customer';
 import { portfolioApi } from '../../server/portfolioApi';
+import { orderApi } from '../../server/order';
 import './CustomerHome.css';
 
 const CustomerHome = () => {
@@ -10,6 +11,7 @@ const CustomerHome = () => {
   const [customer, setCustomer] = useState(null);
   const [portfolios, setPortfolios] = useState([]);
   const [stockCount, setStockCount] = useState(0);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -22,15 +24,17 @@ const CustomerHome = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [customerData, portfoliosData, stockCountData] = await Promise.all([
+        const [customerData, portfoliosData, stockCountData, ordersData] = await Promise.all([
           getCustomerById(customerId),
           portfolioApi.getCustomerPortfolios(customerId),
-          portfolioApi.getCustomerStockCount(customerId)
+          portfolioApi.getCustomerStockCount(customerId),
+          orderApi.getOrdersByCustomerId(customerId)
         ]);
         
         setCustomer(customerData.data);
         setPortfolios(portfoliosData.data);
         setStockCount(stockCountData.data);
+        setOrders(ordersData.data || []);
       } catch (err) {
         setError(err.message);
         console.error('Error fetching customer data:', err);
@@ -48,7 +52,8 @@ const CustomerHome = () => {
     const riskMap = {
       'LOW': 'Düşük Risk',
       'MODERATE': 'Orta Risk',
-      'HIGH': 'Yüksek Risk'
+      'HIGH': 'Yüksek Risk',
+      'AGGRESSIVE': 'Yüksek Risk'
     };
     return riskMap[riskProfile] || riskProfile;
   };
@@ -57,7 +62,8 @@ const CustomerHome = () => {
     const colorMap = {
       'LOW': '#10B981',
       'MODERATE': '#F59E0B',
-      'HIGH': '#EF4444'
+      'HIGH': '#EF4444',
+      'AGGRESSIVE': '#EF4444'
     };
     return colorMap[riskProfile] || '#6B7280';
   };
@@ -72,6 +78,41 @@ const CustomerHome = () => {
 
   const formatPercentage = (percentage) => {
     return `${percentage > 0 ? '+' : ''}${percentage.toFixed(1)}%`;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Belirtilmemiş';
+    try {
+      return new Date(dateString).toLocaleDateString('tr-TR');
+    } catch {
+      return 'Geçersiz tarih';
+    }
+  };
+
+  const getOrderTypeText = (type) => {
+    switch (type) {
+      case 'BUY':
+        return 'Alım';
+      case 'SELL':
+        return 'Satım';
+      default:
+        return type;
+    }
+  };
+
+  const getOrderStatusText = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'Beklemede';
+      case 'COMPLETED':
+        return 'Tamamlandı';
+      case 'CANCELLED':
+        return 'İptal Edildi';
+      case 'REJECTED':
+        return 'Reddedildi';
+      default:
+        return status;
+    }
   };
 
   const handleEditClick = () => {
@@ -125,6 +166,9 @@ const CustomerHome = () => {
   const totalPortfolioValue = portfolios.reduce((sum, portfolio) => sum + portfolio.totalValue, 0);
   const totalProfitLoss = portfolios.reduce((sum, portfolio) => sum + portfolio.totalProfitLoss, 0);
   const totalProfitLossPercentage = totalPortfolioValue > 0 ? (totalProfitLoss / (totalPortfolioValue - totalProfitLoss)) * 100 : 0;
+
+  // Son 10 işlemi al
+  const recentOrders = orders.slice(0, 10);
 
   return (
     <div className="customer-home">
@@ -180,7 +224,13 @@ const CustomerHome = () => {
           
           <div 
             className="risk-badge"
-            style={{ backgroundColor: getRiskProfileColor(customer.riskProfile) }}
+            style={{ 
+              backgroundColor: getRiskProfileColor(customer.riskProfile) === '#10B981' ? '#F0FDF4' : 
+                              getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FFFBEB' : '#FEF2F2',
+              color: getRiskProfileColor(customer.riskProfile),
+              borderColor: getRiskProfileColor(customer.riskProfile) === '#10B981' ? '#BBF7D0' : 
+                          getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FED7AA' : '#FECACA'
+            }}
           >
             {getRiskProfileText(customer.riskProfile)}
           </div>
@@ -212,8 +262,49 @@ const CustomerHome = () => {
       {/* Bottom Section - Recent Transactions */}
       <div className="recent-transactions-section">
         <h3 className="section-title">Son İşlemler</h3>
-        <div className="transactions-placeholder">
-          <p>Son işlemler buraya gelecek</p>
+        <div className="transaction-table-container">
+          <table className="transaction-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Hisse</th>
+                <th>Emir Türü</th>
+                <th>Durum</th>
+                <th>Adet</th>
+                <th>Fiyat</th>
+                <th>Toplam Tutar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <tr key={order.id}>
+                    <td>{formatDate(order.createdAt)}</td>
+                    <td>{order.stockCode}</td>
+                    <td>
+                      <span className={`transaction-type ${order.type.toLowerCase()}`}>
+                        {getOrderTypeText(order.type)}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`order-status ${order.status.toLowerCase()}`}>
+                        {getOrderStatusText(order.status)}
+                      </span>
+                    </td>
+                    <td>{order.quantity}</td>
+                    <td>{order.price} ₺</td>
+                    <td>{order.totalAmount.toLocaleString('tr-TR')} ₺</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                    Henüz işlem geçmişi bulunmuyor.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

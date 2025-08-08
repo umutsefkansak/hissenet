@@ -17,36 +17,47 @@ const Navbar = () => {
   const [isCustomerSubmenuOpen, setIsCustomerSubmenuOpen] = useState(false);
   const [customerId, setCustomerId] = useState(null);
  
-   const {
+     const {
     step,         // 'IDLE' | 'ASK_ID' | 'ASK_CODE'
     start,        // kimlik modalını açar
     cancel,       // tüm akışı iptal eder
     confirmIdentity,
     confirmCode,
-  } = useAuthFlow(() => navigate('/customers'));
+  } = useAuthFlow(() => {
+    // Doğrulama başarılı olduğunda sayfayı yenile ve customers sayfasına git
+    window.location.reload();
+    navigate('/customers');
+  });
 
   
   const isActiveMenu = (path) => {
     return location.pathname === path;
   };
- 
-  useEffect(() => {
-    // Check if user is logged in
-    const loginStatus = localStorage.getItem('isLogin');
-    setIsLoggedIn(loginStatus === 'true');
- 
-    // Get customerId from URL params or localStorage
+
+  // CustomerId kontrol fonksiyonu
+  const checkCustomerId = () => {
     const urlCustomerId = params.customerId;
     const storedCustomerId = localStorage.getItem('customerId');
     const currentCustomerId = urlCustomerId || storedCustomerId;
-   
+    
+    setCustomerId(currentCustomerId);
+    
     if (currentCustomerId) {
-      setCustomerId(currentCustomerId);
-      // Store in localStorage for persistence
       localStorage.setItem('customerId', currentCustomerId);
     }
+    
+    return currentCustomerId;
+  };
  
-    // Check screen size
+  useEffect(() => {
+    // Login durumunu kontrol et
+    const loginStatus = localStorage.getItem('isLogin');
+    setIsLoggedIn(loginStatus === 'true');
+ 
+    // CustomerId'yi kontrol et
+    checkCustomerId();
+ 
+    // Ekran boyutunu kontrol et
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
@@ -59,7 +70,7 @@ const Navbar = () => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
  
-    // Listen for storage changes (when login/logout happens in other components)
+    // Storage değişikliklerini dinle
     const handleStorageChange = (e) => {
       if (e.key === 'isLogin') {
         setIsLoggedIn(e.newValue === 'true');
@@ -71,10 +82,12 @@ const Navbar = () => {
  
     window.addEventListener('storage', handleStorageChange);
  
-    // Also listen for custom events
+    // Custom eventları dinle
     const handleLoginChange = () => {
       const loginStatus = localStorage.getItem('isLogin');
       setIsLoggedIn(loginStatus === 'true');
+      // Login değiştiğinde customerId'yi de yeniden kontrol et
+      checkCustomerId();
     };
  
     window.addEventListener('loginStateChanged', handleLoginChange);
@@ -91,6 +104,9 @@ const Navbar = () => {
       setIsCustomerSubmenuOpen(true);
     }
   }, [location.pathname]);
+
+  // Menü tipini belirle
+  const isCustomerMenu = Boolean(customerId);
  
   const handleLogout = async () => {
     try {
@@ -200,7 +216,6 @@ const Navbar = () => {
               <span className="drawer-menu-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M21 12H3M3 12L10 5M3 12L10 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M21 12H3M3 12L10 5M3 12L10 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </span>
               <span className="drawer-menu-text">Bakiye Yükle/Çek</span>
@@ -210,7 +225,7 @@ const Navbar = () => {
       </li>
  
       <li className={`drawer-menu-item ${isActiveMenu('/c') ? 'active' : ''}`}>
-        <Link to="/c" className="drawer-menu-link" onClick={closeDrawer}>
+        <Link to="/transaction-history" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
             <div className="drawer-menu-left">
               <span className="drawer-menu-icon">
@@ -227,8 +242,8 @@ const Navbar = () => {
     </>
   );
  
-  // Admin menu items when no customerId
-  const renderAdminMenuItems = () => (
+  // Staff/Admin menu items when no customerId
+  const renderStaffMenuItems = () => (
     <>
       <li className={`drawer-menu-item ${isActiveMenu('/') ? 'active' : ''}`}>
         <Link to="/" className="drawer-menu-link" onClick={closeDrawer}>
@@ -247,8 +262,8 @@ const Navbar = () => {
       </li>
  
       <li className={`drawer-menu-item ${isActiveMenu('/customers') ? 'active' : ''}`}>
-       <Link to="{location.pathname}" className="drawer-menu-link" onClick={start}>          
-       <div className="drawer-menu-header">
+        <Link to={location.pathname} className="drawer-menu-link" onClick={start}>          
+          <div className="drawer-menu-header">
             <div className="drawer-menu-left">
               <span className="drawer-menu-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -388,7 +403,8 @@ const Navbar = () => {
             // Giriş yapmış kullanıcı menüsü
             <>
               <ul className="drawer-menu-list">
-                {customerId ? renderCustomerMenuItems() : renderAdminMenuItems()}
+                {/* CustomerId varsa Customer menüsü, yoksa Staff menüsü göster */}
+                {isCustomerMenu ? renderCustomerMenuItems() : renderStaffMenuItems()}
               </ul>
  
               <div className="drawer-footer">

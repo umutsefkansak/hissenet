@@ -21,7 +21,7 @@ import { useState, useEffect } from 'react';
 
 import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
-import Reports from './pages/Reports/Reports';
+
 import CustomerHome from './pages/CustomerHome/CustomerHome';
 
 function AppContent() {

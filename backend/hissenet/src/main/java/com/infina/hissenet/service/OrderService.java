@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.exception.order.IllegalStateException;
 import com.infina.hissenet.exception.stock.StockNotFoundException;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
 import com.infina.hissenet.dto.response.OrderResponse;
-import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.entity.Customer;
@@ -33,7 +33,6 @@ import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.order.OrderNotFoundException;
 import com.infina.hissenet.mapper.OrderMapper;
 import com.infina.hissenet.repository.OrderRepository;
-import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
@@ -50,10 +49,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final ICacheManagerService stockCacheService;
 	private final WalletRepository walletRepository;
 	private final IStockTransactionService stockTransactionService;
+	private final MarketHourService marketHourService;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
-                        OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
-                        WalletRepository walletRepository, IStockTransactionService stockTransactionService) {
+						OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
+						WalletRepository walletRepository, IStockTransactionService stockTransactionService, MarketHourService marketHourService) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -62,10 +62,14 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.stockCacheService = stockCacheService;
 		this.walletRepository = walletRepository;
         this.stockTransactionService = stockTransactionService;
-    }
+		this.marketHourService = marketHourService;
+	}
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateRequest request) {
+		if (!marketHourService.canPlaceOrder()){
+			throw new IllegalStateException();
+		}
 		Customer customer = customerService.findById(request.customerId())
 				.orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
 
@@ -104,6 +108,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		return orderMapper.toResponse(saved);
 	}
 	private void processMarketOrder(OrderCreateRequest request, Order order, BigDecimal totalAmount) {
+		if (!marketHourService.isMarketOpen()){
+			order.setStatus(OrderStatus.REJECTED);
+			return;
+		}
 		if (request.type() != null) {
 			handleWalletTransaction(request, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
@@ -125,6 +133,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		};
 
 		if (isValid) {
+			if (!marketHourService.isMarketOpen()){
+				order.setStatus(OrderStatus.OPEN);
+				return;
+			}
 			handleWalletTransaction(request, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
 		} else {

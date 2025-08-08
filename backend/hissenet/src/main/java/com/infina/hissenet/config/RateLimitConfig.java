@@ -1,5 +1,6 @@
 package com.infina.hissenet.config;
 
+import com.infina.hissenet.properties.RateLimitProperties;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -10,9 +11,17 @@ import java.time.Duration;
 @Configuration
 public class RateLimitConfig {
 
-    public Bucket createNewBucket() {
+    private final RateLimitProperties properties;
 
-        Bandwidth limit = Bandwidth.classic(20, Refill.greedy(20, Duration.ofMinutes(1)));
+    public RateLimitConfig(RateLimitProperties properties) {
+        this.properties = properties;
+    }
+
+    public Bucket createNewBucket() {
+        Bandwidth limit = Bandwidth.classic(
+                properties.getCapacity(),
+                Refill.greedy(properties.getCapacity(), Duration.ofMinutes(properties.getTimeInMinutes()))
+        );
         return Bucket.builder()
                 .addLimit(limit)
                 .build();

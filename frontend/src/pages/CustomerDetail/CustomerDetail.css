@@ -391,15 +391,15 @@
 }
 
 .order-status.open {
-  background: rgba(255, 225, 136, 0.99);
-  color:rgb(155, 116, 0);
+  background: rgba(187, 184, 184, 0.45);
+  color:rgb(75, 75, 75);
   border-color: rgba(255, 193, 7, 0.3);
   box-shadow: 0 1px 4px rgba(255, 193, 7, 0.1);
 }
 
 .order-status.open:hover {
-  background: rgba(255, 193, 7, 0.15);
-  border-color: rgba(255, 193, 7, 0.4);
+  background: rgba(172, 170, 164, 0.15);
+  border-color: rgba(148, 146, 140, 0.09);
   transform: translateY(-1px);
 }
 
@@ -521,4 +521,90 @@
   .page-header h1 {
     font-size: 24px;
   }
+}
+.export-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.export-icon-button {
+  background: #1e3a8a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+}
+
+.export-icon-button:hover {
+  background: #274bb6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.export-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e9ecef;
+  min-width: 160px;
+  z-index: 1000;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a5568;
+  transition: background-color 0.2s ease;
+}
+
+.export-dropdown-item:hover {
+  background: #f8f9fa;
+  color: #1e3a8a;
+}
+
+.export-dropdown-item svg {
+  color: #6c757d;
+  transition: color 0.2s ease;
+}
+
+.export-dropdown-item:hover svg {
+  color: #1e3a8a;
+}
+
+.export-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+  z-index: -1;
 }

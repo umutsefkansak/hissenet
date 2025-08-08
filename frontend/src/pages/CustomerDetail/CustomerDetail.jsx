@@ -5,6 +5,7 @@ import { orderApi } from '../../server/order';
 import { getCustomerById } from '../../server/customer';
 import { portfolioApi } from '../../server/portfolioApi';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import './CustomerDetail.css';
 
@@ -17,7 +18,7 @@ const CustomerDetailPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -216,7 +217,74 @@ const CustomerDetailPage = () => {
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const file = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(file, `islem_gecmisi_${customer.firstName}_${customer.lastName}.xlsx`);
-    setExportMenuOpen(false);
+    setExportDropdownOpen(false);
+  };
+  const handleExportPDF = () => {
+    if (!orders.length) return;
+    
+    const pdf = new jsPDF();
+    
+    // NotoSans font'u ekle
+    pdf.addFont('/fonts/NotoSans-Regular.ttf', 'NotoSans', 'normal');
+    pdf.setFont('NotoSans');
+    
+    // Başlık
+    pdf.setFontSize(18);
+    pdf.setTextColor(30, 55, 72);
+    pdf.text('Müşteri İşlem Geçmişi', 20, 30);
+    
+    // Müşteri bilgileri
+    pdf.setFontSize(12);
+    pdf.setTextColor(74, 85, 104);
+    pdf.text(`Müşteri: ${customer.firstName} ${customer.lastName}`, 20, 45);
+    pdf.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 55);
+    
+    // Tablo başlıkları
+    const headers = ['Tarih', 'Hisse', 'Emir Türü', 'Durum', 'Adet', 'Fiyat', 'Toplam'];
+    const startY = 75;
+    let currentY = startY;
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFillColor(30, 58, 138);
+    
+    // Header row
+    headers.forEach((header, index) => {
+      const x = 20 + (index * 25);
+      pdf.rect(x, currentY - 8, 25, 8, 'F');
+      pdf.text(header, x + 2, currentY - 2);
+    });
+    
+    currentY += 8;
+    
+    // Data rows
+    pdf.setTextColor(45, 55, 72);
+    orders.forEach((order, rowIndex) => {
+      if (currentY > 250) {
+        pdf.addPage();
+        currentY = 20;
+      }
+      
+      const rowData = [
+        formatDate(order.createdAt),
+        order.stockCode,
+        getOrderTypeText(order.type),
+        getOrderStatusText(order.status),
+        order.quantity.toString(),
+        `${order.price} ₺`,
+        `${order.totalAmount.toLocaleString('tr-TR')} ₺`
+      ];
+      
+      rowData.forEach((cell, index) => {
+        const x = 20 + (index * 25);
+        pdf.text(cell, x + 2, currentY);
+      });
+      
+      currentY += 6;
+    });
+    
+    pdf.save(`islem_gecmisi_${customer.firstName}_${customer.lastName}.pdf`);
+    setExportDropdownOpen(false);
   };
 
 
@@ -276,15 +344,52 @@ const CustomerDetailPage = () => {
         </div>
 
         <div className="transaction-section">
-          <div className="transaction-header">
-            <h3 className='transaction-title'>İşlem Geçmişi</h3>
-            <button
-              className="export-button"
-              onClick={handleExportExcel}
-            >
-              İndir
-            </button>
-          </div>
+        <div className="transaction-header">
+              <h3 className='transaction-title'>İşlem Geçmişi</h3>
+              <div className="export-dropdown">
+                <button
+                  className="export-icon-button"
+                  onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </button>
+                
+                {exportDropdownOpen && (
+                  <div className="export-dropdown-menu">
+                    <button 
+                      className="export-dropdown-item"
+                      onClick={handleExportExcel}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                      </svg>
+                      Excel İndir
+                    </button>
+                    <button 
+                      className="export-dropdown-item"
+                      onClick={handleExportPDF}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                      </svg>
+                      PDF İndir
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           <div className="transaction-table-container">
             <table className="transaction-table">
               <thead>

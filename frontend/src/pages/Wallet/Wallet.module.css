@@ -1,4 +1,4 @@
-.wallet-page {
+.walletPage {
   min-height: 100vh;
   background: white;
   display: flex;
@@ -7,20 +7,20 @@
   padding: 40px 20px;
 }
 
-.wallet-modal {
+.walletModal {
   background: white;
   border-radius: 16px; 
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); 
-  width: 74%;
+  width: 50%;
   max-width: 1000px; 
-  max-height: 90vh;
-  height: 830px; 
-  min-height: 600px;
+  max-height: 100vh;
+  height: 750px; 
+  min-height: 500px;
   display: flex;
   flex-direction: column; 
 }
 
-.modal-header {
+.modalHeader {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,7 +30,7 @@
   flex-shrink: 0; 
 }
 
-.wallet-tab-buttons {
+.walletTabButtons {
   display: flex;
   gap: 8px; 
   background: #e9ecef;
@@ -38,7 +38,7 @@
   padding: 4px;
 }
 
-.wallet-tab-button {
+.walletTabButton {
   padding: 12px 24px;
   border: none;
   background: transparent;
@@ -51,21 +51,19 @@
   position: relative;
 }
 
-.wallet-tab-button:hover {
+.walletTabButton:hover {
   color: #495057;
   background: rgba(255, 255, 255, 0.7);
 }
 
-.wallet-tab-button.active {
+.walletTabButtonActive {
   color: #fff;
   background: #1e3a8a;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
   transform: translateY(-1px);
 }
 
-
-
-.modal-content {
+.modalContent {
   padding: 40px 32px; 
   flex: 1; 
   overflow-y: auto; 
@@ -73,34 +71,32 @@
   flex-direction: column;
 }
 
-
-.modal-content form {
+.modalContentForm {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0; 
 }
 
-
-.modal-content form > div:not(:last-child) {
+.modalContentForm > div:not(:last-child) {
   flex: 1;
 }
 
-.balance-info {
+.balanceInfo {
   margin-bottom: 32px; 
   padding: 24px; 
   background: #f8f9fa;
   border-radius: 12px; 
 }
 
-.balance-info h3 {
+.balanceInfoTitle {
   margin: 0 0 16px 0; 
   font-size: 20px; 
   font-weight: 600;
   color: #333;
 }
 
-.balance-row {
+.balanceRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -108,32 +104,32 @@
   padding: 8px 0; 
 }
 
-.balance-row:last-child {
+.balanceRow:last-child {
   margin-bottom: 0;
 }
 
-.balance-row span:first-child {
+.balanceRowLabel {
   color: #666;
   font-size: 16px; 
 }
 
-.balance-amount {
+.balanceAmount {
   font-weight: 600;
   color: #333;
   font-size: 20px;
 }
 
-.available-balance {
+.availableBalance {
   font-weight: 600;
   color: #28a745;
   font-size: 20px; 
 }
 
-.form-section {
+.formSection {
   margin-bottom: 28px; 
 }
 
-.form-section label {
+.formSectionLabel {
   display: block;
   margin-bottom: 12px; 
   font-weight: 600;
@@ -141,8 +137,8 @@
   font-size: 16px; 
 }
 
-.form-section input,
-.form-section select {
+.formSectionInput,
+.formSectionSelect {
   width: 100%;
   padding: 16px 20px; 
   border: 2px solid #e0e0e0;
@@ -152,59 +148,59 @@
   box-sizing: border-box;
 }
 
-.form-section input:focus,
-.form-section select:focus {
+.formSectionInput:focus,
+.formSectionSelect:focus {
   outline: none;
   border-color: #007bff;
 }
 
-.form-section input:disabled,
-.form-section select:disabled {
+.formSectionInput:disabled,
+.formSectionSelect:disabled {
   background: #f8f9fa;
   cursor: not-allowed;
 }
 
-.form-note {
+.formNote {
   margin-top: 8px;
   font-size: 14px; 
   color: #666;
 }
 
-.checkbox-group {
+.checkboxGroup {
   display: flex;
   align-items: center;
   gap: 12px; 
   margin-top: 16px; 
 }
 
-.checkbox-group input[type="checkbox"] {
+.checkboxGroupInput {
   width: 20px; 
   height: 20px; 
   margin: 0;
 }
 
-.checkbox-group label {
+.checkboxGroupLabel {
   margin: 0;
   font-size: 16px; 
   color: #333;
   cursor: pointer;
 }
 
-.info-section {
+.infoSection {
   margin-bottom: 28px; 
   padding: 24px; 
   background: #f8f9fa;
   border-radius: 12px; 
 }
 
-.info-section h4 {
+.infoSectionTitle {
   margin: 0 0 16px 0; 
   font-size: 18px; 
   font-weight: 600;
   color: #333;
 }
 
-.info-section ul {
+.infoSectionList {
   margin: 0;
   padding-left: 24px; 
   font-size: 15px; 
@@ -212,7 +208,7 @@
   line-height: 1.6; 
 }
 
-.info-section li {
+.infoSectionListItem {
   margin-bottom: 8px; 
 }
 
@@ -225,19 +221,19 @@
   text-align: center;
 }
 
-.message.success {
+.messageSuccess {
   background: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
-.message.error {
+.messageError {
   background: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
 
-.confirm-button {
+.confirmButton {
   width: 100%;
   padding: 18px 32px; 
   background: #1e3a8a;
@@ -254,33 +250,48 @@
   z-index: 10;
 }
 
-.confirm-button:hover:not(:disabled) {
+.confirmButton:hover:not(:disabled) {
   background: #5a6268;
 }
 
-.confirm-button:disabled {
+.confirmButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
+.walletContainer {
+  text-align: center;
+  padding: 40px;
+}
+
+.walletContainerTitle {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.walletContainerText {
+  color: #666;
+  font-size: 16px;
+}
 
 @media (max-height: 800px) {
-  .wallet-modal {
+  .walletModal {
     max-height: 95vh;
   }
   
-  .modal-content {
+  .modalContent {
     padding: 20px 32px;
   }
 }
 
 @media (max-width: 768px) {
-  .wallet-modal {
+  .walletModal {
     max-height: 100vh;
     width: 95%;
   }
   
-  .modal-content {
+  .modalContent {
     padding: 20px 24px;
   }
 }

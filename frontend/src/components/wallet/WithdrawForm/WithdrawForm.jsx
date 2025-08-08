@@ -27,12 +27,10 @@ const WithdrawForm = ({ amount, setAmount, iban, setIban, availableBalance, load
     }
   };
 
-  // IBAN formatı için yardımcı fonksiyon
+
   const formatIBAN = (value) => {
-    // Sadece rakamları al
     const numbers = value.replace(/[^0-9]/g, '');
     
-    // TR ile başla ve sayıları formatla
     let formatted = 'TR';
     
     if (numbers.length > 0) {

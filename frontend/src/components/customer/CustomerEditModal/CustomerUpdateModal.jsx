@@ -10,15 +10,24 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   });
   const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(false);
+  const isCorporate = customer?.customerType === 'CORPORATE';
 
   useEffect(() => {
     if (customer && isOpen) {
-      const initialData = {
-        firstName: customer.firstName || '',
-        lastName: customer.lastName || '',
-        email: customer.email || '',
-        phone: customer.phone || ''
-      };
+     const initialData = isCorporate
+  ? {
+      // Kurumsal: yetkili kişi adı tek alandan gelir
+      firstName: customer.authorizedPersonName || '',
+      lastName: '',
+      email: customer.email || '',
+      phone: customer.phone || ''
+    }
+  : {
+      firstName: customer.firstName || '',
+      lastName: customer.lastName || '',
+      email: customer.email || '',
+      phone: customer.phone || ''
+    };
       
       setFormData(initialData);
       setOriginalData(initialData);
@@ -37,7 +46,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   const hasChanges = () => {
     return (
       formData.firstName !== originalData.firstName ||
-      formData.lastName !== originalData.lastName ||
+      (!isCorporate && formData.lastName !== originalData.lastName) ||
       formData.email !== originalData.email ||
       formData.phone !== originalData.phone
     );
@@ -57,12 +66,20 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
 
     try {
       // Backend'e gönderilecek veriyi hazırla
-      const updateData = {
-        id: customer.id,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone
-      };
+      const updateData = isCorporate
+  ? {
+      id: customer.id,
+      customerType: 'CORPORATE',
+      authorizedPersonName: formData.firstName,
+      phone: formData.phone
+    }
+  : {
+      id: customer.id,
+      customerType: 'INDIVIDUAL',
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone
+    };
 
       // Email sadece değişmişse gönder
       if (formData.email !== originalData.email) {
@@ -97,8 +114,18 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="customer-update-form">
-          <div className="form-group">
-            <label htmlFor="name">Ad Soyad</label>
+        <div className="form-group">
+          <label htmlFor="name">{isCorporate ? 'Yetkili Kişi' : 'Ad Soyad'}</label>
+          {isCorporate ? (
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              placeholder="Yetkili kişi adı"
+              required
+            />
+          ) : (
             <div className="name-inputs">
               <input
                 type="text"
@@ -117,7 +144,8 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
                 required
               />
             </div>
-          </div>
+          )}
+        </div>
 
           <div className="form-group">
             <label htmlFor="email">Email</label>

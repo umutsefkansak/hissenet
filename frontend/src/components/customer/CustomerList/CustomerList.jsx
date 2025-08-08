@@ -12,27 +12,99 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+ 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage] = useState(8);
+  
+  const [sortConfig, setSortConfig] = useState({
+    key: 'id',
+    direction: 'asc'
+  });
+
   const shouldShowCards = !loading && !error;
 
   const getCustomerType = (customer) => {
     return customer.customerType === 'INDIVIDUAL' ? 'Bireysel' : 'Kurumsal';
   };
 
-  // Arama filtreleme - ilk harfle başlayan müşteriler
-  const filteredCustomers = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return customers;
+  const sortCustomers = (customers, key, direction) => {
+    return [...customers].sort((a, b) => {
+      let aValue, bValue;
+  
+      if (key === 'name') {
+        aValue = a.customerType === 'INDIVIDUAL'
+          ? `${a.firstName} ${a.lastName}`.toLowerCase()
+          : a.companyName.toLowerCase();
+        bValue = b.customerType === 'INDIVIDUAL'
+          ? `${b.firstName} ${b.lastName}`.toLowerCase()
+          : b.companyName.toLowerCase();
+      } else if (typeof a[key] === 'number' || typeof b[key] === 'number') {
+        aValue = Number(a[key]) || 0;
+        bValue = Number(b[key]) || 0;
+      } else {
+        aValue = (a[key] ?? '').toString().toLowerCase();
+        bValue = (b[key] ?? '').toString().toLowerCase();
+      }
+  
+      if (aValue === bValue) return 0;
+      return direction === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
+    });
+  };
+
+  const handleSort = (key) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+    }));
+    setCurrentPage(1); 
+  };
+
+  const filteredAndSortedCustomers = useMemo(() => {
+    let filtered = customers;
+    
+    if (searchTerm.trim()) {
+      filtered = customers.filter(customer => {
+        const fullName = customer.customerType === 'INDIVIDUAL' 
+          ? `${customer.firstName} ${customer.lastName}`.toLowerCase()
+          : customer.companyName.toLowerCase();
+        
+        return fullName.startsWith(searchTerm.toLowerCase());
+      });
     }
     
-    return customers.filter(customer => {
-      const fullName = customer.customerType === 'INDIVIDUAL' 
-        ? `${customer.firstName} ${customer.lastName}`.toLowerCase()
-        : customer.companyName.toLowerCase();
-      
-      // İlk harfle başlayan müşterileri filtrele
-      return fullName.startsWith(searchTerm.toLowerCase());
-    });
-  }, [customers, searchTerm]);
+    return sortCustomers(filtered, sortConfig.key, sortConfig.direction);
+  }, [customers, searchTerm, sortConfig]);
+
+  const getPaginatedCustomers = () => {
+    const indexOfLastCustomer = currentPage * customersPerPage;
+    const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+    return filteredAndSortedCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  };
+
+  const totalPages = Math.ceil(filteredAndSortedCustomers.length / customersPerPage);
+  
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  const SortIndicator = ({ columnKey }) => {
+    if (sortConfig.key !== columnKey) {
+      return <span className="sort-indicator">↕</span>;
+    }
+    return (
+      <span className={`sort-indicator ${sortConfig.direction === 'asc' ? 'asc' : 'desc'}`}>
+        {sortConfig.direction === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
 
   const handleViewCustomer = (customerId) => {
     navigate(`/customers/${customerId}`);
@@ -47,15 +119,10 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
     setIsUpdateModalOpen(false);
     setSelectedCustomer(null);
   };
+  
 
   const handleUpdateSubmit = async (updateData) => {
-    try {
-      await onUpdate(updateData);
-      window.showToast && window.showToast('Müşteri başarıyla güncellendi!', 'success', 3000);
-    } catch (error) {
-      window.showToast && window.showToast('Müşteri güncellenirken hata oluştu!', 'error', 3000);
-      throw error;
-    }
+    await onUpdate(updateData); 
   };
 
   if (loading) {
@@ -78,7 +145,7 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
 
   return (
     <div className="customer-list">
-      {/* Summary Cards - sadece gerekli olduğunda göster */}
+      
       {shouldShowCards && (
         <div className="summary-cards">
           <div className="summary-card">
@@ -97,7 +164,6 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         <h2>Müşteri Listesi</h2>
       </div>
 
-      {/* Arama Çubuğu */}
       <div className="search-container">
         <div className="search-box">
           <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -126,15 +192,35 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         <table className="customer-table">
           <thead>
             <tr>
-              <th>Ad Soyad</th>
-              <th>Email</th>
-              <th>Telefon</th>
-              <th>Müşteri Tipi</th>
+              <th 
+                className="sortable-header"
+                onClick={() => handleSort('name')}
+              >
+                Ad Soyad <SortIndicator columnKey="name" />
+              </th>
+              <th 
+                className="sortable-header"
+                onClick={() => handleSort('email')}
+              >
+                Email <SortIndicator columnKey="email" />
+              </th>
+              <th 
+                className="sortable-header"
+                onClick={() => handleSort('phone')}
+              >
+                Telefon <SortIndicator columnKey="phone" />
+              </th>
+              <th 
+                className="sortable-header"
+                onClick={() => handleSort('customerType')}
+              >
+                Müşteri Tipi <SortIndicator columnKey="customerType" />
+              </th>
               <th>İşlemler</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.map((customer) => (
+            {getPaginatedCustomers().map((customer) => (
               <tr key={customer.id}>
                 <td>
                   {customer.customerType === 'INDIVIDUAL' 
@@ -150,23 +236,64 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
                   </span>
                 </td>
                 <td>
-                <div className="customer-actions">
-                  <button 
-                    className="btn-view"
-                    onClick={() => handleViewCustomer(customer.id)}
-                  >
-                    Görüntüle
-                  </button>
-                  <EditButton 
-                    onClick={() => handleUpdateCustomer(customer)}
-                  />
-                </div>
-              </td>
+                  <div className="customer-actions">
+                    <button 
+                      className="btn-view"
+                      onClick={() => handleViewCustomer(customer.id)}
+                    >
+                      Görüntüle
+                    </button>
+                    <EditButton 
+                      onClick={() => handleUpdateCustomer(customer)}
+                    />
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {filteredAndSortedCustomers.length > customersPerPage && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            {((currentPage - 1) * customersPerPage) + 1} - {Math.min(currentPage * customersPerPage, filteredAndSortedCustomers.length)} / {filteredAndSortedCustomers.length} müşteri
+          </div>
+          <div className="pagination-controls">
+            <button 
+              className="pagination-button"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15,18 9,12 15,6"/>
+              </svg>
+            </button>
+            
+            <div className="page-numbers">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  className={`page-number ${currentPage === page ? 'active' : ''}`}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            
+            <button 
+              className="pagination-button"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9,18 15,12 9,6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       <CustomerUpdateModal
         isOpen={isUpdateModalOpen}

@@ -65,5 +65,16 @@ export const portfolioApi = {
       console.error('Error moving stock transaction:', error);
       throw error;
     }
+  },
+
+  // Get stock count for customer
+  getCustomerStockCount: async (customerId) => {
+    try {
+      const response = await api.get(`/stock-transactions/stock-size/${customerId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching customer stock count:', error);
+      throw error;
+    }
   }
 }; 

@@ -26,13 +26,6 @@ export const orderApi = {
     return response.json();
   },
 
-  getPopularStockCodes: async () => {
-    const response = await fetch(`${BASE_URL}/popular`);
-    if (!response.ok) {
-      throw new Error('En popüler hisseler getirilemedi');
-    }
-    return response.json(); 
-  },
 
   getTodayTotalTradeVolume: async () => {
     const response = await fetch(`${BASE_URL}/filled/today/volume`);
@@ -88,5 +81,6 @@ export const orderApi = {
       throw new Error('Bugünkü toplam emir sayısı alınamadı');
     }
     return response.json();
-  }
+  },
+
 };

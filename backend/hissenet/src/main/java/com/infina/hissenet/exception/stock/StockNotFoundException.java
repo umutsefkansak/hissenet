@@ -1,14 +1,14 @@
 package com.infina.hissenet.exception.stock;
 
 import com.infina.hissenet.exception.common.NotFoundException;
+import com.infina.hissenet.utils.MessageUtils;
 
 public class StockNotFoundException extends NotFoundException {
 	public StockNotFoundException(Long id) {
-		super("Stock not found with id: " + id);
+		super(MessageUtils.getMessage("stock.not.found", id));
 	}
+
 	public StockNotFoundException(String code) {
-		super("Stock not found with id: " + code);
+		super(MessageUtils.getMessage("stock.not.found", code));
 	}
-
-
 }

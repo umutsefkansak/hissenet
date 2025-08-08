@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
 import Reports from './pages/Reports/Reports';
+import Chatbot from './components/Chatbot/Chatbot';
 
 function AppContent() {
   const location = useLocation();
@@ -63,8 +64,22 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Chatbot />
     </Router>
   );
 }
 
 export default App;
+
+/*
+import Chatbot from './components/Chatbot/Chatbot';
+
+function App() {
+  return (
+    <div className="App">
+      <Chatbot />
+    </div>
+  );
+}
+
+export default App;*/

@@ -2,7 +2,7 @@ import EmployeeStatusBadge from './EmployeeStatusBadge';
 import './EmployeeTable.css';
 import React, { useState, useEffect } from 'react';
 import { roleApi } from '../../server/roles';
-import Modal from '../Modal/Modal';
+import Modal from '../common/Modal/Modal';
 
 const EmployeeTable = ({ employees, onEdit, onDelete, loading }) => {
     const [roleMap, setRoleMap] = useState(new Map());

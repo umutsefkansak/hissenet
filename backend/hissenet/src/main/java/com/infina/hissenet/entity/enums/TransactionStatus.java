@@ -6,7 +6,8 @@ public enum TransactionStatus {
         COMPLETED,
         FAILED,
         CANCELLED,
-        SETTLED
-
+        SETTLED,
+        PARTIALLY_SOLD,  // FIFO için: Kısmen satılmış
+        SOLD             // FIFO için: Tamamen satılmış
 
 }

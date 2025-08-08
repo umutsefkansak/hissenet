@@ -15,6 +15,7 @@ import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,10 +88,10 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
              Integer currentQuantity=  getQuantityForStockTransactionWithStream(order.getCustomer().getId(),transaction.getStockCode());
             // fifoService.processFIFOForSell(order.getCustomer().getId(),transaction.getStockCode(),currentQuantity);
              if(order.getQuantity().intValue()>currentQuantity){
-                 throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+                 throw new InsufficientStockException(transaction.getStockCode());
              }
             }catch (RuntimeException e){
-                throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+                throw new InsufficientStockException(transaction.getStockCode());
             }
         }
 
@@ -143,12 +144,11 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
        return commonFinancialService.mergeTransactions(transactions);
     }
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
-        StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException("Stock "));
+        StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException(MessageUtils.getMessage("stock.transaction.not.found", transactionId)));
         Long oldPortfolioId = transaction.getPortfolio().getId();
-        Portfolio portfolio=portfolioService.findById(portfolioId).orElseThrow(()->new NotFoundException("Portfolio "));
+        Portfolio portfolio=portfolioService.findById(portfolioId).orElseThrow(()->new NotFoundException(MessageUtils.getMessage("portfolio.not.found", portfolioId)));
         if (!portfolio.getCustomer().getId().equals(transaction.getPortfolio().getCustomer().getId())) {
-            throw new UnauthorizedOperationException("You are not authorized to modify this portfolio");
-        }
+            throw new UnauthorizedOperationException(MessageUtils.getMessage("stock.transaction.unauthorized.portfolio"));        }
         transaction.setPortfolio(portfolio);
         save(transaction);
         portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());

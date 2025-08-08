@@ -9,6 +9,7 @@ import com.infina.hissenet.mapper.StockMapper;
 import com.infina.hissenet.repository.StockRepository;
 import com.infina.hissenet.service.abstracts.IStockService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class StockService extends GenericServiceImpl<Stock, Long> implements ISt
 
     public StockResponse getStock(Long id) {
         Stock stock = stockRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Stock not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.not.found", id)));
         return stockMapper.toResponse(stock);
     }
 
@@ -51,7 +52,7 @@ public class StockService extends GenericServiceImpl<Stock, Long> implements ISt
     @Transactional
     public StockResponse updateStock(Long id, StockUpdateRequest request) {
         Stock existing = stockRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Stock not found: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("stock.not.found", id)));
         stockMapper.updateEntityFromDto(request, existing);
         Stock updated = stockRepository.save(existing);
         return stockMapper.toResponse(updated);
@@ -65,7 +66,7 @@ public class StockService extends GenericServiceImpl<Stock, Long> implements ISt
     @Transactional
     public void deleteStock(Long id) {
         if (!stockRepository.existsById(id)) {
-            throw new NotFoundException("Stock not found: " + id);
+            throw new NotFoundException(MessageUtils.getMessage("stock.not.found", id));
         }
         stockRepository.deleteById(id);
     }

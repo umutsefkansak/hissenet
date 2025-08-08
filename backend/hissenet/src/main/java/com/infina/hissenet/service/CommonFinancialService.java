@@ -6,8 +6,10 @@ import com.infina.hissenet.entity.StockTransaction;
 import com.infina.hissenet.entity.enums.StockTransactionType;
 import com.infina.hissenet.entity.enums.TransactionStatus;
 import com.infina.hissenet.exception.common.NotFoundException;
+import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.StockTransactionRepository;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,7 +42,7 @@ public class CommonFinancialService {
     }
     public StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
         if (transactions == null || transactions.isEmpty()) {
-            throw new IllegalArgumentException("Transactions list cannot be null or empty");
+            throw new IllegalArgumentException(MessageUtils.getMessage("transaction.list.empty"));
         }
 
         StockTransaction baseTx = transactions.get(0);
@@ -100,7 +102,7 @@ public class CommonFinancialService {
     }
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {
         Customer customer = customerService.findById(customerId)
-                .orElseThrow(() -> new NotFoundException("Customer not found with id: " + customerId));
+                .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
         return customer.getPortfolios().stream()
                 .flatMap(portfolio -> portfolio.getTransactions().stream())

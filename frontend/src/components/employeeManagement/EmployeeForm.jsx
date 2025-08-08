@@ -3,7 +3,7 @@ import { roleApi } from '../../server/roles';
 import useEmployeeFormValidation from '../../hooks/EmployeeManagement/useEmployeeFormValidation';
 import { positionOptions } from '../../constants/EmployeeManagement/formOptions';
 import styles from './EmployeeForm.module.css';
-import Modal from '../Modal/Modal';
+import Modal from '../common/Modal/Modal';
 
 const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
     const [rolesLoading, setRolesLoading] = useState(true);

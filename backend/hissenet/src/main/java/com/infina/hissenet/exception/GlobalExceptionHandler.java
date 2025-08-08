@@ -11,6 +11,7 @@ import com.infina.hissenet.exception.mail.MailException;
 import com.infina.hissenet.exception.mail.MailRateLimitException;
 import com.infina.hissenet.exception.mail.VerificationCodeException;
 import com.infina.hissenet.exception.mail.VerificationCodeNotFoundException;
+import com.infina.hissenet.exception.order.IllegalStateException;
 import com.infina.hissenet.exception.riskassessment.IncompleteAssessmentException;
 import com.infina.hissenet.exception.riskassessment.InvalidAnswerException;
 import com.infina.hissenet.exception.riskassessment.RiskAssessmentException;
@@ -107,7 +108,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
     // 423 Locked Exception
-    @ExceptionHandler({WalletLockedException.class})
+    @ExceptionHandler({WalletLockedException.class, IllegalStateException.class})
     public ProblemDetail lockedException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.LOCKED, ex.getMessage());
         problem.setTitle("Too Many Requests");

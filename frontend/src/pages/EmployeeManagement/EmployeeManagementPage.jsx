@@ -9,7 +9,7 @@ import Pagination from "../../components/common/Pagination/Pagination";
 import DashboardCard from '../../components/common/Card/DashboardCard';
 import { orderApi } from '../../server/order';
 import TrendArrow from '../../components/Icons/TrendArrow';
-import UsersIcon from '../../components/Icons/UsersIcon';
+import UsersIconBlue from '../../components/Icons/UsersIconBlue';
 import UserActivityIcon from '../../components/Icons/UserActivityIcon';
 import PlusIcon from '../../components/Icons/PlusIcon';
 
@@ -182,7 +182,7 @@ const EmployeeManagementPage = () => {
                 <DashboardCard
                     title="Toplam Personel"
                     icon={
-                        <UsersIcon/>
+                        <UsersIconBlue/>
                     }
                     value={dashboardData.totalEmployees}
                     subtitle="Aktif personeller"

@@ -15,6 +15,7 @@ const CustomerListPage = () => {
     } else {
       window.showToast('Müşteri güncellenirken hata oluştu!', 'error', 3000);
     }
+    return success;
   };
 
   return (

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { roleApi } from '../../server/roles';
 import useEmployeeFormValidation from '../../hooks/EmployeeManagement/useEmployeeFormValidation';
-import './EmployeeForm.css';
+import { positionOptions } from '../../constants/EmployeeManagement/formOptions';
+import styles from './EmployeeForm.module.css';
+import Modal from '../common/Modal/Modal';
 
 const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
-
     const [rolesLoading, setRolesLoading] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [availableRoles, setAvailableRoles] = useState([]);
+    const [modalConfig, setModalConfig] = useState(null);
 
     const initialFormData = {
         firstName: '',
@@ -47,7 +49,6 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                 setAvailableRoles(roles);
 
                 if (employee && isEdit && roles.length > 0) {
-
                     setFormData({
                         id: employee.id,
                         firstName: employee.firstName || '',
@@ -72,14 +73,71 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
     }, [employee, isEdit]);
 
 
+    const closeModal = () => setModalConfig(null);
 
-    const handleSubmit = async (e) => {
+    const hasFormChanges = () => {
+        if (!employee || !isEdit) return true;
+
+        return (
+            formData.firstName !== (employee.firstName || '') ||
+            formData.lastName !== (employee.lastName || '') ||
+            formData.email !== (employee.email || '') ||
+            formData.phone !== (employee.phone || '') ||
+            formData.position !== (employee.position || '') ||
+            formData.emergencyContactName !== (employee.emergencyContactName || '') ||
+            formData.emergencyContactPhone !== (employee.emergencyContactPhone || '') ||
+            JSON.stringify(formData.roleIds) !== JSON.stringify(employee.roleIds || []) ||
+            (formData.password && formData.password.trim() !== '')
+        );
+    };
+
+    const handleSubmitClick = (e) => {
         e.preventDefault();
 
         if (!validateForm()) {
             return;
         }
 
+        const employeeName = isEdit
+            ? `${employee?.firstName || ''} ${employee?.lastName || ''}`.trim()
+            : `${formData.firstName} ${formData.lastName}`.trim();
+
+        setModalConfig({
+            variant: 'confirm',
+            title: isEdit ? 'Personel Güncelleme Onayı' : 'Personel Kaydetme Onayı',
+            message: isEdit
+                ? `${employeeName} adlı personelin bilgilerini güncellemek istediğinizden emin misiniz?`
+                : `${employeeName} adlı yeni personeli kaydetmek istediğinizden emin misiniz?`,
+            cancelText: 'Vazgeç',
+            confirmText: isEdit ? 'Güncelle' : 'Kaydet',
+            onConfirm: () => {
+                closeModal();
+                handleActualSubmit();
+            },
+            onClose: closeModal,
+        });
+    };
+
+    const handleCancelClick = () => {
+        if (hasFormChanges()) {
+            setModalConfig({
+                variant: 'warning',
+                title: 'Değişiklikleri Kaybet',
+                message: 'Yaptığınız değişiklikler kaydedilmeyecek.\n\nDevam etmek istediğinizden emin misiniz?',
+                cancelText: 'Kalmaya Devam Et',
+                confirmText: 'Evet, Çık',
+                onConfirm: () => {
+                    closeModal();
+                    onCancel();
+                },
+                onClose: closeModal,
+            });
+        } else {
+            onCancel();
+        }
+    };
+
+    const handleActualSubmit = async () => {
         setIsLoading(true);
 
         try {
@@ -114,21 +172,23 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
 
     if (rolesLoading) {
         return (
-            <div className="employee-form-loading">
-                <div className="loading-spinner"></div>
+            <div className={styles.employeeFormLoading}>
+                <div className={styles.loadingSpinner}></div>
                 <p>Form yükleniyor...</p>
             </div>
         );
     }
+
     return (
-        <form onSubmit={handleSubmit} className="employee-form">
-            <div className="form-header">
+        <>
+        <form onSubmit={handleSubmitClick} className={styles.employeeForm}>
+            <div className={styles.formHeader}>
                 <h3>{isEdit ? 'Personel Bilgilerini Düzenle' : 'Yeni Personel Ekle'}</h3>
             </div>
 
-            <div className="form-content">
-                <div className="form-row">
-                    <div className="form-group">
+            <div className={styles.formContent}>
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
                         <label htmlFor="firstName">Ad *</label>
                         <input
                             type="text"
@@ -136,13 +196,13 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            className={errors.firstName ? 'error' : ''}
+                            className={errors.firstName ? styles.error : ''}
                             placeholder="Personel adını giriniz"
                         />
-                        {errors.firstName && <span className="error-text">{errors.firstName}</span>}
+                        {errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}
                     </div>
 
-                    <div className="form-group">
+                    <div className={styles.formGroup}>
                         <label htmlFor="lastName">Soyad *</label>
                         <input
                             type="text"
@@ -150,17 +210,15 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            className={errors.lastName ? 'error' : ''}
+                            className={errors.lastName ? styles.error : ''}
                             placeholder="Personel soyadını giriniz"
                         />
-                        {errors.lastName && <span className="error-text">{errors.lastName}</span>}
+                        {errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}
                     </div>
                 </div>
 
-
-
-                <div className="form-row">
-                    <div className="form-group">
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
                         <label htmlFor="email">E-posta *</label>
                         <input
                             type="email"
@@ -168,48 +226,53 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={errors.email ? 'error' : ''}
+                            className={errors.email ? styles.error : ''}
                             placeholder="ornek@firma.com"
                         />
-                        {errors.email && <span className="error-text">{errors.email}</span>}
+                        {errors.email && <span className={styles.errorText}>{errors.email}</span>}
                     </div>
 
-                    <div className="form-group">
+                    <div className={styles.formGroup}>
                         <label htmlFor="phone">Telefon *</label>
-                        <div className={`phone-input-container ${errors.phone ? 'error' : ''}`}>
-                            <span className="phone-prefix">+90</span>
+                        <div className={`${styles.phoneInputContainer} ${errors.phone ? styles.error : ''}`}>
+                            <span className={styles.phonePrefix}>+90</span>
                             <input
                                 type="tel"
                                 id="phone"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                className={errors.phone ? 'error phone-input' : 'phone-input'}
+                                className={`${errors.phone ? styles.error : ''} ${styles.phoneInput}`}
                                 placeholder="5XX XXX XX XX"
                                 maxLength="10"
                             />
                         </div>
-                        {errors.phone && <span className="error-text">{errors.phone}</span>}
+                        {errors.phone && <span className={styles.errorText}>{errors.phone}</span>}
                     </div>
                 </div>
 
-                <div className="form-row">
-                    <div className="form-group">
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
                         <label htmlFor="position">Pozisyon *</label>
-                        <input
-                            type="text"
+                        <select
                             id="position"
                             name="position"
                             value={formData.position}
                             onChange={handleInputChange}
-                            className={errors.position ? 'error' : ''}
-                            placeholder="Müdür, Uzman, Analyst vb."
-                        />
-                        {errors.position && <span className="error-text">{errors.position}</span>}
+                            className={errors.position ? styles.error : ''}
+                        >
+                            <option value="">Pozisyon seçiniz</option>
+                            {positionOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.position && <span className={styles.errorText}>{errors.position}</span>}
                     </div>
 
                     {!isEdit && (
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <label htmlFor="password">Şifre *</label>
                             <input
                                 type="password"
@@ -217,16 +280,16 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                className={errors.password ? 'error' : ''}
+                                className={errors.password ? styles.error : ''}
                                 placeholder="En az 8 karakter, büyük-küçük harf ve rakam içermeli"
                             />
-                            {errors.password && <span className="error-text">{errors.password}</span>}
+                            {errors.password && <span className={styles.errorText}>{errors.password}</span>}
                         </div>
                     )}
                 </div>
 
-                <div className="form-row">
-                    <div className="form-group">
+                <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
                         <label htmlFor="emergencyContactName">Acil Durum Kişisi *</label>
                         <input
                             type="text"
@@ -234,47 +297,48 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                             name="emergencyContactName"
                             value={formData.emergencyContactName}
                             onChange={handleInputChange}
-                            className={errors.emergencyContactName ? 'error' : ''}
+                            className={errors.emergencyContactName ? styles.error : ''}
                             placeholder="Acil durumda aranacak kişi"
                         />
                         {errors.emergencyContactName &&
-                            <span className="error-text">{errors.emergencyContactName}</span>}
+                            <span className={styles.errorText}>{errors.emergencyContactName}</span>}
                     </div>
 
-                    <div className="form-group">
+                    <div className={styles.formGroup}>
                         <label htmlFor="emergencyContactPhone">Acil Durum Telefonu *</label>
-                        <div className={`phone-input-container ${errors.emergencyContactPhone ? 'error' : ''}`}>
-                            <span className="phone-prefix">+90</span>
+                        <div className={`${styles.phoneInputContainer} ${errors.emergencyContactPhone ? styles.error : ''}`}>
+                            <span className={styles.phonePrefix}>+90</span>
                             <input
                                 type="tel"
                                 id="emergencyContactPhone"
                                 name="emergencyContactPhone"
                                 value={formData.emergencyContactPhone}
                                 onChange={handleInputChange}
-                                className={errors.emergencyContactPhone ? 'error phone-input' : 'phone-input'}
+                                className={`${errors.emergencyContactPhone ? styles.error : ''} ${styles.phoneInput}`}
                                 placeholder="5XX XXX XX XX"
                                 maxLength="10"
                             />
                         </div>
                         {errors.emergencyContactPhone &&
-                            <span className="error-text">{errors.emergencyContactPhone}</span>}
+                            <span className={styles.errorText}>{errors.emergencyContactPhone}</span>}
                     </div>
                 </div>
             </div>
-            <div className="roles-section">
-                <h4 className="roles-title">Roller</h4>
+
+            <div className={styles.rolesSection}>
+                <h4 className={styles.rolesTitle}>Roller</h4>
                 {availableRoles.length > 0 ? (
                     <>
                         {formData.roleIds.length > 0 && (
-                            <div className="selected-roles-tags">
+                            <div className={styles.selectedRolesTags}>
                                 {formData.roleIds.map(roleId => {
                                     const role = availableRoles.find(r => r.id === roleId);
                                     return role ? (
-                                        <span key={roleId} className="role-tag">
+                                        <span key={roleId} className={styles.roleTag}>
                                             {role.name}
                                             <button
                                                 type="button"
-                                                className="role-tag-remove"
+                                                className={styles.roleTagRemove}
                                                 onClick={() => toggleRole(roleId)}
                                                 title="Rolü kaldır"
                                             >
@@ -285,11 +349,11 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                                 })}
                             </div>
                         )}
-                        <div className="roles-grid">
+                        <div className={styles.rolesGrid}>
                             {availableRoles.map(role => (
                                 <label
                                     key={role.id}
-                                    className={`role-item ${formData.roleIds.includes(role.id) ? 'selected' : ''}`}
+                                    className={`${styles.roleItem} ${formData.roleIds.includes(role.id) ? styles.selected : ''}`}
                                 >
                                     <input
                                         type="checkbox"
@@ -297,22 +361,22 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                                         checked={formData.roleIds.includes(role.id)}
                                         onChange={handleRoleChange}
                                     />
-                                    <span className="role-name">{role.name}</span>
+                                    <span className={styles.roleName}>{role.name}</span>
                                 </label>
                             ))}
                         </div>
                     </>
                 ) : (
-                    <p className="no-roles">Rol bulunamadı</p>
+                    <p className={styles.noRoles}>Rol bulunamadı</p>
                 )}
-                {errors.roleIds && <span className="error-text">{errors.roleIds}</span>}
+                {errors.roleIds && <span className={styles.errorText}>{errors.roleIds}</span>}
             </div>
 
-            <div className="form-actions">
+            <div className={styles.formActions}>
                 <button
                     type="button"
-                    onClick={onCancel}
-                    className="btn-cancel"
+                    onClick={handleCancelClick}
+                    className={styles.btnCancel}
                     disabled={isLoading}
                 >
                     İptal
@@ -320,12 +384,15 @@ const EmployeeForm = ({ employee, onSubmit, onCancel, isEdit = false }) => {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="btn-submit"
+                    className={styles.btnSubmit}
                 >
                     {isLoading ? 'Kaydediliyor...' : (isEdit ? 'Güncelle' : 'Kaydet')}
                 </button>
             </div>
         </form>
+
+            {modalConfig && <Modal {...modalConfig} />}
+        </>
     );
 };
 

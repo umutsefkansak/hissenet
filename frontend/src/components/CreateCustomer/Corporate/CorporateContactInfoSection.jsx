@@ -2,30 +2,32 @@ import React from 'react';
 import FormInput from '../../Form/FormInput';
 import FormSelect from '../../Form/FormSelect';
 import LocationSelector from "../../Form/LocationSelector";
+import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) => {
     return (
-        <div className="form-section">
-            <h3 className="section-title">İLETİŞİM BİLGİLERİ</h3>
+        <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>İLETİŞİM BİLGİLERİ</h3>
 
-            <div className="form-row">
-                <div className="form-group">
+            <div className={styles.formRow}>
+                <div className={styles.formComponentGroup}>
                     <label htmlFor="phoneNumber">
-                        Sabit Tel <span className="required">*</span>
+                        Sabit Tel <span className={styles.required}>*</span>
                     </label>
-                    <div className={`phone-input-container ${errors.phoneNumber ? 'error' : ''}`}>
-                        <span className="phone-prefix">+90</span>
+                    <div className={`${styles.phoneInputContainer} ${errors.phoneNumber ? styles.error : ''}`}>
+                        <span className={styles.phonePrefix}>+90</span>
                         <input
                             type="tel"
                             id="phoneNumber"
                             name="phoneNumber"
                             value={formData.phoneNumber}
                             onChange={handleInputChange}
-                            className={errors.phoneNumber ? 'error phone-input' : 'phone-input'}
+                            className={`${errors.phoneNumber ? styles.error : ''} ${styles.phoneInput}`}
                             placeholder="2XX XXX XX XX"
                             maxLength="10"
                         />
                     </div>
+                    {errors.phoneNumber && <span className={styles.errorText}>{errors.phoneNumber}</span>}
                 </div>
 
                 <FormInput
@@ -40,7 +42,7 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormSelect
                     label="Adres Tipi"
                     name="addressType"
@@ -67,7 +69,7 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                 />
             </div>
 
-            <div className="form-row full-width">
+            <div className={`${styles.formRow} ${styles.fullWidth}`}>
                 <FormInput
                     label="Sokak/Cadde/Mahalle"
                     name="street"
@@ -87,7 +89,7 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                 errors={errors}
             />
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Bölge"
                     name="state"
@@ -109,7 +111,7 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Komisyon Oranı (%)"
                     name="commissionRate"

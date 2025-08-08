@@ -1,11 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './AuthModal.css';
 import logo from '../../images/logo-transparan1.png'; // replace with your logo path
 
 export default function AuthModal({ isOpen, onClose, onConfirm }) {
   const [value, setValue] = useState('');
+   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setValue('');
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

@@ -3,6 +3,7 @@ package com.infina.hissenet.scheduler;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.infina.hissenet.service.MarketHourService;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,18 +25,23 @@ public class OrderScheduler {
     private final IWalletService walletService;
     private final ICacheManagerService stockCacheService;
     private final IStockTransactionService stockTransactionService;
+    private final MarketHourService marketHourService;
 
     public OrderScheduler(OrderRepository orderRepository, IWalletService walletService,
-                          ICacheManagerService stockCacheService, IStockTransactionService stockTransactionService) {
+                          ICacheManagerService stockCacheService, IStockTransactionService stockTransactionService, MarketHourService marketHourService) {
         this.orderRepository = orderRepository;
         this.walletService = walletService;
         this.stockCacheService = stockCacheService;
         this.stockTransactionService = stockTransactionService;
+        this.marketHourService = marketHourService;
     }
 
     @Transactional
     @Scheduled(fixedDelay = 60000 * 5 + 1)
     public void processPendingLimitOrders() {
+        if (!marketHourService.isMarketOpen()){
+            return;
+        }
         List<Order> openOrders = orderRepository.findByStatus(OrderStatus.OPEN);
 
         for (Order order : openOrders) {

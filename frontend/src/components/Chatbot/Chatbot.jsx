@@ -24,13 +24,18 @@ const Chatbot = () => {
     setInput('');
 
     try {
-      const response = await fetch('/api/chat/', {
+        const url = "http://localhost:8000/api/chat/";
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: trimmed }),
       });
 
       const data = await response.json();
+      console.log(response);
+
+      console.log(data);
 
       setMessages(prev => [...prev, { sender: 'bot', text: data.response }]);
     } catch (error) {

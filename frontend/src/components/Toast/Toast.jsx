@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Toast.css';
+import styles from './Toast.module.css';
 
 const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -15,19 +15,21 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => onClose(), 300);
+  };
+
   return (
-    <div className={`toast ${type} ${isVisible ? 'show' : 'hide'}`}>
-      <div className="toast-content">
-        <span className="toast-message">{message}</span>
-        <button className="toast-close" onClick={() => {
-          setIsVisible(false);
-          setTimeout(() => onClose(), 300);
-        }}>
-          ×
-        </button>
+      <div className={`${styles.toast} ${styles[type]} ${isVisible ? styles.show : styles.hide}`}>
+        <div className={styles.toastContent}>
+          <span className={styles.toastMessage}>{message}</span>
+          <button className={styles.toastClose} onClick={handleClose}>
+            ×
+          </button>
+        </div>
       </div>
-    </div>
   );
 };
 
-export default Toast; 
+export default Toast;

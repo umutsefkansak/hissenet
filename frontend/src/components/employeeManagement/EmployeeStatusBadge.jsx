@@ -4,10 +4,10 @@ import './EmployeeStatusBadge.css';
 const EmployeeStatusBadge = ({ status }) => {
     const getStatusClass = (status) => {
         switch (status?.toLowerCase()) {
-            case 'active':
+            case 'ACTIVE':
             case 'aktif':
                 return 'status-active';
-            case 'inactive':
+            case 'INACTIVE':
             case 'pasif':
                 return 'status-inactive';
             default:

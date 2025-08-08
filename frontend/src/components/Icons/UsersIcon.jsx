@@ -1,4 +1,5 @@
 import * as React from "react";
+
 const UsersIcon = (props) => (
   <svg
     width="800px"
@@ -19,3 +20,4 @@ const UsersIcon = (props) => (
   </svg>
 );
 export default UsersIcon;
+

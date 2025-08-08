@@ -2,16 +2,15 @@ import React from 'react';
 import FormInput from '../../Form/FormInput';
 import { translateRiskProfile } from '../../../server/riskAssessment';
 import FormSelect from "../../Form/FormSelect";
-import {sectorOptions } from '../../../constants/CreateCustomer/formOptions';
-
+import { sectorOptions } from '../../../constants/CreateCustomer/formOptions';
+import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnalysis, riskAssessmentResult }) => {
-
     return (
-        <div className="form-section">
-            <h3 className="section-title">FİNANSAL BİLGİLER</h3>
+        <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>FİNANSAL BİLGİLER</h3>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Meslek"
                     name="profession"
@@ -33,7 +32,7 @@ const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnaly
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormSelect
                     label="Sektör"
                     name="sector"
@@ -58,27 +57,27 @@ const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnaly
                 />
             </div>
 
-            <div className="form-row">
-                <div className="risk-analysis-container">
+            <div className={styles.formRow}>
+                <div className={styles.riskAnalysisContainer}>
                     <button
                         type="button"
-                        className="risk-analysis-btn"
+                        className={styles.riskAnalysisBtn}
                         onClick={onRiskAnalysis}
                     >
                         Risk Analizi
                     </button>
                     {riskAssessmentResult ? (
-                        <div className="risk-result-display">
-                            <span className="risk-result-label">Sonuç:</span>
-                            <span className="risk-result-value">
-                {translateRiskProfile(riskAssessmentResult.riskProfile)}
-              </span>
+                        <div className={styles.riskResultDisplay}>
+                            <span className={styles.riskResultLabel}>Sonuç:</span>
+                            <span className={styles.riskResultValue}>
+                                {translateRiskProfile(riskAssessmentResult.riskProfile)}
+                            </span>
                         </div>
                     ) : (
-                        <div className="risk-warning-display">
-              <span className="risk-warning-text">
-                Risk analizi yapılması zorunludur
-              </span>
+                        <div className={styles.riskWarningDisplay}>
+                            <span className={styles.riskWarningText}>
+                                Risk analizi yapılması zorunludur
+                            </span>
                         </div>
                     )}
                 </div>

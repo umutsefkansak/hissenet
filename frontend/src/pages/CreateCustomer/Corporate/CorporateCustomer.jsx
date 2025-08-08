@@ -9,7 +9,7 @@ import {
 } from '../../../components/CreateCustomer';
 import { createCorporateCustomer,mapCorporateFormDataToCustomerDto,handleCustomerApiError } from '../../../server/customer';
 import { createAddress, mapFormDataToAddressDto, handleAddressApiError } from '../../../server/address';
-import '../CreateCustomer.css';
+import styles from '../CreateCustomer.module.css';
 
 const CorporateCustomer = () => {
     const navigate = useNavigate();
@@ -129,14 +129,14 @@ const CorporateCustomer = () => {
     };
 
     return (
-        <div className="new-customer">
-            <div className="create-individual-page-header">
+        <div className={styles.newCustomer}>
+            <div className={styles.createCustomerPageHeader}>
                 <h1>YENİ KURUMSAL YATIRIMCI KAYIT EKRANI</h1>
                 <p>Yeni kurumsal yatırımcı kaydı oluşturmak için aşağıdaki tüm gerekli alanların doldurulması gerekir</p>
             </div>
 
-            <div className="page-content">
-                <form onSubmit={handleSubmit} className="customer-form">
+            <div className={styles.pageContent}>
+                <form onSubmit={handleSubmit} className={styles.customerForm}>
                     <CompanyInfoSection
                         formData={formData}
                         handleInputChange={handleInputChange}

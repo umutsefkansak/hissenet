@@ -1,20 +1,21 @@
 import React from 'react';
+import styles from '../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const FormActions = ({ onGoBack, onSubmit, isLoading }) => {
     return (
-        <div className="form-actions">
+        <div className={styles.formActions}>
             <button
                 type="button"
-                className="create-customer-btn-secondary"
                 onClick={onGoBack}
+                className={styles.createCustomerBtnSecondary}
+                disabled={isLoading}
             >
-                Geri Dön
+                Geri
             </button>
             <button
                 type="submit"
-                className="create-customer-btn-primary"
                 disabled={isLoading}
-                onClick={onSubmit}
+                className={styles.createCustomerBtnPrimary}
             >
                 {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
             </button>

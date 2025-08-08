@@ -148,7 +148,7 @@ const SearchInput = ({
 
             <div className="search-input-wrapper">
                 {showSearchIcon && (
-                    <div className="search-icon">
+                    <div className="common-component-search-icon">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -158,7 +158,7 @@ const SearchInput = ({
 
                 <input
                     type="text"
-                    className="search-input"
+                    className="common-component-search-input"
                     placeholder={getPlaceholderText()}
                     value={searchTerm}
                     onChange={handleInputChange}

@@ -2,14 +2,14 @@ import React from 'react';
 import FormInput from '../../Form/FormInput';
 import FormSelect from '../../Form/FormSelect';
 import { sectorOptions } from '../../../constants/CreateCustomer/formOptions';
+import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const CompanyInfoSection = ({ formData, handleInputChange, errors }) => {
-
     return (
-        <div className="form-section">
-            <h3 className="section-title">ŞİRKET BİLGİLERİ</h3>
+        <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>ŞİRKET BİLGİLERİ</h3>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Ticaret Unvanı"
                     name="companyName"
@@ -32,7 +32,7 @@ const CompanyInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Vergi Dairesi"
                     name="taxOffice"
@@ -53,7 +53,7 @@ const CompanyInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Kuruluş Tarihi"
                     name="establishmentDate"
@@ -76,7 +76,7 @@ const CompanyInfoSection = ({ formData, handleInputChange, errors }) => {
                 />
             </div>
 
-            <div className="form-row">
+            <div className={styles.formRow}>
                 <FormInput
                     label="Web Site"
                     name="website"

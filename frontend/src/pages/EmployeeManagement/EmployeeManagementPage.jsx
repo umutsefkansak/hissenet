@@ -9,7 +9,9 @@ import Pagination from "../../components/common/Pagination/Pagination";
 import DashboardCard from '../../components/common/Card/DashboardCard';
 import { orderApi } from '../../server/order';
 import TrendArrow from '../../components/Icons/TrendArrow';
-
+import UsersIcon from '../../components/Icons/UsersIcon';
+import UserActivityIcon from '../../components/Icons/UserActivityIcon';
+import PlusIcon from '../../components/Icons/PlusIcon';
 
 
 const EmployeeManagementPage = () => {
@@ -30,6 +32,8 @@ const EmployeeManagementPage = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
     const [todayTradeVolume, setTodayTradeVolume] = useState(null);
+    const [todayOrderCount, setTodayOrderCount] = useState(null);
+
 
     useEffect(() => {
         const fetchTodayTradeVolume = async () => {
@@ -41,15 +45,26 @@ const EmployeeManagementPage = () => {
                 setTodayTradeVolume('₺0');
             }
         };
+        const fetchTodayOrderCount = async () => {
+            try {
+                const result = await orderApi.getTodayOrderCount();
+                setTodayOrderCount(result.data || 0);
+            } catch (err) {
+                console.error("Bugünkü emir sayısı alınamadı:", err);
+                setTodayOrderCount(0);
+            }
+        };
+
 
         fetchTodayTradeVolume();
+        fetchTodayOrderCount();
     }, []);
 
 
     const dashboardData = {
         totalRevenue: todayTradeVolume ?? 'Yükleniyor...',
         totalEmployees: paginationData.totalElements || 0,
-        dailyTransactions: (paginationData.content || []).filter(emp => emp.status === 'ACTIVE').length
+        dailyTransactions: todayOrderCount ?? 'Yükleniyor...'
     };
 
     const searchFilterOptions = [
@@ -114,18 +129,16 @@ const EmployeeManagementPage = () => {
         }
     };
 
-    const handleDeleteEmployee = async (employeeId) => {
-        if (window.confirm('Bu personeli silmek istediğinizden emin misiniz?')) {
-            const result = await deleteEmployee(employeeId);
-            if (result.success) {
-                window.showToast && window.showToast('Personel başarıyla silindi!', 'success', 3000);
-            } else {
-                window.showToast && window.showToast(
-                    result.error || 'Personel silinirken hata oluştu',
-                    'error',
-                    3000
-                );
-            }
+    const handleDeleteEmployee = async (employee) => {
+        const result = await deleteEmployee(employee.id);
+        if (result.success) {
+            window.showToast && window.showToast('Personel başarıyla silindi!', 'success', 3000);
+        } else {
+            window.showToast && window.showToast(
+                result.error || 'Personel silinirken hata oluştu',
+                'error',
+                3000
+            );
         }
     };
 
@@ -143,14 +156,11 @@ const EmployeeManagementPage = () => {
 
     return (
         <div className="employee-management-page">
-            <div className="page-header">
+            <div className="employee-management-page-header">
                 <div className="header-content">
                     <h1 className="page-title">Personel Yönetimi</h1>
                     <button className="add-employee-btn" onClick={handleAddEmployee}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                  strokeLinejoin="round"/>
-                        </svg>
+                        <PlusIcon className="mr-1" />
                         Personel Ekle
                     </button>
                 </div>
@@ -172,49 +182,22 @@ const EmployeeManagementPage = () => {
                 <DashboardCard
                     title="Toplam Personel"
                     icon={
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                strokeLinejoin="round"/>
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"
-                                    strokeLinecap="round" strokeLinejoin="round"/>
-                            <path
-                                d="M23 21V19C23 18.1326 22.7035 17.2982 22.1677 16.636C21.6319 15.9738 20.8918 15.5229 20.06 15.36"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                strokeLinejoin="round"/>
-                            <path
-                                d="M16 3.13C16.8318 3.29312 17.5719 3.74398 18.1077 4.40619C18.6435 5.06839 18.94 5.90285 18.94 6.77C18.94 7.63715 18.6435 8.47161 18.1077 9.13381C17.5719 9.79602 16.8318 10.2469 16 10.41"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                strokeLinejoin="round"/>
-                        </svg>
+                        <UsersIcon/>
                     }
                     value={dashboardData.totalEmployees}
                     subtitle="Aktif personeller"
                     iconVariant="users"
                 />
 
-                <div className="dashboard-card">
-                    <div className="card-header">
-                        <h3>Günlük Yapılan İşlem</h3>
-                        <div className="card-icon trend-up">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"
-                                    stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                                    strokeLinejoin="round"/>
-                                <circle cx="8.5" cy="7" r="4" stroke="currentColor" strokeWidth="2"
-                                        strokeLinecap="round" strokeLinejoin="round"/>
-                                <polyline points="17,11 19,13 23,9" stroke="currentColor" strokeWidth="2"
-                                          strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="card-value">{dashboardData.dailyTransactions}</div>
-                    <div className="card-subtitle">Son 24 saatte işlem yapan</div>
-                </div>
+                <DashboardCard
+                    title="Günlük Yapılan İşlem"
+                    icon={
+                        <UserActivityIcon/>
+                    }
+                    value={dashboardData.dailyTransactions}
+                    subtitle="Son 24 saat"
+                    iconVariant="trend-up"
+                />
             </div>
 
             <div className="search-bar-wrapper">

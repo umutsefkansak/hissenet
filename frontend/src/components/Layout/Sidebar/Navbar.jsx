@@ -225,7 +225,7 @@ const Navbar = () => {
       </li>
  
       <li className={`drawer-menu-item ${isActiveMenu('/c') ? 'active' : ''}`}>
-        <Link to="/c" className="drawer-menu-link" onClick={closeDrawer}>
+        <Link to="/transaction-history" className="drawer-menu-link" onClick={closeDrawer}>
           <div className="drawer-menu-header">
             <div className="drawer-menu-left">
               <span className="drawer-menu-icon">

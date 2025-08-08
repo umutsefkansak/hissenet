@@ -23,6 +23,7 @@ import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
 import Reports from './pages/Reports/Reports';
 import Chatbot from './components/Chatbot/Chatbot';
+import CustomerHome from './pages/CustomerHome/CustomerHome';
 
 function AppContent() {
   const location = useLocation();
@@ -35,6 +36,7 @@ function AppContent() {
       {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/home/:customerId" element={<CustomerHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verification-code" element={<VerificationCode />} />

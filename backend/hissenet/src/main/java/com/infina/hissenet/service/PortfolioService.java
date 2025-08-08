@@ -241,7 +241,7 @@ Portfolio portfolio = getPortfolio(id);
         return customerService.findById(customerId)
                 .orElseThrow(() -> new UserNotFoundException("Müşteri "));
     }
-    protected Portfolio getCustomerFirstPortfolio(Long customerId) {
+    public Portfolio getCustomerFirstPortfolio(Long customerId) {
         return portfolioRepository.findByCustomerId(customerId)
                 .stream()
                 .findFirst()

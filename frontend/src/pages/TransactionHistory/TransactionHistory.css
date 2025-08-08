@@ -136,7 +136,7 @@
 
 .pagination button {
   padding: 6px 12px;
-  background: #001f3f; 
+  background: #001f3f;
   color: white;
   border: none;
   border-radius: 4px;
@@ -146,7 +146,7 @@
 }
 
 .pagination button:hover {
-  background: #001634; 
+  background: #001634;
 }
 
 .pagination button:disabled {
@@ -213,4 +213,11 @@
   .transaction-table td {
     font-weight: bold;
   }
+}
+
+.transaction-history .transaction-table thead th,
+.transaction-history .transaction-table th,
+.transaction-history table th,
+.transaction-history th {
+  text-transform: none !important;
 }

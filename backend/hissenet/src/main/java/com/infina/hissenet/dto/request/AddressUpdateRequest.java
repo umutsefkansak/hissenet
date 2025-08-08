@@ -10,7 +10,7 @@ public record AddressUpdateRequest(
         String city,
         String state,
         String country,
-        @Pattern(regexp = "^[0-9]{5}$") String postalCode,
+        @Pattern(regexp = "^[0-9]{5}$", message = "{validation.address.postal.code.pattern}") String postalCode,
         Boolean isPrimary,
         Long customerId
 ) {}

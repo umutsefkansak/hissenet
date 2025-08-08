@@ -6,13 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record AddressCreateRequest(
-        @NotNull AddressType addressType,
-        @NotBlank String street,
+        @NotNull(message = "{validation.address.type.required}") AddressType addressType,
+        @NotBlank(message = "{validation.address.street.required}") String street,
         String district,
-        @NotBlank String city,
-        @NotBlank String state,
-        @NotBlank String country,
-        @Pattern(regexp = "^[0-9]{5}$") String postalCode,
+        @NotBlank(message = "{validation.address.city.required}") String city,
+        @NotBlank(message = "{validation.address.state.required}") String state,
+        @NotBlank(message = "{validation.address.country.required}") String country,
+        @Pattern(regexp = "^[0-9]{5}$", message = "{validation.address.postal.code.pattern}") String postalCode,
         Boolean isPrimary,
-        @NotNull Long customerId
+        @NotNull(message = "{validation.customer.id.required}") Long customerId
 ) {}

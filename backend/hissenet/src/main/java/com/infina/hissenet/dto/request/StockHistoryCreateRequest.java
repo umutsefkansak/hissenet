@@ -7,24 +7,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record StockHistoryCreateRequest(
-        @NotNull
+        @NotNull(message = "{validation.stock.id.required}")
         Long stockId,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.record.date.required}")
         LocalDateTime recordDate,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.data.date.required}")
         LocalDate dataDate,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.open.price.required}")
         BigDecimal openPrice,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.high.price.required}")
         BigDecimal highPrice,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.low.price.required}")
         BigDecimal lowPrice,
 
-        @NotNull
+        @NotNull(message = "{validation.stock.history.close.price.required}")
         BigDecimal closePrice
 ) {}

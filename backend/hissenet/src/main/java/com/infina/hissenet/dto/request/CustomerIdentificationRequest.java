@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record CustomerIdentificationRequest(
-        @NotBlank @Size(min = 10, max = 11) String identificationNumber
+        @NotBlank(message = "{validation.identification.number.required}")
+        @Size(min = 10, max = 11, message = "{validation.identification.number.size}") String identificationNumber
 ) {}

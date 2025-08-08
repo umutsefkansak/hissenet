@@ -9,46 +9,47 @@ import jakarta.validation.constraints.*;
 
 public record EmployeeCreateRequest(
 
-		@NotBlank(message = "First name is required")
-		@Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+		@NotBlank(message = "{validation.required}")
+		@Size(min = 2, max = 50, message = "{validation.first.name.size}")
 		String firstName,
 
-		@NotBlank(message = "Last name is required")
-		@Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
+		@NotBlank(message = "{validation.last.name.required}")
+		@Size(min = 2, max = 50, message = "{validation.last.name.size}")
 		String lastName,
 
-		@NotBlank(message = "Email is required")
-		@Email(message = "Invalid email format")
+		@NotBlank(message = "{validation.email.required}")
+		@Email(message = "{validation.email.invalid}")
 		@UniqueValue(type = UniqueValueType.EMPLOYEE_EMAIL)
 		String email,
 
-		@NotBlank(message = "Phone is required")
-		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "Invalid phone number")
+		@NotBlank(message = "{validation.phone.required}")
+		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "{validation.phone.invalid}")
 		String phone,
 
-		@NotBlank(message = "Position is required")
-		@Size(max = 100, message = "Position must be at most 100 characters")
+		@NotBlank(message = "{validation.position.required}")
+		@Size(max = 100, message = "{validation.position.size}")
 		String position,
 
-		@NotBlank(message = "Password is required")
+		@NotBlank(message = "{validation.password.required}")
 		@Size(min = 8, max = 64, message = "Password must be between 8 and 64 characters")
+		@Size(min = 8, max = 64, message = "{validation.employee.password.size}")
 		@Pattern(
 				regexp = "^(?=.*[a-z])(?=.*[A-Z]).*$",
-				message = "Password must contain at least one uppercase and one lowercase letter"
+				message = "{validation.employee.password.pattern}"
 		)
 		String password,
 
-		@NotBlank(message = "Emergency contact name is required")
-		@Size(max = 100, message = "Emergency contact name must be at most 100 characters")
+		@NotBlank(message = "{validation.emergency.contact.name.required}")
+		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "{validation.emergency.contact.phone.invalid}")
 		String emergencyContactName,
 
-		@NotBlank(message = "Emergency contact phone is required")
-		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "Invalid emergency contact phone number")
+		@NotBlank(message = "{validation.emergency.contact.phone.required}")
+		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "{validation.emergency.contact.phone.invalid}")
 		String emergencyContactPhone,
 
-		@NotNull(message = "Role IDs cannot be null")
-		@Size(min = 1, message = "At least one role ID must be provided")
-		Set<@NotNull(message = "Role ID cannot be null") Long> roleIds
+		@NotNull(message = "{validation.role.ids.required}")
+		@Size(min = 1, message = "{validation.role.ids.min}")
+		Set<@NotNull(message = "{validation.role.id.required}") Long> roleIds
 
 ) {}
 

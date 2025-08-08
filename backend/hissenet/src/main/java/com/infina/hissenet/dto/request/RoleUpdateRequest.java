@@ -3,10 +3,10 @@ package com.infina.hissenet.dto.request;
 import jakarta.validation.constraints.Size;
 
 public record RoleUpdateRequest(
-        @Size(max = 50, message = "Role name cannot exceed 50 characters")
+        @Size(max = 50, message = "{validation.role.name.size}")
         String name,
 
-        @Size(max = 255, message = "Description cannot exceed 255 characters")
+        @Size(max = 255, message = "{validation.role.description.size}")
         String description,
 
         Boolean isActive

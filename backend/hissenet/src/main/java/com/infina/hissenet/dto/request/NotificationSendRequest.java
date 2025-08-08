@@ -4,8 +4,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record NotificationSendRequest(
-        @NotBlank @Email String email,
+        @NotBlank(message = "{validation.email.required}")
+        @Email(message = "{validation.email.invalid}")
+        String email,
+
         String recipientName,
-        @NotBlank String message,
+
+        @NotBlank(message = "{validation.notification.message.required}")
+        String message,
+
         String title
 ) {}

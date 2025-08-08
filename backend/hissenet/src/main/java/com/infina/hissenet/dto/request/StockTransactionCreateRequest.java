@@ -11,44 +11,44 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record StockTransactionCreateRequest(
-    @NotNull(message = "Portfolio ID boş olamaz")
+    @NotNull(message = "{validation.portfolio.id.required}")
     Long portfolioId,
 
     Long orderId,
 
-    @NotNull(message = "İşlem türü boş olamaz")
+    @NotNull(message = "{validation.stock.transaction.type.required}")
     StockTransactionType transactionType,
 
-    @NotNull(message = "İşlem durumu boş olamaz")
+    @NotNull(message = "{validation.stock.transaction.status.required}")
     TransactionStatus transactionStatus,
 
-    @NotNull(message = "Miktar boş olamaz")
-    @Positive(message = "Miktar pozitif olmalıdır")
+    @NotNull(message = "{validation.quantity.required}")
+    @Positive(message = "{validation.quantity.positive}")
     Integer quantity,
 
-    @NotNull(message = "Fiyat boş olamaz")
-    @DecimalMin(value = "0.0", message = "Fiyat negatif olamaz")
+    @NotNull(message = "{validation.price.required}")
+    @DecimalMin(value = "0.0", message = "{validation.price.negative}")
     BigDecimal price,
 
-    @NotNull(message = "Toplam tutar boş olamaz")
-    @DecimalMin(value = "0.0", message = "Toplam tutar negatif olamaz")
+    @NotNull(message = "{validation.total.amount.required}")
+    @DecimalMin(value = "0.0", message = "{validation.total.amount.negative}")
     BigDecimal totalAmount,
 
-    @DecimalMin(value = "0.0", message = "Komisyon negatif olamaz")
+    @DecimalMin(value = "0.0", message = "{validation.commission.negative}")
     BigDecimal commission,
 
-    @DecimalMin(value = "0.0", message = "Vergi negatif olamaz")
+    @DecimalMin(value = "0.0", message = "{validation.tax.negative}")
     BigDecimal tax,
 
-    @DecimalMin(value = "0.0", message = "Diğer ücretler negatif olamaz")
+    @DecimalMin(value = "0.0", message = "{validation.other.fees.negative}")
     BigDecimal otherFees,
 
     MarketOrderType marketOrderType,
 
-    @DecimalMin(value = "0.0", message = "Limit fiyatı negatif olamaz")
+    @DecimalMin(value = "0.0", message = "{validation.limit.price.negative}")
     BigDecimal limitPrice,
 
-    @DecimalMin(value = "0.0", message = "Gerçekleşme fiyatı negatif olamaz")
+    @DecimalMin(value = "0.0", message = "{validation.execution.price.negative}")
     BigDecimal executionPrice,
 
     LocalDateTime transactionDate,

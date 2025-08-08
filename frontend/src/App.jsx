@@ -21,7 +21,9 @@ import { useState, useEffect } from 'react';
 
 import './App.css';
 import EmployeeManagementPage from "./pages/EmployeeManagement/EmployeeManagementPage";
-import Reports from './pages/Reports/Reports';
+
+import Chatbot from './components/Chatbot/Chatbot';
+import CustomerHome from './pages/CustomerHome/CustomerHome';
 
 function AppContent() {
   const location = useLocation();
@@ -34,6 +36,7 @@ function AppContent() {
       {!isAuthPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/home/:customerId" element={<CustomerHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verification-code" element={<VerificationCode />} />
@@ -41,13 +44,12 @@ function AppContent() {
         <Route path="/new-customer" element={<div className="page-content">Yeni Müşteri Sayfası</div>} />
         <Route path="/individual-customer" element={<IndividualCustomer />} />
         <Route path="/corporate-customer" element={<CorporateCustomer />} />
-        <Route path="/reports" element={<Reports></Reports>} />
+        <Route path="/reports" element={<CustomerList></CustomerList>} />
         <Route path="/customer-transactions" element={<div className="page-content">Müşteri İşlemleri Sayfası</div>} />
-        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports" element={<CustomerList />} />
         <Route path="/employee-management" element={<EmployeeManagementPage />} />
         <Route path="/wallet/:customerId?" element={<Wallet />} />
         <Route path="/portfolio/:customerId?" element={<Portfolio />} />
-        <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/stocks" element={<StocksPage/>} />
         <Route path="/dashboard" element={<DashBoard/>} />
@@ -63,8 +65,22 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Chatbot />
     </Router>
   );
 }
 
 export default App;
+
+/*
+import Chatbot from './components/Chatbot/Chatbot';
+
+function App() {
+  return (
+    <div className="App">
+      <Chatbot />
+    </div>
+  );
+}
+
+export default App;*/

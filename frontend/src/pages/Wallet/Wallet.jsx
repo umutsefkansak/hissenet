@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { WalletBalance, DepositForm, WithdrawForm } from '../../components/wallet';
 import { walletApi } from '../../server/wallet';
-import './Wallet.css';
+import styles from './Wallet.module.css';
 
 const Wallet = () => {
   const { customerId = '68' } = useParams(); // Default to 68 if no parameter
@@ -31,7 +31,6 @@ const Wallet = () => {
     try {
       setLoading(true);
       
-      // Tüm bakiye bilgilerini paralel olarak çek
       const [balanceData, availableData, blockedData] = await Promise.all([
         walletApi.getWalletBalance(customerId),
         walletApi.getAvailableBalance(customerId),
@@ -59,7 +58,6 @@ const Wallet = () => {
       return;
     }
 
-    // Gerçek available balance ile kontrol
     if (activeTab === 'withdraw') {
       if (!iban) {
         setMessage('Lütfen IBAN bilgisini girin');
@@ -89,7 +87,7 @@ const Wallet = () => {
       setMessageType('success');
       setAmount('');
       setIban('');
-      fetchWalletData(); // Bakiye bilgilerini yenile
+      fetchWalletData(); 
     } catch (error) {
       console.error('İşlem hatası:', error);
       setMessage(error.message || 'Bir hata oluştu');
@@ -101,29 +99,29 @@ const Wallet = () => {
 
   if (!customerId) {
     return (
-      <div className="wallet-page">
-        <div className="wallet-container">
-          <h1>Müşteri Bilgisi Gerekli</h1>
-          <p>Lütfen önce giriş yapın veya müşteri ID'si belirtin.</p>
+      <div className={styles.walletPage}>
+        <div className={styles.walletContainer}>
+          <h1 className={styles.walletContainerTitle}>Müşteri Bilgisi Gerekli</h1>
+          <p className={styles.walletContainerText}>Lütfen önce giriş yapın veya müşteri ID'si belirtin.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="wallet-page">
-      <div className="wallet-modal">
-        {/* Header */}
-        <div className="modal-header">
-          <div className="wallet-tab-buttons">
+    <div className={styles.walletPage}>
+      <div className={styles.walletModal}>
+        
+        <div className={styles.modalHeader}>
+          <div className={styles.walletTabButtons}>
             <button 
-              className={`wallet-tab-button ${activeTab === 'withdraw' ? 'active' : ''}`}
+              className={`${styles.walletTabButton} ${activeTab === 'withdraw' ? styles.walletTabButtonActive : ''}`}
               onClick={() => setActiveTab('withdraw')}
             >
               Bakiye Çek
             </button>
             <button 
-              className={`wallet-tab-button ${activeTab === 'deposit' ? 'active' : ''}`}
+              className={`${styles.walletTabButton} ${activeTab === 'deposit' ? styles.walletTabButtonActive : ''}`}
               onClick={() => setActiveTab('deposit')}
             >
               Bakiye Yükle
@@ -131,7 +129,7 @@ const Wallet = () => {
           </div>
         </div>
 
-        <div className="modal-content">
+        <div className={styles.modalContent}>
           
           <WalletBalance 
             balance={walletBalance} 
@@ -139,7 +137,7 @@ const Wallet = () => {
             blockedBalance={blockedBalance}
           />
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className={styles.modalContentForm}>
             {activeTab === 'deposit' ? (
               <DepositForm 
                 amount={amount}
@@ -159,14 +157,14 @@ const Wallet = () => {
             )}
 
             {message && (
-              <div className={`message ${messageType}`}>
+              <div className={`${styles.message} ${messageType === 'success' ? styles.messageSuccess : styles.messageError}`}>
                 {message}
               </div>
             )}
 
             <button 
               type="submit" 
-              className="confirm-button"
+              className={styles.confirmButton}
               disabled={loading}
             >
               {loading ? 'İşleniyor...' : 'Onayla'}

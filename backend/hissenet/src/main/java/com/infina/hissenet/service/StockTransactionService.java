@@ -1,6 +1,7 @@
 package com.infina.hissenet.service;
 
 import com.infina.hissenet.dto.response.StockTransactionResponse;
+import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.Portfolio;
 import com.infina.hissenet.entity.StockTransaction;
@@ -158,11 +159,13 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {
         return commonFinancialService.getQuantityForStockTransactionWithStream(customerId, stockCode);
     }
-    public List<StockTransactionResponse> list(Long customerId, String stockCode, int sellQuantity){
-        List<StockTransaction> list=stockTransactionRepository.findByCustomerIdAndStockCodeAndTypeAndStatusIn(
-                customerId,stockCode,StockTransactionType.BUY,TransactionStatus.SETTLED
-        );
-        return list.stream().map(mapper::toResponse).toList();
+    public Integer getTotalStock(Long customerId) {
+        Customer customer=customerService.findById(customerId).orElseThrow(()->new NotFoundException("Cursomer"));
+        Integer result=0;
+        for (Portfolio portfolio : customer.getPortfolios()) {
+            result+=getAllBuyTransactions(portfolio.getId()).size();
+        }
+        return result;
     }
 
 }

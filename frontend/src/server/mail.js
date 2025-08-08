@@ -49,6 +49,20 @@ export const verifyCode = async (email, code) => {
   }
 };
 
+export const sendVerificationByIdentification = async (identificationNumber) => {
+  try {
+    const response = await api.post('/mail/send-verification-by-identification', {
+      identificationNumber
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('VerificationByIdentification error:', error);
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.detail || 'Kod gönderilemedi';
+    return { success: false, error: errorMessage };
+  }
+};
+
 // Send password change token
 export const sendPasswordChangeToken = async (email) => {
   try {

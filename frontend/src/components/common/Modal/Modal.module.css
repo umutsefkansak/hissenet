@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100;
 }
 
 .dialog {
@@ -17,6 +17,7 @@
   width: 80%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   overflow: hidden;
+  position: relative;
 }
 
 .header {

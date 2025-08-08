@@ -35,8 +35,9 @@ public class StockTransactionController implements StockTransactionControllerDoc
     public ApiResponse<Integer> getQuantityForStockTransaction(@PathVariable Long cursomerId,@PathVariable String stockCode) {
         return ApiResponse.ok(MessageUtils.getMessage("stock.transaction.quantity.success", stockCode),stockTransactionService.getQuantityForStockTransactionWithStream(cursomerId,stockCode));
     }
-    @GetMapping("/list/{customerId}/{stockCode}/{quantity}")
-    public List<StockTransactionResponse> list(@PathVariable Long customerId, @PathVariable String stockCode,@PathVariable int quantity){
-        return stockTransactionService.list(customerId,stockCode,quantity);
+    @GetMapping("/stock-size/{cursomerId}")
+    public ApiResponse<Integer> getStockSizeForStockTransaction(@PathVariable Long cursomerId) {
+        return ApiResponse.ok("hisse sayısı",stockTransactionService.getTotalStock(cursomerId));
     }
+
 }

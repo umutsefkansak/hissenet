@@ -1,18 +1,10 @@
 package com.infina.hissenet.scheduler;
 
-import java.math.BigDecimal;
-import java.util.List;
-import com.infina.hissenet.service.MarketHourService;
-import com.infina.hissenet.service.abstracts.ICacheManagerService;
-import com.infina.hissenet.service.abstracts.IStockTransactionService;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.enums.OrderStatus;
 import com.infina.hissenet.entity.enums.OrderType;
 import com.infina.hissenet.repository.OrderRepository;
+import com.infina.hissenet.service.MarketHourService;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.service.abstracts.IWalletService;
@@ -46,9 +38,9 @@ public class OrderScheduler {
     @Transactional
     @Scheduled(fixedDelay = 60000 * 5 + 1)
     public void processPendingLimitOrders() {
-        if (!marketHourService.isMarketOpen()){
+  /*      if (!marketHourService.isMarketOpen()){
             return;
-        }
+        }*/
         List<Order> openOrders = orderRepository.findByStatus(OrderStatus.OPEN);
 
         for (Order order : openOrders) {

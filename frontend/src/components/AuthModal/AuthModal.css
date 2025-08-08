@@ -1,0 +1,58 @@
+.auth-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* navbar ve drawer’dan üstte olmalı */
+}
+
+.auth-modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.auth-modal h2 {
+  font-size: 1.5rem;     /* önceki 1.25rem idi, şimdi daha büyük */
+  margin: 0 0 1.25rem;
+  color: #1e293b;
+}
+
+.auth-input {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 0.85rem;
+  margin: 0 0 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.auth-confirm-btn {
+  padding: 0.9rem;
+  width: 100%;
+  font-size: 1.1rem;
+  background-color: #1d293d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.auth-confirm-btn:hover {
+  background-color: #13275e;
+  transform: translateY(-1px);
+}
+
+.auth-logo {
+  height: 70px;
+  margin: 0 auto 2rem;
+  display: block;
+}

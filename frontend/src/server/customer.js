@@ -26,6 +26,16 @@ export const createCorporateCustomer = async (customerData) => {
     }
 };
 
+export const getCustomerByEmail = async (email) => {
+  try {
+    const response = await api.get(`/customers/email/${encodeURIComponent(email)}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get customer by email error:', error);
+    throw error;
+  }
+};
+
 export const getAllCustomers = async () => {
     try {
         const response = await api.get('/customers');
@@ -145,7 +155,7 @@ const mapGenderToEnum = (gender) => {
     const genderMap = {
         'erkek': 'MALE',
         'kadin': 'FEMALE',
-        'kadın': 'FEMALE',
+	        'kadın': 'FEMALE',
         'diger': 'OTHER',
         'diğer': 'OTHER'
     };
@@ -174,7 +184,7 @@ const mapIncomeToEnum = (monthlyIncome) => {
 
 export const handleCustomerApiError = (error) => {
     if (!error.response) {
-        return 'İnternet bağlantısını kontrol edin';
+	        return 'İnternet bağlantısını kontrol edin';
     }
 
     const { status, data } = error.response;
@@ -190,22 +200,22 @@ export const handleCustomerApiError = (error) => {
         case 409: 
             if (data.detail) {
                 if (data.detail.includes('email')) {
-                    return 'Bu e-posta adresi zaten kullanılıyor';
+	                    return 'Bu e-posta adresi zaten kullanılıyor';
                 }
                 if (data.detail.includes('ID') || data.detail.includes('TC')) {
-                    return 'Bu TC Kimlik No zaten kayıtlı';
+	                    return 'Bu TC Kimlik No zaten kayıtlı';
                 }
                 if (data.detail.includes('tax number')) {
-                    return 'Bu vergi numarası zaten kayıtlı';
+	                    return 'Bu vergi numarası zaten kayıtlı';
                 }
             }
-            return 'Bu bilgiler zaten kayıtlı';
+	            return 'Bu bilgiler zaten kayıtlı';
 
         case 422:
             return data.detail || 'İşlem gerçekleştirilemedi';
 
         case 500:
-            return 'Sunucu hatası. Lütfen tekrar deneyin';
+	            return 'Sunucu hatası. Lütfen tekrar deneyin';
 
         default:
             return 'Bir hata oluştu. Lütfen tekrar deneyin';

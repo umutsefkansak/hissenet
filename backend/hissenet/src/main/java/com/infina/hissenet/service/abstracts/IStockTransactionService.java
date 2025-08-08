@@ -32,6 +32,18 @@ public interface IStockTransactionService {
      */
     void updatePortfolioIdForStockTransactions(Long transactionId, Long portfolioId);
 
-
+    /**
+     * Belirtilen müşterinin belirli bir hisse kodundaki mevcut hisse miktarını getirir
+     * @param customerId Müşteri ID'si
+     * @param stockCode Hisse kodu
+     * @return Mevcut hisse miktarı
+     */
     Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode);
+    
+    /**
+     * Belirtilen müşterinin toplam hisse sayısını getirir
+     * @param customerId Müşteri ID'si
+     * @return Toplam hisse sayısı
+     */
+    Integer getTotalStock(Long customerId);
 }

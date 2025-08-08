@@ -1,13 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomerUpdateModal from '../CustomerEditModal/CustomerUpdateModal';
+import TodayTotalTradeVolumeCard from '../../TodayTotalTradeVolume/TodayTotalTradeVolume';
+import ActiveCustomerCard from '../../ActiveCustomerCard/ActiveCustomerCard';
+import MostActiveStockCard from '../../MostActiveStock/MostActiveStock';
+import EditButton from '../../common/Button/EditButton';
 import './CustomerList.css';
 
-const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) => {
+const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
   const navigate = useNavigate();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const shouldShowCards = !loading && !error;
 
   const getCustomerType = (customer) => {
     return customer.customerType === 'INDIVIDUAL' ? 'Bireysel' : 'Kurumsal';
@@ -73,9 +78,23 @@ const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) =>
 
   return (
     <div className="customer-list">
+      {/* Summary Cards - sadece gerekli olduğunda göster */}
+      {shouldShowCards && (
+        <div className="summary-cards">
+          <div className="summary-card">
+            <TodayTotalTradeVolumeCard />
+          </div>
+          <div className="summary-card">
+            <ActiveCustomerCard />
+          </div>
+          <div className="summary-card">
+            <MostActiveStockCard />
+          </div>
+        </div>
+      )}
+
       <div className="customer-list-header">
         <h2>Müşteri Listesi</h2>
-        <span className="customer-count">Toplam: {filteredCustomers.length} müşteri</span>
       </div>
 
       {/* Arama Çubuğu */}
@@ -131,21 +150,18 @@ const CustomerList = ({ customers = [], loading, error, onDelete, onUpdate }) =>
                   </span>
                 </td>
                 <td>
-                  <div className="customer-actions">
-                    <button 
-                      className="btn-view"
-                      onClick={() => handleViewCustomer(customer.id)}
-                    >
-                      Görüntüle
-                    </button>
-                    <button 
-                      className="btn-update"
-                      onClick={() => handleUpdateCustomer(customer)}
-                    >
-                      Güncelle
-                    </button>
-                  </div>
-                </td>
+                <div className="customer-actions">
+                  <button 
+                    className="btn-view"
+                    onClick={() => handleViewCustomer(customer.id)}
+                  >
+                    Görüntüle
+                  </button>
+                  <EditButton 
+                    onClick={() => handleUpdateCustomer(customer)}
+                  />
+                </div>
+              </td>
               </tr>
             ))}
           </tbody>

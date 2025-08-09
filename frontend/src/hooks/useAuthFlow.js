@@ -75,48 +75,7 @@ export default function useAuthFlow(onSuccessRedirect) {
         const apiData = result?.data?.data;
         const isOk = apiData?.success === true;
 
-        // Yanlış kod ise: modal göster, deneme haklarını güncelle ve ÇIK
-        if (!isOk) {
-            // (opsiyonel) kalan hak/limit güncellemesi
-            const apiMax = apiData?.maxAttempts ?? maxAttempts; // backend göndermediyse önceki değer
-            const apiRemaining = apiData?.remainingAttempts ?? remainingAttempts;
-
-            if (apiMax != null) setMaxAttempts(apiMax);
-            if (apiRemaining != null) {
-                setRemainingAttempts(apiRemaining);
-            } else {
-                // remaining yoksa local fallback
-                setLocalFailedCount(prev => prev + 1);
-            }
-
-            const left = apiRemaining ?? (apiMax != null ? Math.max(apiMax - (localFailedCount + 1), 0) : null);
-            const pretty = (apiMax != null && left != null) ? ` (${left}/${apiMax})` : '';
-
-            // ❗ Haklar bittiyse özel uyarı
-            if (left === 0) {
-
-                setMail('');
-                setRemainingAttempts(null);
-                setLocalFailedCount(0);
-                setStep('IDLE');
-
-                openModal(
-                    'error',
-                    'Deneme Hakkı Doldu',
-                    'Bu işlem için çok fazla yanlış deneme yapıldı. Lütfen daha sonra tekrar deneyin.'
-                );
-                return;
-            }
-
-            openModal(
-                'error',
-                'Kod Doğrulanamadı',
-                (apiData?.message || 'Lütfen kodu kontrol edin.') + pretty
-            );
-            return; // yönlendirmeyi durdur
-        }
-
-        // ---- Başarılı akış ----
+        if (isOk) {
         try {
             const customerResp = await getCustomerByEmail(email);
             const customerId = customerResp?.data?.id;
@@ -134,7 +93,43 @@ export default function useAuthFlow(onSuccessRedirect) {
         } catch {
             openModal('error', 'Müşteri Sorgu Hatası', 'Müşteri bilgileri alınırken bir sorun oluştu.');
         }
-    }, [email, onSuccessRedirect, maxAttempts, localFailedCount]);
+        return; // ❗ burada bitiriyoruz
+    }
+
+    // ❌ Başarısızsa hak kontrolü
+    const apiMax = apiData?.maxAttempts ?? maxAttempts;
+    const apiRemaining = apiData?.remainingAttempts ?? remainingAttempts;
+
+    if (apiMax != null) setMaxAttempts(apiMax);
+    if (apiRemaining != null) {
+        setRemainingAttempts(apiRemaining);
+    } else {
+        setLocalFailedCount(prev => prev + 1);
+    }
+
+    const left = apiRemaining ?? (apiMax != null ? Math.max(apiMax - (localFailedCount + 1), 0) : null);
+    const pretty = (apiMax != null && left != null) ? ` (${left}/${apiMax})` : '';
+
+    if (left === 0) {
+        setMail('');
+        setRemainingAttempts(null);
+        setLocalFailedCount(0);
+        setStep('IDLE');
+
+        openModal(
+            'error',
+            'Deneme Hakkı Doldu',
+            'Bu işlem için çok fazla yanlış deneme yapıldı. Lütfen daha sonra tekrar deneyin.'
+        );
+        return;
+    }
+
+    openModal(
+        'error',
+        'Kod Doğrulanamadı',
+        (apiData?.message || 'Lütfen kodu kontrol edin.') + pretty
+    );
+}, [email, onSuccessRedirect, maxAttempts, localFailedCount]);
 
     return {
         step, start, cancel,

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getCustomerById } from '../../server/customer';
 import { portfolioApi } from '../../server/portfolioApi';
 import { orderApi } from '../../server/order';
+import UnauthorizedAccess from '../../components/common/UnauthorizedAccess/UnauthorizedAccess';
 import './CustomerHome.css';
 
 const CustomerHome = () => {
@@ -19,9 +20,30 @@ const CustomerHome = () => {
     phone: '',
     email: ''
   });
+  const [hasAccess, setHasAccess] = useState(null); // null: checking, true: has access, false: no access
+
+  // Güvenlik kontrolü - URL'deki customerId ile localStorage'daki customerId eşleşmeli
+  const checkCustomerAccess = () => {
+    const storedCustomerId = localStorage.getItem('customerId');
+    const urlCustomerId = customerId;
+    
+    // Eğer localStorage'da customerId yoksa veya URL'deki ID ile eşleşmiyorsa yetkisiz erişim
+    if (!storedCustomerId || storedCustomerId !== urlCustomerId) {
+      return false;
+    }
+    return true;
+  };
+
+  // İlk yüklemede güvenlik kontrolü
+  useEffect(() => {
+    const hasValidAccess = checkCustomerAccess();
+    setHasAccess(hasValidAccess);
+  }, [customerId]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!hasAccess) return; // Erişim yoksa data fetch etme
+      
       try {
         setLoading(true);
         const [customerData, portfoliosData, stockCountData, ordersData] = await Promise.all([
@@ -43,10 +65,30 @@ const CustomerHome = () => {
       }
     };
 
-    if (customerId) {
+    if (customerId && hasAccess === true) {
       fetchData();
     }
-  }, [customerId]);
+  }, [customerId, hasAccess]);
+
+  // Güvenlik kontrolü sonucu bekleniyor
+  if (hasAccess === null) {
+    return (
+      <div className="customer-home">
+        <div className="loading">Yetki kontrol ediliyor...</div>
+      </div>
+    );
+  }
+
+  // Yetkisiz erişim
+  if (hasAccess === false) {
+    return (
+      <UnauthorizedAccess 
+        title="Yetkisiz Müşteri Erişimi"
+        message="Bu müşteri hesabına erişim yetkiniz bulunmamaktadır."
+        description="Yalnızca kendi hesabınıza ait sayfalara erişebilirsiniz. Lütfen doğru müşteri hesabı ile giriş yapın."
+      />
+    );
+  }
 
   const getRiskProfileText = (riskProfile) => {
     const riskMap = {

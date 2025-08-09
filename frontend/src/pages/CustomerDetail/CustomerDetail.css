@@ -50,7 +50,7 @@
 
 .info-section h3,
 .transaction-section h3 {
-  margin: 0 0 24px 0;
+  margin: 0 0 0 0;
   color: #2d3748;
   font-size: 20px;
   font-weight: 700;
@@ -571,6 +571,7 @@
   .info-section,
   .transaction-section {
     padding: 24px;
+    margin-bottom: 20px;
   }
   
 

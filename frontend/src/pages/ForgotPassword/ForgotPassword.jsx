@@ -90,7 +90,7 @@ const ForgotPassword = () => {
             )}
 
             <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? 'Gönderiliyor...' : 'Şifre Sıfırlama Linki Gönder'}
+              {loading ? 'Gönderiliyor...' : 'Gönder'}
             </button>
           </form>
         )}

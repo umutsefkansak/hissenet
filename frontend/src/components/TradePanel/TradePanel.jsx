@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './TradePanel.module.css';
 import { orderApi } from '../../server/order';
 import { walletApi } from '../../server/wallet';
+import { getCustomerById } from '../../server/customer';
+import Modal from '../../components/common/Modal/Modal';
 
 const TradePanel = ({ stock, onBack }) => {
   const [type, setType] = useState("BUY");
@@ -9,20 +11,110 @@ const TradePanel = ({ stock, onBack }) => {
   const [quantity, setQuantity] = useState('');
   const [totalInput, setTotalInput] = useState('');
   const [price, setPrice] = useState('');
-  const [availableQuantity, setAvailableQuantity] = useState(null);
   const [availableBalance, setAvailableBalance] = useState(null);
+  const [sellableQty, setSellableQty] = useState(null);
+  const [sellHold, setSellHold] = useState(0);
+  const [commissionRate, setCommissionRate] = useState(0.005);
+  const [modalConfig, setModalConfig] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const customerId = 68;
+  const customerId = localStorage.getItem("customerId");
 
-  const unitPrice = category === 'LIMIT' ? parseFloat(price) || 0 : stock.lastPrice || 0;
-  const total = quantity && unitPrice ? (unitPrice * Number(quantity)).toFixed(2) : '0.00';
-  const commission = (total * 0.005).toFixed(2);
-  const net = (total - commission).toFixed(2);
-
-  const formatPrice = (price) => {
-    const number = parseFloat(price);
+  const normalizeNumber = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const normalizeApiNumber = (resp) => {
+    if (typeof resp === 'number') return resp;
+    if (resp && typeof resp.data === 'number') return resp.data;
+    if (resp && resp.data != null) return normalizeNumber(resp.data);
+    return normalizeNumber(resp);
+  };
+  const normalizeCommission = (val) => {
+    const n = Number(val);
+    if (!Number.isFinite(n) || n < 0) return 0.005;
+    return n > 1 ? n / 100 : n;
+  };
+  const formatPrice = (p) => {
+    const number = parseFloat(p);
     return isNaN(number) ? '-' : number.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
+
+  const unitPrice = category === 'LIMIT' ? parseFloat(price) || 0 : (stock.lastPrice || 0);
+  const totalNumber = quantity && unitPrice ? unitPrice * Number(quantity) : 0;
+  const commissionNumber = totalNumber * commissionRate;
+  const netNumber = totalNumber - commissionNumber;
+
+  const total = totalNumber.toFixed(2);
+  const commission = commissionNumber.toFixed(2);
+  const net = netNumber.toFixed(2);
+
+  const openModal = (config) => setModalConfig(config);
+  const closeModal = () => setModalConfig(null);
+
+  const buildConfirmMessage = () => {
+    const lines = [
+      `${stock.code} - ${stock.text}`,
+      `İşlem: ${type === 'BUY' ? 'ALIŞ' : 'SATIŞ'}`,
+      `Emir Türü: ${category === 'MARKET' ? 'Piyasa Emri' : 'Limit Emri'}`,
+      `Birim Fiyat: ${formatPrice(unitPrice)} TL`,
+      `Adet: ${quantity || '-'}`,
+      `Toplam: ${total} TL`,
+      `Komisyon (%${(commissionRate * 100).toFixed(2)}): ${commission} TL`,
+      `Net: ${net} TL`,
+    ];
+    return lines.join('\n');
+  };
+
+  const fetchSellableQty = useCallback(async () => {
+    if (!stock?.code || !customerId) {
+      setSellableQty(null);
+      return;
+    }
+    try {
+      const resp = await orderApi.getQuantityForStockTransaction(customerId, stock.code);
+      const q = Math.max(0, normalizeApiNumber(resp));
+      setSellableQty(q);
+    } catch {
+      setSellableQty(0);
+    }
+  }, [customerId, stock?.code]);
+
+  const fetchBalance = useCallback(async () => {
+    if (!customerId) {
+      setAvailableBalance(null);
+      return;
+    }
+    try {
+      const resp = await walletApi.getAvailableBalance(customerId);
+      const val = normalizeApiNumber(resp);
+      setAvailableBalance(val);
+    } catch {
+      setAvailableBalance(null);
+    }
+  }, [customerId]);
+
+  const fetchCommissionRate = useCallback(async () => {
+    if (!customerId) {
+      setCommissionRate(0.005);
+      return;
+    }
+    try {
+      const data = await getCustomerById(customerId);
+      const cr = normalizeCommission(data?.commissionRate);
+      setCommissionRate(cr);
+    } catch {
+      setCommissionRate(0.005);
+    }
+  }, [customerId]);
+
+  const displaySellable = useMemo(() => sellableQty, [sellableQty]);
+
+  const effectiveSellable = useMemo(() => {
+    const base = normalizeNumber(sellableQty);
+    const hold = normalizeNumber(sellHold);
+    return Math.max(0, base - hold);
+  }, [sellableQty, sellHold]);
 
   useEffect(() => {
     setPrice(stock.lastPrice?.toFixed(2) || '');
@@ -31,77 +123,115 @@ const TradePanel = ({ stock, onBack }) => {
   useEffect(() => {
     if (totalInput && unitPrice > 0) {
       const maxShares = Math.floor(parseFloat(totalInput) / unitPrice);
-      setQuantity(maxShares.toString());
+      setQuantity(String(maxShares));
     }
   }, [totalInput, unitPrice]);
 
   useEffect(() => {
-    const fetchAvailableQuantity = async () => {
-      if (type === "SELL" && stock?.code) {
-        try {
-          const quantity = await orderApi.getQuantityForStockTransaction(customerId, stock.code);
-          setAvailableQuantity(quantity);
-          setQuantity(quantity.toString());
-        } catch (error) {
-          console.error("Mevcut hisse adedi alınamadı:", error);
-          setAvailableQuantity(0);
-          setQuantity('0');
-        }
-      } else {
-        setAvailableQuantity(null);
-        setQuantity('');
-      }
-    };
-
-    fetchAvailableQuantity();
-  }, [stock, type]);
+    fetchCommissionRate();
+  }, [fetchCommissionRate]);
 
   useEffect(() => {
-    const fetchBalance = async () => {
-      if (type === "BUY") {
-        try {
-          const result = await walletApi.getAvailableBalance(customerId);
-          setAvailableBalance(result.data); // 🔥 burada düzeltildi
-        } catch (err) {
-          console.error("Bakiye alınamadı", err);
-          setAvailableBalance(null);
-        }
-      }
-    };
+    fetchSellableQty();
+    if (type === 'BUY') fetchBalance();
+  }, [stock, type, fetchSellableQty, fetchBalance]);
 
-    fetchBalance();
-  }, [type]);
+  useEffect(() => {
+    if (type === 'BUY') fetchBalance();
+    if (type === 'SELL') fetchSellableQty();
+  }, [type, fetchBalance, fetchSellableQty]);
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    setSellHold((h) => {
+      const base = normalizeNumber(sellableQty);
+      return Math.min(base, normalizeNumber(h));
+    });
+  }, [sellableQty]);
+
+  const handleSubmit = () => {
     if (!customerId || !stock?.code || !quantity || Number(quantity) <= 0) {
-      alert("Lütfen tüm alanları doğru doldurun.");
+      openModal({
+        variant: 'error',
+        title: 'Eksik / Hatalı Bilgi',
+        message: 'Lütfen tüm alanları doğru doldurun.',
+        confirmText: 'Tamam',
+        onClose: closeModal,
+      });
       return;
     }
 
-    if (type === "SELL" && availableQuantity !== null && Number(quantity) > availableQuantity) {
-      alert(`❌ En fazla ${availableQuantity} adet satabilirsiniz.`);
+    if (type === 'SELL' && Number(quantity) > effectiveSellable) {
+      openModal({
+        variant: 'warning',
+        title: 'Yetersiz Hisse',
+        message: `Satılabilir (T+2): ${effectiveSellable}. Daha fazla satamazsınız.`,
+        confirmText: 'Tamam',
+        onClose: closeModal,
+      });
       return;
     }
 
-    const payload = {
-      customerId: Number(customerId),
-      stockCode: stock.code,
-      quantity: Number(quantity),
-      price: category === "MARKET" ? stock.lastPrice : Number(price),
-      type,
-      category
-    };
+    openModal({
+      variant: 'confirm',
+      title: type === 'BUY' ? 'Alış Emrini Onayla' : 'Satış Emrini Onayla',
+      message: buildConfirmMessage(),
+      cancelText: 'Vazgeç',
+      confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
+      onConfirm: async () => {
+        closeModal();
+        setIsSubmitting(true);
 
-    try {
-      await orderApi.createOrder(payload);
-      alert("✅ Emir başarıyla gönderildi");
-      setQuantity('');
-      setTotalInput('');
-    } catch (err) {
-      alert("❌ Emir gönderilemedi: " + (err.message || err));
-      console.error(err);
-    }
+        const payload = {
+          customerId: Number(customerId),
+          stockCode: stock.code,
+          quantity: Number(quantity),
+          price: category === 'MARKET' ? stock.lastPrice : Number(price),
+          type,
+          category,
+        };
+
+        try {
+          const res = await orderApi.createOrder(payload);
+          const statusStr = (res?.data?.status ?? res?.status ?? '').toString().toUpperCase();
+
+          if (type === 'BUY') {
+            await fetchBalance();
+            await fetchSellableQty();
+          } else {
+            if (statusStr === 'FILLED' || category === 'MARKET' || statusStr) {
+              setSellHold((h) => normalizeNumber(h) + Number(quantity));
+            }
+            await fetchSellableQty();
+          }
+
+          setIsSubmitting(false);
+          openModal({
+            variant: 'success',
+            title: 'İşlem Başarılı',
+            message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri${statusStr && statusStr !== 'FILLED' ? ` (${statusStr})` : ''} gönderildi.`,
+            confirmText: 'Tamam',
+            onClose: () => {
+              closeModal();
+              setQuantity('');
+              setTotalInput('');
+            },
+          });
+        } catch (err) {
+          setIsSubmitting(false);
+          openModal({
+            variant: 'error',
+            title: 'İşlem Başarısız',
+            message: `Emir gönderilemedi.\n${err?.message || err}`,
+            confirmText: 'Tamam',
+            onClose: closeModal,
+          });
+        }
+      },
+      onClose: closeModal,
+    });
   };
+
+  const sellDisabled = type === 'SELL' && effectiveSellable <= 0;
 
   return (
     <div className={styles.panel}>
@@ -127,13 +257,15 @@ const TradePanel = ({ stock, onBack }) => {
       </div>
 
       <div className={styles.card}>
-        <h3 className={styles.cardTitle}>
-          {type === 'BUY' ? 'Alış Emri' : 'Satış Emri'}
-        </h3>
-
         {type === 'BUY' && (
           <div className={styles.balanceInfo}>
             <strong>Mevcut Bakiye:</strong> {availableBalance !== null ? `${formatPrice(availableBalance)} TL` : 'Yükleniyor...'}
+          </div>
+        )}
+
+        {type === 'SELL' && (
+          <div className={styles.balanceInfo}>
+            <strong>Mevcut Hisse Adedi:</strong> {displaySellable !== null ? displaySellable : 'Yükleniyor...'}
           </div>
         )}
 
@@ -143,12 +275,22 @@ const TradePanel = ({ stock, onBack }) => {
             type="number"
             min="0"
             value={quantity}
+            disabled={isSubmitting || (type === 'SELL' && sellDisabled)}
             onChange={e => {
               const val = Number(e.target.value);
               if (val < 0) return;
-              if (type === "SELL" && availableQuantity !== null && val > availableQuantity) {
-                alert(`⚠️ Maksimum ${availableQuantity} adet satabilirsiniz.`);
-                setQuantity(availableQuantity.toString());
+              if (type === 'SELL' && val > effectiveSellable) {
+                openModal({
+                  variant: 'warning',
+                  title: 'Maksimum Adet Aşıldı',
+                  message: `Bu anda en fazla ${effectiveSellable} adet satabilirsiniz.`,
+                  confirmText: 'Tamam',
+                  onConfirm: () => {
+                    setQuantity(String(effectiveSellable));
+                    closeModal();
+                  },
+                  onClose: closeModal,
+                });
               } else {
                 setQuantity(e.target.value);
               }
@@ -163,61 +305,80 @@ const TradePanel = ({ stock, onBack }) => {
             type="number"
             min="0"
             value={totalInput}
+            disabled={isSubmitting}
             onChange={e => {
               const value = parseFloat(e.target.value);
               if (value < 0) return;
-
-              if (type === "SELL" && category === "LIMIT" && availableQuantity !== null) {
-                const maxTotal = availableQuantity * unitPrice;
+              if (type === 'SELL' && category === 'LIMIT') {
+                const maxTotal = effectiveSellable * unitPrice;
                 if (value > maxTotal) {
-                  alert(`⚠️ Maksimum ${maxTotal.toFixed(2)} TL değerinde satış yapabilirsiniz.`);
-                  setTotalInput(maxTotal.toFixed(2));
+                  openModal({
+                    variant: 'warning',
+                    title: 'Maksimum Tutar Aşıldı',
+                    message: `Maksimum ${maxTotal.toFixed(2)} TL değerinde satış yapabilirsiniz.`,
+                    confirmText: 'Tamam',
+                    onConfirm: () => {
+                      setTotalInput(maxTotal.toFixed(2));
+                      closeModal();
+                    },
+                    onClose: closeModal,
+                  });
                   return;
                 }
               }
-
               setTotalInput(e.target.value);
             }}
             placeholder="Toplam Tutar"
           />
         </div>
 
-        <div className={styles.field}>
-          <label>Emir Türü</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value === 'LIMIT' ? 'LIMIT' : 'MARKET')}
-          >
-            <option value="MARKET">Piyasa Emri</option>
-            <option value="LIMIT">Limit Emri</option>
-          </select>
-        </div>
-
-        {category === 'LIMIT' && (
+        <div className={styles.inlineGroup}>
           <div className={styles.field}>
-            <label>Birim Fiyat</label>
-            <input
-              type="number"
-              min="0"
-              value={price}
-              onChange={e => setPrice(e.target.value)}
-              placeholder="TL"
-            />
+            <label>Emir Türü</label>
+            <select
+              value={category}
+              disabled={isSubmitting}
+              onChange={(e) => setCategory(e.target.value === 'LIMIT' ? 'LIMIT' : 'MARKET')}
+            >
+              <option value="MARKET">Piyasa Emri</option>
+              <option value="LIMIT">Limit Emri</option>
+            </select>
           </div>
-        )}
+
+          {category === 'LIMIT' && (
+            <div className={styles.field}>
+              <label>Birim Fiyat</label>
+              <input
+                type="number"
+                min="0"
+                value={price}
+                disabled={isSubmitting}
+                onChange={e => setPrice(e.target.value)}
+                placeholder="TL"
+              />
+            </div>
+          )}
+        </div>
 
         <div className={styles.summary}>
           <div><span>Birim Fiyat:</span><span>{formatPrice(unitPrice)}</span></div>
           <div><span>Adet:</span><span>{quantity || '-'}</span></div>
           <div><span>Toplam Tutar:</span><span>{total} TL</span></div>
-          <div><span>Komisyon (%0.5):</span><span>{commission} TL</span></div>
+          <div><span>Komisyon (%{(commissionRate * 100).toFixed(2)}):</span><span>{commission} TL</span></div>
           <div><span>Net Tutar:</span><span>{net} TL</span></div>
         </div>
 
-        <button className={styles.actionBtn} onClick={handleSubmit}>
+        <button
+          className={styles.actionBtn}
+          onClick={handleSubmit}
+          disabled={isSubmitting || (type === 'SELL' && sellDisabled)}
+          title={(type === 'SELL' && sellDisabled) ? 'Satış için satılabilir (T+2) adet yok' : ''}
+        >
           {type === 'BUY' ? 'Alış Emri Ver' : 'Satış Emri Ver'}
         </button>
       </div>
+
+      {modalConfig && <Modal {...modalConfig} />}
     </div>
   );
 };

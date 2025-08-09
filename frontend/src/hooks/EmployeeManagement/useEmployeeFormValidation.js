@@ -129,10 +129,8 @@ const useEmployeeFormValidation = (initialData, validationConfig, isEdit = false
         setErrors({});
     };
 
-    // Form data değiştiğinde validation'ı tetikle (opsiyonel)
     useEffect(() => {
         if (Object.keys(formData).some(key => formData[key] !== initialData[key])) {
-            // Sadece hata varsa tekrar validate et
             if (Object.keys(errors).length > 0) {
                 validateForm();
             }

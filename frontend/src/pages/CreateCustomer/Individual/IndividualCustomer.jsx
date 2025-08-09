@@ -37,8 +37,8 @@ const IndividualCustomer = () => {
         street: '',
         district: '',
         city: '',
-        state: '',
-        country: 'Turkey',
+        state: 'Türkiye',
+        country: 'Türkiye',
         postalCode: '',
 
         profession: '',
@@ -51,7 +51,7 @@ const IndividualCustomer = () => {
         requiredFields: [
             'firstName', 'lastName', 'tcNumber', 'birthDate', 'birthPlace',
             'educationLevel', 'gender', 'phoneNumber', 'email', 'addressType',
-            'street', 'city', 'state', 'country', 'monthlyIncome'
+            'street', 'city', 'monthlyIncome'
         ]
     };
 

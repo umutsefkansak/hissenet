@@ -135,4 +135,24 @@ public interface IOrderService {
      */
     Long getTodayOrderCount();
 
+    /**
+     * T+2 settlement kurallarına uygun olarak satılabilir hisse miktarını hesaplar.
+     * Bloke edilen (T+2 bekleyen) hisseleri çıkarır.
+     *
+     * @param customerId müşteri ID'si
+     * @param stockCode hisse senedi kodu
+     * @return satılabilir hisse miktarı
+     */
+    BigDecimal getAvailableStockQuantityForSale(Long customerId, String stockCode);
+
+    /**
+     * T+2 settlement nedeniyle bloke edilen hisse miktarını hesaplar.
+     * Test modunda: 1 dakika, Production'da: 2 iş günü
+     *
+     * @param customerId müşteri ID'si
+     * @param stockCode hisse senedi kodu
+     * @return bloke edilen hisse miktarı
+     */
+    BigDecimal getBlockedStockQuantity(Long customerId, String stockCode);
+
 }

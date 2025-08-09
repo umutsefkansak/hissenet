@@ -18,7 +18,6 @@ public record EmployeeResponse(
 	    EmployeeStatus status,
 	    String emergencyContactName,
 	    String emergencyContactPhone,
-	    Long accountId,
 	    Set<Long> roleIds,
 	    LocalDateTime createdAt,
 	    LocalDateTime updatedAt

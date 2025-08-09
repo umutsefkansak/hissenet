@@ -69,8 +69,6 @@ public class Employee extends BaseEntity implements UserDetails {
     @Column(name = "emergency_contact_phone", length = 20)
     private String emergencyContactPhone;
 
-    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Account account;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -159,14 +157,6 @@ public class Employee extends BaseEntity implements UserDetails {
 
     public void setEmergencyContactPhone(String emergencyContactPhone) {
         this.emergencyContactPhone = emergencyContactPhone;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
     }
 
     public Set<Role> getRoles() {

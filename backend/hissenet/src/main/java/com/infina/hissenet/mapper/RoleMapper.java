@@ -63,7 +63,6 @@ public interface RoleMapper {
                             employee.getStatus(),
                             employee.getEmergencyContactName(),
                             employee.getEmergencyContactPhone(),
-                            employee.getAccount() != null ? employee.getAccount().getId() : null,
                             roleIds,
                             employee.getCreatedAt(),
                             employee.getUpdatedAt()

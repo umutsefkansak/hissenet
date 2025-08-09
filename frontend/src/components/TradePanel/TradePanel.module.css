@@ -3,14 +3,12 @@
   flex-direction: column;
   gap: 2px;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden; 
   background: #f3f6fc;
 }
 
-/* Üst Bar */
 .topBar {
-      border-radius: 8px;
-
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,14 +17,14 @@
   padding: 12px 16px;
 }
 .backBtn {
- background: none;
+  background: none;
   border: none;
   color: #0073e6;
   cursor: pointer;
   font-size: 14px;
 }
 .title {
-font-size: 20px;
+  font-size: 20px;
   font-weight: 600;
 }
 .currentPrice {
@@ -34,7 +32,6 @@ font-size: 20px;
   font-weight: 600;
 }
 
-/* Sekmeler */
 .tabs {
   display: flex;
   background: #fff;
@@ -54,23 +51,15 @@ font-size: 20px;
   font-weight: 600;
 }
 
-/* Ana Kart */
 .card {
   flex: 1;
   background: #fff;
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow-y: auto;
-}
-.cardTitle {
-  text-align: center;
-  margin-bottom: 16px;
-  font-size: 18px;
-  color: #333;
+  overflow: visible; 
 }
 
-/* Form alanları */
 .field {
   display: flex;
   flex-direction: column;
@@ -90,7 +79,12 @@ font-size: 20px;
   font-size: 14px;
 }
 
-/* Özet */
+.inlineGroup {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
 .summary {
   background: #fff;
   border-radius: 4px;
@@ -107,7 +101,6 @@ font-size: 20px;
   margin-bottom: 0;
 }
 
-/* Buton */
 .actionBtn {
   width: 100%;
   background: #1f2a44;
@@ -124,4 +117,11 @@ font-size: 20px;
   margin-bottom: 10px;
   font-size: 14px;
   color: #1b325f;
+}
+
+@media (max-width: 640px) {
+  .inlineGroup {
+    flex-direction: column;
+    gap: 12px;
+  }
 }

@@ -25,21 +25,18 @@ import com.infina.hissenet.entity.Role;
 public interface EmployeeMapper {
     EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
 
-    @Mapping(target = "account", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "hireDate", ignore = true)
     @Mapping(target = "terminationDate", ignore = true)
     @Mapping(target = "status", ignore = true)
     Employee toEntity(EmployeeCreateRequest dto);
 
-    @Mapping(target = "account", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "hireDate", ignore = true)
     @Mapping(target = "terminationDate", ignore = true)
     Employee toEntity(EmployeeUpdateRequest dto);
 
-    @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "roles", target = "roleIds", qualifiedByName = "mapToId")
     EmployeeResponse toResponse(Employee entity);
 

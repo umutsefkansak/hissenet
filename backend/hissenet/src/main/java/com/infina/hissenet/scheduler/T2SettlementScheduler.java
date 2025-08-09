@@ -17,8 +17,7 @@ public class T2SettlementScheduler {
 
     @Scheduled(cron = "0 */1 * * * ?")// bu satır gercek hayattaki kullanım  @Scheduled(cron = "0 5 17 * * MON-FRI")
     public void processT2Settlements() {
-        walletService.processT2Settlements();
         stockTransactionService.processStockSettlements();
-
+        walletService.processT2Settlements();
     }
 }

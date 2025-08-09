@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllCustomers, updateIndividualCustomer } from '../server/customer';
+import { getAllCustomers, updateIndividualCustomer, updateCorporateCustomer } from '../server/customer';
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState([]);
@@ -24,14 +24,14 @@ export const useCustomers = () => {
 
   const updateCustomer = async (updateData) => {
     try {
-      const { id, ...data } = updateData;
-      
-      console.log('Updating customer with data:', { id, data });
-      
-      // Sadece individual customer güncellemesi yapıyoruz
-      await updateIndividualCustomer(id, data);
-      
-      // Listeyi yenile
+      const { id, customerType, ...data } = updateData;
+  
+      if (customerType === 'CORPORATE') {
+        await updateCorporateCustomer(id, data);
+      } else {
+        await updateIndividualCustomer(id, data);
+      }
+  
       await fetchCustomers();
       return true;
     } catch (err) {

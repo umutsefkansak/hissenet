@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './TradePanel.module.css';
 import { orderApi } from '../../server/order';
 import { walletApi } from '../../server/wallet';
-import { getCustomerById } from '../../server/customer';
+import { customerApi} from '../../server/customerApi';
 import Modal from '../../components/common/Modal/Modal';
 
 const TradePanel = ({ stock, onBack }) => {
@@ -100,8 +100,10 @@ const TradePanel = ({ stock, onBack }) => {
       return;
     }
     try {
-      const data = await getCustomerById(customerId);
-      const cr = normalizeCommission(data?.commissionRate);
+      const data = await customerApi.getCustomerById(customerId);
+      console.log(customerId)
+      console.log(data.data)
+     const cr = normalizeCommission(data?.data?.commissionRate || 0.005);
       setCommissionRate(cr);
     } catch {
       setCommissionRate(0.005);

@@ -1,0 +1,27 @@
+/* frontend/src/components/common/Export/ExportMenu.css */
+.export-dropdown { position: relative; display: inline-block; }
+.export-icon-button {
+  background: #1e3a8a; color: #fff; border: none; border-radius: 8px;
+  padding: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(30,58,138,.2); transition: all .3s ease; cursor: pointer;
+}
+.export-icon-button:hover { background: #274bb6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,58,138,.3); }
+
+.export-dropdown-menu {
+  position: absolute; top: 100%; right: 0; margin-top: 8px; z-index: 1000;
+  background: #fff; border: 1px solid #e9ecef; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  min-width: 160px; overflow: hidden;
+}
+.export-dropdown-item {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 12px 16px; background: #fff; border: 0; cursor: pointer; font-size: 14px; color: #4a5568;
+  transition: background-color .2s ease;
+}
+.export-dropdown-item:hover { background: #f8f9fa; color: #1e3a8a; }
+.export-dropdown-item svg { color: #6c757d; transition: color .2s ease; }
+.export-dropdown-item:hover svg { color: #1e3a8a; }
+
+.export-dropdown-menu::before {
+  content: ''; position: absolute; top: -6px; right: 12px; width: 12px; height: 12px; background: #fff;
+  border: 1px solid #e9ecef; border-bottom: none; border-right: none; transform: rotate(45deg); z-index: -1;
+}

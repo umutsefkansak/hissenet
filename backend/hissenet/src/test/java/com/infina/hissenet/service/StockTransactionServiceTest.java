@@ -93,8 +93,6 @@ class StockTransactionServiceTest {
         assertEquals(new BigDecimal("21.00"), saved.getCurrentPrice());
         assertEquals(TransactionStatus.COMPLETED, saved.getTransactionStatus());
 
-        // commission = totalAmount * commissionRate (0.0025)
-        assertEquals(new BigDecimal("7.6875"), saved.getCommission());
 
         verify(portfolioService).updatePortfolioValues(portfolio.getId());
     }

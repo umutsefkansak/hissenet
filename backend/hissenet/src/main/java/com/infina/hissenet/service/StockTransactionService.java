@@ -143,17 +143,31 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
        return commonFinancialService.mergeTransactions(transactions);
     }
+    @Transactional
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
-        StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException("Stock "));
-        Long oldPortfolioId = transaction.getPortfolio().getId();
-        Portfolio portfolio=portfolioService.findById(portfolioId).orElseThrow(()->new NotFoundException("Portfolio "));
-        if (!portfolio.getCustomer().getId().equals(transaction.getPortfolio().getCustomer().getId())) {
+        StockTransaction transaction = stockTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException("Stock Transaction not found"));
+
+        Portfolio oldPortfolio = transaction.getPortfolio();
+        Portfolio newPortfolio = portfolioService.findById(portfolioId)
+                .orElseThrow(() -> new NotFoundException("New Portfolio not found"));
+
+        // Yetki kontrolü - Müşteri aynı mı
+        if (!oldPortfolio.getCustomer().getId().equals(newPortfolio.getCustomer().getId())) {
             throw new UnauthorizedOperationException("You are not authorized to modify this portfolio");
         }
-        transaction.setPortfolio(portfolio);
-        save(transaction);
-        portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
-        portfolioService.updatePortfolioValues(oldPortfolioId);
+
+        String stockCode = transaction.getStockCode();
+        Long customerId = oldPortfolio.getCustomer().getId();
+
+        // Doğrudan güncelleme - update sorgusu ile bulk işlem
+        int updatedCount = stockTransactionRepository.updatePortfolioIdByCustomerIdAndStockCode(
+                portfolioId, customerId, stockCode
+        );
+
+        // Portföy değerlerini güncelle
+        portfolioService.updatePortfolioValues(portfolioId);
+        portfolioService.updatePortfolioValues(oldPortfolio.getId());
     }
     // aktif hisse adedini döndüren methot
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {

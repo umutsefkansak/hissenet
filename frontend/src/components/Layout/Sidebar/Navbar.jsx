@@ -120,7 +120,7 @@ const Navbar = () => {
         if (isMobile) {
           setIsDrawerOpen(false);
         }
-        window.showToast('Başarıyla çıkış yapıldı!', 'info', 2000);
+        window.showToast('Müşteri hesabından başarıyla çıkıldı!', 'info', 2000);
         window.dispatchEvent(new Event('loginStateChanged'));
         navigate('/');
       } else {

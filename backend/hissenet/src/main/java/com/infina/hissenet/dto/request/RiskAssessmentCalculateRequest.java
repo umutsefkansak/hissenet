@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record RiskAssessmentCalculateRequest(
-        @NotNull List<Integer> selectedOptionIndexes
+        @NotNull(message = "{validation.risk.assessment.options.required}")
+        List<Integer> selectedOptionIndexes
 ) {}

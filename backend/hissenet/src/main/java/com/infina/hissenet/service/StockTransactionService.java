@@ -16,6 +16,7 @@ import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,10 +89,10 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
              Integer currentQuantity=  getQuantityForStockTransactionWithStream(order.getCustomer().getId(),transaction.getStockCode());
             // fifoService.processFIFOForSell(order.getCustomer().getId(),transaction.getStockCode(),currentQuantity);
              if(order.getQuantity().intValue()>currentQuantity){
-                 throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+                 throw new InsufficientStockException(transaction.getStockCode());
              }
             }catch (RuntimeException e){
-                throw new InsufficientStockException("The quantity to sell exceeds the available stock for: " + transaction.getStockCode());
+                throw new InsufficientStockException(transaction.getStockCode());
             }
         }
 

@@ -3,6 +3,7 @@ package com.infina.hissenet.controller;
 import java.util.List;
 
 import com.infina.hissenet.dto.request.ForgotPasswordRequest;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,35 +31,35 @@ public class EmployeeController implements EmployeeControllerDoc {
 	@PostMapping
 	public ResponseEntity<ApiResponse<EmployeeResponse>> createEmployee(
 			@Valid @RequestBody EmployeeCreateRequest request) {
-		ApiResponse<EmployeeResponse> response = ApiResponse.created("Employee created successfully",
+		ApiResponse<EmployeeResponse> response = ApiResponse.created(MessageUtils.getMessage("employee.created.successfully"),
 				service.createEmployee(request));
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@PutMapping
 	public ApiResponse<EmployeeResponse> updateEmployee(@Valid @RequestBody EmployeeUpdateRequest request) {
-		return ApiResponse.ok("Employee updated successfully", service.updateEmployee(request));
+		return ApiResponse.ok(MessageUtils.getMessage("employee.updated.successfully"), service.updateEmployee(request));
 	}
 
 	@GetMapping("/{id}")
 	public ApiResponse<EmployeeResponse> getEmployee(@PathVariable Long id) {
-		return ApiResponse.ok("Employee retrieved successfully", service.getEmployeeById(id));
+		return ApiResponse.ok(MessageUtils.getMessage("employee.retrieved.successfully"),  service.getEmployeeById(id));
 	}
 
 	@GetMapping
 	public ApiResponse<List<EmployeeResponse>> getAllEmployees() {
-		return ApiResponse.ok("Employees retrieved successfully", service.getAllEmployees());
+		return ApiResponse.ok(MessageUtils.getMessage("employee.list.retrieved.successfully"),  service.getAllEmployees());
 	}
 
 	@DeleteMapping("/{id}")
 	public ApiResponse<Void> deleteEmployee(@PathVariable Long id) {
 		service.deleteEmployee(id);
-		return ApiResponse.ok("Employee deleted successfully");
+		return ApiResponse.ok(MessageUtils.getMessage("employee.deleted.successfully"));
 	}
 	@PatchMapping("/changePassword")
 	public ApiResponse<Void> changePassword(@Valid @RequestBody ForgotPasswordRequest request){
 		service.changePassword(request);
-		return ApiResponse.ok("Password changed successfully");
+		return ApiResponse.ok(MessageUtils.getMessage("employee.password.changed.successfully"));
 	}
 
 	@GetMapping("/pageable")
@@ -69,7 +70,7 @@ public class EmployeeController implements EmployeeControllerDoc {
 			@RequestParam(defaultValue = "asc") String sortDir) {
 
 		Page<EmployeeResponse> employees = service.getAllEmployeesPageable(page, size, sortBy, sortDir);
-		return ApiResponse.ok("Employees retrieved successfully", employees);
+		return ApiResponse.ok(MessageUtils.getMessage("employee.paged.retrieved.successfully"), employees);
 	}
 
 }

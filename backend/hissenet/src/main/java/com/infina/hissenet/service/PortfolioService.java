@@ -13,6 +13,7 @@ import com.infina.hissenet.mapper.PortfolioMapper;
 import com.infina.hissenet.repository.PortfolioRepository;
 import com.infina.hissenet.service.abstracts.IPortfolioService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +45,13 @@ public class PortfolioService extends GenericServiceImpl<Portfolio,Long> impleme
     // portföy getir
     protected Portfolio getPortfolio(Long id){
         return portfolioRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("portfolio.not.found", id)));
     }
 
     // portföy getir
     protected Portfolio getPortfolioWithCustomer(Long id){
         return portfolioRepository.findByIdWithCustomer(id)
-                .orElseThrow(() -> new NotFoundException("Portfolio bulunamadı: " + id));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("portfolio.not.found", id)));
     }
 
     // pörtföy dto döndür
@@ -239,13 +240,13 @@ Portfolio portfolio = getPortfolio(id);
 
     private Customer findCustomerOrThrow(Long customerId) {
         return customerService.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException("Müşteri "));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("customer.not.found.id", customerId)));
     }
     public Portfolio getCustomerFirstPortfolio(Long customerId) {
         return portfolioRepository.findByCustomerId(customerId)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Portfolio "));
+                .orElseThrow(() -> new NotFoundException(MessageUtils.getMessage("portfolio.not.found", customerId)));
     }
 
 }

@@ -15,14 +15,19 @@ import java.time.LocalDate;
 
 public record IndividualCustomerUpdateRequest(
         @UniqueValue(type = UniqueValueType.CUSTOMER_EMAIL)
-        @Email String email,
-        @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
+        @Email(message = "{validation.email.invalid}")
+        String email,
+
+        @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "{validation.phone.invalid}")
+        String phone,
         String nationality,
         String firstName,
         String middleName,
         String lastName,
         @UniqueValue(type = UniqueValueType.TC_NUMBER)
-        @Pattern(regexp = "^[1-9][0-9]{10}$") String tcNumber,
+        @Pattern(regexp = "^[1-9][0-9]{10}$", message = "{validation.tc.number.invalid}")
+        String tcNumber,
+
         @MinAge(18)
         LocalDate birthDate,
         String birthPlace,

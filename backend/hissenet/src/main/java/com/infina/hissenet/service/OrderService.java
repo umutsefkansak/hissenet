@@ -36,6 +36,7 @@ import com.infina.hissenet.repository.OrderRepository;
 import com.infina.hissenet.service.abstracts.IOrderService;
 import com.infina.hissenet.service.abstracts.IWalletService;
 import com.infina.hissenet.utils.GenericServiceImpl;
+import com.infina.hissenet.utils.MessageUtils;
 
 import static com.infina.hissenet.constants.OrderConstants.COMMISSION_RATE;
 
@@ -61,7 +62,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.walletService = walletService;
 		this.stockCacheService = stockCacheService;
 		this.walletRepository = walletRepository;
-        this.stockTransactionService = stockTransactionService;
+		this.stockTransactionService = stockTransactionService;
 		this.marketHourService = marketHourService;
 	}
 
@@ -74,7 +75,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 				.orElseThrow(() -> new CustomerNotFoundException(request.customerId()));
 
 		if (request.price() == null || request.quantity() == null) {
-			throw new IllegalArgumentException("Price and quantity must not be null");
+			throw new IllegalArgumentException(MessageUtils.getMessage("order.price.quantity.required"));
 		}
 
 		Order order = orderMapper.toEntity(request);
@@ -169,54 +170,54 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getAllOrders() {
-	    List<Order> orders = orderRepository.findAllByCreatedAtDesc();
+		List<Order> orders = orderRepository.findAllByCreatedAtDesc();
 
-	    return orders.stream().map(order -> {
-	        Long customerId = order.getCustomer().getId();
-	        LocalDateTime createdAt = order.getCreatedAt();
+		return orders.stream().map(order -> {
+			Long customerId = order.getCustomer().getId();
+			LocalDateTime createdAt = order.getCreatedAt();
 
-	        BigDecimal blockedBalance = BigDecimal.ZERO;
+			BigDecimal blockedBalance = BigDecimal.ZERO;
 
-	        if (order.getStatus() == OrderStatus.FILLED) {
-	            LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
+			if (order.getStatus() == OrderStatus.FILLED) {
+				LocalDateTime tPlus2 = calculateTPlus2BusinessDays(createdAt);
 
-	            if (LocalDateTime.now().isBefore(tPlus2)) {
-	                blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
-	            }
-	        }
+				if (LocalDateTime.now().isBefore(tPlus2)) {
+					blockedBalance = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+				}
+			}
 
-	        return new OrderResponse(
-	            order.getId(),
-	            customerId,
-	            order.getCategory(),
-	            order.getType(),
-	            order.getStatus(),
-	            order.getStockCode(),
-	            order.getQuantity(),
-	            order.getPrice(),
-	            order.getTotalAmount(),
-	            order.getCreatedAt(),
-	            order.getUpdatedAt(),
-	            order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
-	            order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
-	            blockedBalance
-	        );
-	    }).toList();
+			return new OrderResponse(
+					order.getId(),
+					customerId,
+					order.getCategory(),
+					order.getType(),
+					order.getStatus(),
+					order.getStockCode(),
+					order.getQuantity(),
+					order.getPrice(),
+					order.getTotalAmount(),
+					order.getCreatedAt(),
+					order.getUpdatedAt(),
+					order.getCreatedBy() != null ? order.getCreatedBy().getId() : null,
+					order.getUpdatedBy() != null ? order.getUpdatedBy().getId() : null,
+					blockedBalance
+			);
+		}).toList();
 	}
 
 	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
-	    int businessDaysAdded = 0;
-	    LocalDateTime result = startDateTime;
+		int businessDaysAdded = 0;
+		LocalDateTime result = startDateTime;
 
-	    while (businessDaysAdded < 2) {
-	        result = result.plusDays(1);
-	        DayOfWeek day = result.getDayOfWeek();
-	        if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
-	            businessDaysAdded++;
-	        }
-	    }
+		while (businessDaysAdded < 2) {
+			result = result.plusDays(1);
+			DayOfWeek day = result.getDayOfWeek();
+			if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+				businessDaysAdded++;
+			}
+		}
 
-	    return result;
+		return result;
 	}
 
 	@Transactional(readOnly = true)
@@ -293,14 +294,14 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getTodayFilledOrders() {
-	    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-	    LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
+		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 
-	    List<Order> filledToday = orderRepository.findFilledOrdersToday(startOfDay, endOfDay);
+		List<Order> filledToday = orderRepository.findFilledOrdersToday(startOfDay, endOfDay);
 
-	    return filledToday.stream()
-	            .map(orderMapper::toResponse)
-	            .collect(Collectors.toList());
+		return filledToday.stream()
+				.map(orderMapper::toResponse)
+				.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
@@ -309,27 +310,27 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.getTodayTotalVolume(startOfDay, endOfDay);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<PopularStockCodesResponse> getPopularStockCodes() {
-	    return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
-	            .stream()
-	            .map(PopularStockCodesResponse::new)
-	            .toList();
+		return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
+				.stream()
+				.map(PopularStockCodesResponse::new)
+				.toList();
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public BigDecimal getTotalTradeVolume() {
-	    return orderRepository.getTotalTradeVolume();
+		return orderRepository.getTotalTradeVolume();
 	}
-	
+
 	@Transactional(readOnly = true)
 	public Long getTodayOrderCount() {
-	    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-	    LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
-	    return orderRepository.countTodayOrders(startOfDay, endOfDay);
+		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
+		return orderRepository.countTodayOrders(startOfDay, endOfDay);
 	}
 
 }

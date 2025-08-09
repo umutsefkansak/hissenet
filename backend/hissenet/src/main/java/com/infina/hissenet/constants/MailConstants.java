@@ -40,17 +40,6 @@ public final class MailConstants {
     }
 
 
-    /**
-     * Purpose messages for verification code templates.
-     */
-    public static final class PurposeMessages {
-        private PurposeMessages() {}
-
-        public static final String PASSWORD_RESET = "şifrenizi sıfırlamak";
-        public static final String LOGIN_NOTIFICATION = "hesabınıza giriş yapmak";
-        public static final String DEFAULT = "işleminizi tamamlamak";
-    }
-
 
     /**
      * User-facing messages and error codes.
@@ -59,15 +48,9 @@ public final class MailConstants {
         private Messages() {}
 
         // Success messages
-        public static final String MAIL_SENT_SUCCESS = "Mail başarıyla gönderildi";
-        public static final String MAIL_SEND_ERROR = "Mail gönderilirken hata oluştu: ";
-        public static final String VERIFICATION_CODE_SENT = "Doğrulama kodu gönderildi";
-        public static final String VERIFICATION_CODE_SEND_ERROR = "Doğrulama kodu gönderilirken hata oluştu: ";
+
         public static final String CODE_VERIFIED_SUCCESS = "Kod başarıyla doğrulandı";
-        public static final String PASSWORD_CHANGE_TOKEN_SENT = "Şifre değiştirme linki gönderildi";
-        public static final String PASSWORD_CHANGE_TOKEN_SEND_ERROR = "Şifre değiştirme linki gönderilirken hata oluştu: ";
         public static final String PASSWORD_CHANGE_TOKEN_VALID = "Şifre değiştirme token'ı geçerli";
-        public static final String PASSWORD_CHANGE_TOKEN_VERIFY_ERROR = "Şifre değiştirme token'ı doğrulanırken hata oluştu: ";
         public static final String INVALID_PASSWORD_CHANGE_TOKEN = "Geçersiz veya süresi dolmuş şifre değiştirme linki";
 
         // Security and limit messages
@@ -77,19 +60,8 @@ public final class MailConstants {
         public static final String ACTIVE_CODE_NOT_FOUND = "Geçerli bir doğrulama kodu bulunamadı";
         public static final String CODE_BLOCKED = "Çok fazla yanlış deneme yapıldı. Kod bloke edildi.";
 
-        /** Format: "Wrong code. Remaining attempts: {count}" */
         public static final String WRONG_CODE_FORMAT = "Yanlış kod. Kalan deneme hakkı: %d";
 
-        // System messages
-        public static final String EXPIRED_CODES_CLEANED = "Süresi dolmuş doğrulama kodları temizlendi";
-        public static final String BLOCKED_CODES_UNBLOCKED = "Süresi dolmuş bloke kodları serbest bırakıldı";
-
-        // Email content
-        public static final String LOGIN_CODE_ADDITIONAL_INFO = "Hesabınıza güvenli giriş için bu kodu kullanın.";
-        public static final String PASSWORD_RESET_ADDITIONAL_INFO = "Şifrenizi güvenli bir şekilde sıfırlayabilmek için bu kodu kullanın.";
-        public static final String DO_NOT_SHARE_CODE = "Bu kodu kimseyle paylaşmayınız.";
-        public static final String AUTO_GENERATED_MAIL = "Bu mail otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.";
-        public static final String AUTO_GENERATED_NOTIFICATION = "Bu mail otomatik olarak gönderilmiştir.";
     }
 
     /**

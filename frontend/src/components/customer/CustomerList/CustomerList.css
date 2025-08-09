@@ -56,7 +56,7 @@
   
   .summary-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
   }
   
   .summary-card h3 {
@@ -79,7 +79,7 @@
     color: #dc3545;
   }
 .summary-card .dashboard-card {
-    background: transparent;
+
     box-shadow: none;
     padding: 0;
     margin: 0;
@@ -252,7 +252,7 @@
 }
 
 .btn-view {
-    background: rgb(50, 86, 207); 
+    background:  #1e3a8a;
     color: rgb(255, 255, 255);
     box-shadow: 0 1px 4px rgba(0, 123, 255, 0.1);
 }

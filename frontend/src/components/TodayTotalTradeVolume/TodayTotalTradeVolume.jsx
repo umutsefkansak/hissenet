@@ -22,6 +22,7 @@ export default function TodayTotalTradeVolumeCard() {
   return (
     <DashboardCard
       title="Günlük Toplam Hacim"
+      className="no-hover"
       value={dailyVolume !== null ? `${dailyVolume}₺` : "Yükleniyor..."}
       subtitle=""
       iconVariant="volume"

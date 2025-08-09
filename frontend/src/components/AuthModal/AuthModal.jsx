@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import './AuthModal.css';
 import logo from '../../images/logo-transparan1.png'; // replace with your logo path
 
@@ -7,15 +8,19 @@ export default function AuthModal({ isOpen, onClose, onConfirm }) {
    const inputRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setValue('');
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
+    if (!isOpen) return;
+    setValue('');
+    setTimeout(() => inputRef.current?.focus(), 0);
+
+    // body scroll kilidi
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  return (
+  const node = (
      <div className="auth-overlay" onClick={onClose}>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         <img src={logo} alt="Hissenet Logo" className="auth-logo" />
@@ -37,4 +42,6 @@ export default function AuthModal({ isOpen, onClose, onConfirm }) {
       </div>
     </div>
   );
+    return createPortal(node, document.body);
+
 }

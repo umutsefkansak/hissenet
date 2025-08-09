@@ -1,3 +1,4 @@
+// frontend/src/components/customer/CustomerList/CustomerList.jsx
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomerUpdateModal from '../CustomerEditModal/CustomerUpdateModal';
@@ -5,6 +6,7 @@ import TodayTotalTradeVolumeCard from '../../TodayTotalTradeVolume/TodayTotalTra
 import ActiveCustomerCard from '../../ActiveCustomerCard/ActiveCustomerCard';
 import MostActiveStockCard from '../../MostActiveStock/MostActiveStock';
 import EditButton from '../../common/Button/EditButton';
+import Pagination from '../../common/Pagination/Pagination';
 import './CustomerList.css';
 
 const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
@@ -12,10 +14,12 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
- 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage] = useState(8);
-  
+
+  // Pagination (0-based)
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
+
+  // Sorting
   const [sortConfig, setSortConfig] = useState({
     key: 'id',
     direction: 'asc'
@@ -27,17 +31,17 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
     return customer.customerType === 'INDIVIDUAL' ? 'Bireysel' : 'Kurumsal';
   };
 
-  const sortCustomers = (customers, key, direction) => {
-    return [...customers].sort((a, b) => {
+  const sortCustomers = (list, key, direction) => {
+    return [...list].sort((a, b) => {
       let aValue, bValue;
-  
+
       if (key === 'name') {
         aValue = a.customerType === 'INDIVIDUAL'
           ? `${a.firstName} ${a.lastName}`.toLowerCase()
-          : a.companyName.toLowerCase();
+          : (a.companyName || '').toLowerCase();
         bValue = b.customerType === 'INDIVIDUAL'
           ? `${b.firstName} ${b.lastName}`.toLowerCase()
-          : b.companyName.toLowerCase();
+          : (b.companyName || '').toLowerCase();
       } else if (typeof a[key] === 'number' || typeof b[key] === 'number') {
         aValue = Number(a[key]) || 0;
         bValue = Number(b[key]) || 0;
@@ -45,55 +49,44 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         aValue = (a[key] ?? '').toString().toLowerCase();
         bValue = (b[key] ?? '').toString().toLowerCase();
       }
-  
+
       if (aValue === bValue) return 0;
       return direction === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
     });
   };
 
   const handleSort = (key) => {
-    setSortConfig(prevConfig => ({
+    setSortConfig(prev => ({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
-    setCurrentPage(1); 
+    setPage(0);
   };
 
+  // Filter + Sort
   const filteredAndSortedCustomers = useMemo(() => {
     let filtered = customers;
-    
+
     if (searchTerm.trim()) {
       filtered = customers.filter(customer => {
-        const fullName = customer.customerType === 'INDIVIDUAL' 
+        const fullName = customer.customerType === 'INDIVIDUAL'
           ? `${customer.firstName} ${customer.lastName}`.toLowerCase()
-          : customer.companyName.toLowerCase();
-        
+          : (customer.companyName || '').toLowerCase();
+
         return fullName.startsWith(searchTerm.toLowerCase());
       });
     }
-    
+
     return sortCustomers(filtered, sortConfig.key, sortConfig.direction);
   }, [customers, searchTerm, sortConfig]);
 
-  const getPaginatedCustomers = () => {
-    const indexOfLastCustomer = currentPage * customersPerPage;
-    const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-    return filteredAndSortedCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
-  };
+  // Paged data
+  const paginatedCustomers = useMemo(() => {
+    const start = page * pageSize;
+    return filteredAndSortedCustomers.slice(start, start + pageSize);
+  }, [filteredAndSortedCustomers, page, pageSize]);
 
-  const totalPages = Math.ceil(filteredAndSortedCustomers.length / customersPerPage);
-  
-  const goToPage = (page) => {
-    setCurrentPage(page);
-  };
-
-  const goToPreviousPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
-  };
-
-  const goToNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  };
+  const totalPages = Math.ceil(filteredAndSortedCustomers.length / pageSize);
 
   const SortIndicator = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
@@ -119,10 +112,9 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
     setIsUpdateModalOpen(false);
     setSelectedCustomer(null);
   };
-  
 
   const handleUpdateSubmit = async (updateData) => {
-    await onUpdate(updateData); 
+    await onUpdate(updateData);
   };
 
   if (loading) {
@@ -145,7 +137,6 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
 
   return (
     <div className="customer-list">
-      
       {shouldShowCards && (
         <div className="summary-cards">
           <div className="summary-card">
@@ -178,7 +169,7 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
             className="search-input-customer"
           />
           {searchTerm && (
-            <button 
+            <button
               className="clear-search"
               onClick={() => setSearchTerm('')}
             >
@@ -192,25 +183,25 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         <table className="customer-table">
           <thead>
             <tr>
-              <th 
+              <th
                 className="sortable-header"
                 onClick={() => handleSort('name')}
               >
                 Ad Soyad <SortIndicator columnKey="name" />
               </th>
-              <th 
+              <th
                 className="sortable-header"
                 onClick={() => handleSort('email')}
               >
                 Email <SortIndicator columnKey="email" />
               </th>
-              <th 
+              <th
                 className="sortable-header"
                 onClick={() => handleSort('phone')}
               >
                 Telefon <SortIndicator columnKey="phone" />
               </th>
-              <th 
+              <th
                 className="sortable-header"
                 onClick={() => handleSort('customerType')}
               >
@@ -220,10 +211,10 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
             </tr>
           </thead>
           <tbody>
-            {getPaginatedCustomers().map((customer) => (
+            {paginatedCustomers.map((customer) => (
               <tr key={customer.id}>
                 <td>
-                  {customer.customerType === 'INDIVIDUAL' 
+                  {customer.customerType === 'INDIVIDUAL'
                     ? `${customer.firstName} ${customer.lastName}`
                     : customer.companyName
                   }
@@ -237,13 +228,13 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
                 </td>
                 <td>
                   <div className="customer-actions">
-                    <button 
+                    <button
                       className="btn-view"
                       onClick={() => handleViewCustomer(customer.id)}
                     >
                       Görüntüle
                     </button>
-                    <EditButton 
+                    <EditButton
                       onClick={() => handleUpdateCustomer(customer)}
                     />
                   </div>
@@ -254,46 +245,14 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         </table>
       </div>
 
-      {filteredAndSortedCustomers.length > customersPerPage && (
-        <div className="pagination-container">
-          <div className="pagination-info">
-            {((currentPage - 1) * customersPerPage) + 1} - {Math.min(currentPage * customersPerPage, filteredAndSortedCustomers.length)} / {filteredAndSortedCustomers.length} müşteri
-          </div>
-          <div className="pagination-controls">
-            <button 
-              className="pagination-button"
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="15,18 9,12 15,6"/>
-              </svg>
-            </button>
-            
-            <div className="page-numbers">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  className={`page-number ${currentPage === page ? 'active' : ''}`}
-                  onClick={() => goToPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-            
-            <button 
-              className="pagination-button"
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="9,18 15,12 9,6"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        totalElements={filteredAndSortedCustomers.length}
+        pageSize={pageSize}
+        onPageChange={(p) => setPage(p)}
+        onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+      />
 
       <CustomerUpdateModal
         isOpen={isUpdateModalOpen}

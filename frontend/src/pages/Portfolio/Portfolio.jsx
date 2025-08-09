@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { portfolioApi } from '../../server/portfolioApi';
 import { walletApi } from '../../server/wallet';
+import UnauthorizedAccess from '../../components/common/UnauthorizedAccess/UnauthorizedAccess';
 import './Portfolio.css';
 import { FaChevronLeft, FaChevronRight, FaExchangeAlt } from 'react-icons/fa';
 
@@ -22,6 +23,31 @@ const Portfolio = () => {
   const [moveTargetPortfolio, setMoveTargetPortfolio] = useState('');
   const [moveLoading, setMoveLoading] = useState(false);
   const [moveError, setMoveError] = useState('');
+  const [hasAccess, setHasAccess] = useState(null); // null: checking, true: has access, false: no access
+
+  // Güvenlik kontrolü - URL'deki customerId ile localStorage'daki customerId eşleşmeli
+  const checkCustomerAccess = () => {
+    const storedCustomerId = localStorage.getItem('customerId');
+    const urlCustomerId = customerId;
+    
+    console.log('Portfolio Security Check:', {
+      storedCustomerId,
+      urlCustomerId,
+      match: storedCustomerId === urlCustomerId
+    });
+    
+    // Eğer localStorage'da customerId yoksa veya URL'deki ID ile eşleşmiyorsa yetkisiz erişim
+    if (!storedCustomerId || storedCustomerId !== urlCustomerId) {
+      return false;
+    }
+    return true;
+  };
+
+  // İlk yüklemede güvenlik kontrolü
+  useEffect(() => {
+    const hasValidAccess = checkCustomerAccess();
+    setHasAccess(hasValidAccess);
+  }, [customerId]);
 
   const riskProfileOptions = [
     { value: 'CONSERVATIVE', label: 'Muhafazakar' },
@@ -51,22 +77,44 @@ const Portfolio = () => {
 
   // Fetch portfolios and wallet balance on component mount
   useEffect(() => {
-    fetchPortfolios();
-    fetchWalletBalance();
-    fetchBlockedBalance();
-  }, [customerId]);
+    if (hasAccess === true) {
+      fetchPortfolios();
+      fetchWalletBalance();
+      fetchBlockedBalance();
+    }
+  }, [customerId, hasAccess]);
 
   // Fetch stock transactions when selected portfolio changes
   useEffect(() => {
-    if (selectedPortfolio) {
+    if (selectedPortfolio && hasAccess === true) {
       fetchStockTransactions(selectedPortfolio.id);
     }
-  }, [selectedPortfolio]);
+  }, [selectedPortfolio, hasAccess]);
 
   useEffect(() => {
     setPortfolioPage(0); // Portföy değişince ilk sayfaya dön
     setHistoryPage(0);
   }, [selectedPortfolio, activeTab]);
+
+  // Güvenlik kontrolü sonucu bekleniyor
+  if (hasAccess === null) {
+    return (
+      <div className="portfolio">
+        <div className="loading">Yetki kontrol ediliyor...</div>
+      </div>
+    );
+  }
+
+  // Yetkisiz erişim
+  if (hasAccess === false) {
+    return (
+      <UnauthorizedAccess 
+        title="Yetkisiz Portföy Erişimi"
+        message="Bu müşteri portföyüne erişim yetkiniz bulunmamaktadır."
+        description="Yalnızca kendi portföyünüze erişebilirsiniz. Lütfen doğru müşteri hesabı ile giriş yapın."
+      />
+    );
+  }
 
   const fetchPortfolios = async () => {
     try {

@@ -39,8 +39,7 @@ public record EmployeeCreateRequest(
 		)
 		String password,
 
-		@NotBlank(message = "{validation.emergency.contact.name.required}")
-		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "{validation.emergency.contact.phone.invalid}")
+		@Size(max = 100, message = "{validation.emergency.contact.name.size}")
 		String emergencyContactName,
 
 		@NotBlank(message = "{validation.emergency.contact.phone.required}")

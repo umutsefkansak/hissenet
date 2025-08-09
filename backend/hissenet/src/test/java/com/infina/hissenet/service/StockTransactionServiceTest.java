@@ -33,6 +33,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class StockTransactionServiceTest {
 
+
     @Mock private JpaRepository<StockTransaction, Long> jpaRepository;
     @Mock private StockTransactionRepository stockTransactionRepository;
     @Mock private PortfolioService portfolioService;

@@ -36,7 +36,7 @@ public class OrderScheduler {
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 60000 * 5 + 1)
+    @Scheduled(fixedDelay = 2000)
     public void processPendingLimitOrders() {
   /*      if (!marketHourService.isMarketOpen()){
             return;

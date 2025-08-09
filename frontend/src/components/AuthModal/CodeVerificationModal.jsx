@@ -1,17 +1,20 @@
 // src/components/AuthModal/CodeVerificationModal.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import './AuthModal.css';
 
-export function CodeVerificationModal({ isOpen, onClose, onConfirm,  maxAttempts, attemptsLeft }) {
+export function CodeVerificationModal({ isOpen, onClose, onConfirm, maxAttempts, attemptsLeft }) {
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const inputs = useRef([]);
 
   // Modal açıldığında sıfırla ve ilk input’a odaklan
   useEffect(() => {
-    if (isOpen) {
-      setDigits(['', '', '', '', '', '']);
-      inputs.current[0]?.focus();
-    }
+    if (!isOpen) return;
+    setDigits(['', '', '', '', '', '']);
+    inputs.current[0]?.focus();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -21,7 +24,7 @@ export function CodeVerificationModal({ isOpen, onClose, onConfirm,  maxAttempts
     const next = [...digits];
     next[i] = val;
     setDigits(next);
-    if (val && i < 5) inputs.current[i+1]?.focus();
+    if (val && i < 5) inputs.current[i + 1]?.focus();
   };
 
   const handlePaste = (e) => {
@@ -51,25 +54,25 @@ export function CodeVerificationModal({ isOpen, onClose, onConfirm,  maxAttempts
     if (code.length === 6) onConfirm(code);
   };
 
-  return (
+const node = (
     <div className="auth-overlay" onClick={onClose}>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         <h2 className="ham-title">E-posta Doğrulama</h2>
         <p>Müşterinin mail adresine gönderilen kodu girin:</p>
-         {(maxAttempts != null) && (
-           <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 4 }}>
+        {(maxAttempts != null) && (
+          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 4 }}>
             Kalan hak: <b>{attemptsLeft != null ? attemptsLeft : '-'}/{maxAttempts}</b>
           </p>
         )}
-        <div style={{ display:'flex', gap:8, justifyContent:'center', margin:'1rem 0' }}>
-          {digits.map((d,i) => (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', margin: '1rem 0' }}>
+          {digits.map((d, i) => (
             <input
               key={i}
               ref={el => inputs.current[i] = el}
               type="text"
               maxLength="1"
               className="auth-input"
-              style={{ width:'3rem', textAlign:'center' }}
+              style={{ width: '3rem', textAlign: 'center' }}
               value={d}
               onChange={e => handleChange(i, e.target.value)}
               onPaste={handlePaste}
@@ -82,4 +85,6 @@ export function CodeVerificationModal({ isOpen, onClose, onConfirm,  maxAttempts
       </div>
     </div>
   );
+    return createPortal(node, document.body);
+
 }

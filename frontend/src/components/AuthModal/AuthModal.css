@@ -1,14 +1,16 @@
 .auth-overlay {
   position: fixed;
+    inset: 0;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* navbar ve drawer’dan üstte olmalı */
+  z-index: 9999; /* navbar ve drawer’dan üstte olmalı */
 }
 
 .auth-modal {
+   position: relative;
   background: #fff;
   border-radius: 8px;
   padding: 2.5rem 2rem;
@@ -16,6 +18,7 @@
   max-width: 90%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   text-align: center;
+   z-index: 10000; 
 }
 
 .auth-modal h2 {

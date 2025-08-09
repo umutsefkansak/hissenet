@@ -1,4 +1,5 @@
 import React, { useEffect,useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useEmployees from '../../hooks/EmployeeManagement/useEmployees';
 import EmployeeTable from '../../components/employeeManagement/EmployeeTable';
 import EmployeeForm from '../../components/employeeManagement/EmployeeForm';
@@ -12,9 +13,11 @@ import TrendArrow from '../../components/Icons/TrendArrow';
 import UsersIconBlue from '../../components/Icons/UsersIconBlue';
 import UserActivityIcon from '../../components/Icons/UserActivityIcon';
 import PlusIcon from '../../components/Icons/PlusIcon';
+import { isAdmin } from '../../utils/authUtils';
 
 
 const EmployeeManagementPage = () => {
+    const navigate = useNavigate();
     const {
         paginationData,
         paginationParams,
@@ -34,8 +37,37 @@ const EmployeeManagementPage = () => {
     const [todayTradeVolume, setTodayTradeVolume] = useState(null);
     const [todayOrderCount, setTodayOrderCount] = useState(null);
 
-
+    // ADMIN rolü kontrolü
     useEffect(() => {
+        // Önce giriş yapmış mı kontrol et
+        const isLoggedIn = localStorage.getItem('isLogin') === 'true';
+        
+        if (!isLoggedIn) {
+            window.showToast && window.showToast(
+                'Bu sayfaya erişmek için önce giriş yapmanız gerekmektedir.', 
+                'warning', 
+                5000
+            );
+            navigate('/login');
+            return;
+        }
+        
+        // Giriş yapmış ama ADMIN değil
+        if (!isAdmin()) {
+            window.showToast && window.showToast(
+                'Yetkiniz yok! Bu sayfaya erişim için ADMIN rolü gereklidir.', 
+                'error', 
+                5000
+            );
+            navigate('/');
+            return;
+        }
+    }, [navigate]);
+
+    // Dashboard verilerini yükle
+    useEffect(() => {
+        if (!isAdmin()) return; // ADMIN değilse veri yükleme
+
         const fetchTodayTradeVolume = async () => {
             try {
                 const result = await orderApi.getTodayTotalTradeVolume();
@@ -55,10 +87,43 @@ const EmployeeManagementPage = () => {
             }
         };
 
-
         fetchTodayTradeVolume();
         fetchTodayOrderCount();
     }, []);
+
+    // Eğer giriş yapmamışsa veya ADMIN değilse, sayfa içeriğini gösterme
+    const isLoggedIn = localStorage.getItem('isLogin') === 'true';
+    
+    if (!isLoggedIn) {
+        return (
+            <div className="employee-management-page">
+                <div className="unauthorized-access">
+                    <h2>🔐 Giriş Gerekli</h2>
+                    <p>Bu sayfaya erişmek için önce giriş yapmanız gerekmektedir.</p>
+                    <button onClick={() => navigate('/login')} className="back-to-home-btn">
+                        Giriş Yap
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    if (!isAdmin()) {
+        return (
+            <div className="employee-management-page">
+                <div className="unauthorized-access">
+                    <h2>🔒 Yetkisiz Erişim</h2>
+                    <p>Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+                    <p className="unauthorized-detail">
+                        Personel Yönetimi sayfasına erişmek için ADMIN rolüne sahip olmanız gerekmektedir.
+                    </p>
+                    <button onClick={() => navigate('/')} className="back-to-home-btn">
+                        Ana Sayfaya Dön
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
 
     const dashboardData = {

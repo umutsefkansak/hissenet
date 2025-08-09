@@ -26,6 +26,7 @@ public class Role extends BaseEntity implements GrantedAuthority {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<Employee> employees = new HashSet<>();
 
@@ -64,6 +65,6 @@ public class Role extends BaseEntity implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return getName();
+        return "ROLE_" + getName();
     }
 }

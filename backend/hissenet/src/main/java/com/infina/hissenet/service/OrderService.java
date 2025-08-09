@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
-import com.infina.hissenet.exception.order.IllegalStateException;
-import com.infina.hissenet.exception.stock.StockNotFoundException;
+
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
@@ -108,7 +107,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 			return;
 		}*/
 		if (request.type() != null) {
-			handleWalletTransaction(request, totalAmount);
+			handleWalletTransaction(request, order, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
 		} else {
 			order.setStatus(OrderStatus.REJECTED);
@@ -132,14 +131,19 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 				order.setStatus(OrderStatus.OPEN);
 				return;
 			}*/
-			handleWalletTransaction(request, totalAmount);
+			handleWalletTransaction(request, order, totalAmount);
 			order.setStatus(OrderStatus.FILLED);
 		} else {
 			order.setStatus(OrderStatus.OPEN);
 		}
 	}
-	private void handleWalletTransaction(OrderCreateRequest request, BigDecimal totalAmount) {
-		BigDecimal commission = totalAmount.multiply(COMMISSION_RATE);
+	private void handleWalletTransaction(OrderCreateRequest request, Order order, BigDecimal totalAmount) {
+		Customer customer = order.getCustomer();
+		BigDecimal customerRate = customer != null && customer.getCommissionRate() != null
+				? customer.getCommissionRate()
+				: COMMISSION_RATE;
+
+		BigDecimal commission = totalAmount.multiply(customerRate);
 
 		if (request.type() == OrderType.BUY) {
 			walletService.processStockPurchase(request.customerId(), totalAmount, commission);
@@ -314,10 +318,10 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	@Override
 	@Transactional(readOnly = true)
 	public List<PopularStockCodesResponse> getPopularStockCodes() {
-		return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
-				.stream()
-				.map(PopularStockCodesResponse::new)
-				.toList();
+	    return orderRepository.findPopularStockCodes(PageRequest.of(0, 10))
+	            .stream()
+	            .map(stockCode -> new PopularStockCodesResponse((String) stockCode))
+	            .toList();
 	}
 
 	@Override

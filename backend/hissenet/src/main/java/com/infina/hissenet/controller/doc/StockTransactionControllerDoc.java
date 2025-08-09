@@ -313,4 +313,63 @@ public interface StockTransactionControllerDoc {
                     in = ParameterIn.PATH, example = "THYAO")
             String stockCode
     );
+
+    @Operation(
+            summary = "Belirli bir müşterinin sahip olduğu toplam hisse adedi (farklı hisse sayısı)",
+            description = """
+            Müşterinin tüm portföylerindeki pozisyonlara bakarak, sahip olduğu farklı hisse senedi sayısını döndürür.
+            
+            Hesaplama kriterleri:
+            - Sadece BUY (alım) ve SETTLED (takas edilmiş) işlemler baz alınır
+            - Farklı hisse kodları tekil olarak sayılır (aynı koda ait birden fazla işlem 1 sayılır)
+            - Tüm portföyler üzerinden hesaplanır
+            
+            Kullanım alanları:
+            - Portföy çeşitliliği göstergesi
+            - Dashboard/özet ekranları
+            """,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Toplam farklı hisse sayısı başarıyla getirildi",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "status": 200,
+                      "path": null,
+                      "message": "hisse sayısı",
+                      "localDateTime": "2025-08-03T14:30:15.123",
+                      "data": 7
+                    }
+                    """
+                            ))),
+                    @ApiResponse(responseCode = "404", description = "Müşteri bulunamadı",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/not-found",
+                      "title": "Resource Not Found",
+                      "status": 404,
+                      "detail": "Customer not found with id: 123",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                            ))),
+                    @ApiResponse(responseCode = "500", description = "Sunucu hatası",
+                            content = @Content(schema = @Schema(
+                                    example = """
+                    {
+                      "type": "https://www.hissenet.com/errors/internal",
+                      "title": "Internal Server Error",
+                      "status": 500,
+                      "detail": "Internal server error occurred",
+                      "timestamp": "2025-08-03T14:30:15.123"
+                    }
+                    """
+                            )))
+            }
+    )
+    com.infina.hissenet.common.ApiResponse<Integer> getStockSizeForStockTransaction(
+            @Parameter(description = "Müşteri ID'si", required = true,
+                    in = ParameterIn.PATH, example = "123")
+            Long customerId
+    );
 }

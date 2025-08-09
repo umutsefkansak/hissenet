@@ -30,16 +30,13 @@ export const cleanInput = (value, type) => {
 
     switch (type) {
         case 'name':
-            return value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s]/g, '').trim();
+            return value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s]/g, '');
 
         case 'phone':
             return value.replace(/[^0-9]/g, '').slice(0, 10);
 
         case 'email':
             return value.trim().toLowerCase();
-
-        case 'position':
-            return value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s\-.,]/g, '').trim();
 
         default:
             return value.trim();
@@ -49,7 +46,6 @@ export const cleanInput = (value, type) => {
 export const fieldTypes = {
     firstName: 'name',
     lastName: 'name',
-    position: 'position',
     phone: 'phone',
     emergencyContactName: 'name',
     emergencyContactPhone: 'phone',

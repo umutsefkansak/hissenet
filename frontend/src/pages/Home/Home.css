@@ -107,7 +107,7 @@
 }
 
 .welcome-modal-card {
-  background: linear-gradient(135deg, #1a2a55 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1d293d 0%, #263753 100%);
   color: #fff;
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(30, 41, 59, 0.18);
@@ -134,22 +134,26 @@
 }
 
 .welcome-login-btn {
-  background: linear-gradient(90deg, #e6e3e3 0%, #2b3a6b 100%);
-  color: #fadbdb !important;
-  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1d293d !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
   padding: 16px 48px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(255, 94, 98, 0.15);
-  transition: background 0.2s, transform 0.2s, color 0.2s;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
   margin-top: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .welcome-login-btn:hover {
-  background: linear-gradient(90deg, #ff9966 0%, #db1417 100%);
-  color: #f1efef !important;
-  transform: translateY(-2px) scale(1.03);
+  background: rgba(255, 255, 255, 1);
+  color: #1d293d !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Responsive Design */

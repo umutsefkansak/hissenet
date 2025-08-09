@@ -1,6 +1,7 @@
 import React from 'react';
 import FormSelect from './FormSelect';
 import { useLocation } from '../../hooks/CreateCustomer/useLocation';
+import styles from '../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const LocationSelector = ({
                               cityValue,
@@ -25,7 +26,7 @@ const LocationSelector = ({
     };
 
     return (
-        <div className="form-row">
+        <div className={styles.formRow}>
             <FormSelect
                 label="İl"
                 name="city"

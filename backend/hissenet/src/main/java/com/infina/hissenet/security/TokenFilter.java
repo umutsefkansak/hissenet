@@ -15,6 +15,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 @Component
 public class TokenFilter extends OncePerRequestFilter{
+    /**
+     * Resolves authenticated user from Redis-backed JWT token using a sessionId
+     * stored in cookies, and sets the Spring Security context.
+     *
+     * Author: Furkan Can
+     */
     private final JwtService jwtService;
     private final RedisTokenService redisTokenService;
 

@@ -12,6 +12,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 
+/**
+ * HTTP security configuration for the application.
+ *
+ * Responsibilities:
+ * - Enables stateless sessions for JWT-based authentication
+ * - Configures exception handling with RFC 7807 Problem Details responses
+ * - Whitelists public endpoints (auth, swagger, websockets)
+ * - Registers token and session-extension filters
+ *
+ * Author: Furkan Can
+ */
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
@@ -26,6 +37,11 @@ public class WebSecurityConfig {
 
 
     @Bean
+    /**
+     * Builds the security filter chain including authorization rules,
+     * exception handling, and custom filters for token validation and
+     * session extension.
+     */
     SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())

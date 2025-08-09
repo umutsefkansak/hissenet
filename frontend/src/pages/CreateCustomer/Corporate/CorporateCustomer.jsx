@@ -35,8 +35,8 @@ const CorporateCustomer = () => {
         street: '',
         district: '',
         city: '',
-        state: '',
-        country: 'Turkey',
+        state: 'Türkiye',
+        country: 'Türkiye',
         postalCode: '',
         commissionRate: '',
 
@@ -47,7 +47,7 @@ const CorporateCustomer = () => {
         requiredFields: [
             'companyName', 'taxNumber', 'taxOffice', 'establishmentDate', 'sector',
             'authorizedPersonName', 'authorizedPersonTcNumber', 'authorizedPersonPhone', 'authorizedPersonEmail',
-            'phoneNumber', 'email', 'addressType', 'street', 'city', 'state', 'country'
+            'phoneNumber', 'email', 'addressType', 'street', 'city'
         ]
     };
 

@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PasswordEncoderBean {
+    /**
+     * Provides a BCrypt password encoder bean for hashing and verifying passwords.
+     *
+     * Author: Furkan Can
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
 }

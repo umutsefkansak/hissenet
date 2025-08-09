@@ -8,6 +8,12 @@ import java.time.Duration;
 
 @Service
 public class RedisTokenService implements IRedisTokenService {
+    /**
+     * Manages session tokens in Redis and coordinates TTL extension
+     * by leveraging JWT regeneration with preserved claims.
+     *
+     * Author: Furkan Can
+     */
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtService jwtService;
 

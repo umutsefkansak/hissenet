@@ -54,7 +54,7 @@ const ForgotPassword = () => {
           </div>
           <h1 className="forgot-password-title">Şifremi Unuttum</h1>
           <p className="forgot-password-description">
-           Şifrenizi sıfırlamak için e-posta adresinizi giriniz.
+           Lütfen e-posta adresinizi giriniz.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ const ForgotPassword = () => {
         ) : (
           <form className="forgot-password-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label">E-posta Adresi</label>
+              <label className="form-label">E-POSTA ADRESİ</label>
               <input
                 type="email"
                 value={email}

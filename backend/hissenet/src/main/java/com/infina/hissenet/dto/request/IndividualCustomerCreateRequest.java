@@ -42,7 +42,6 @@ public record IndividualCustomerCreateRequest(
         String educationLevel,
         RiskProfile riskProfile,
         @DecimalMin(value = "0.0", message = "{validation.commission.negative}")
-        @DecimalMax(value = "5.0", message = "{validation.commission.max}")
         BigDecimal commissionRate,
         IncomeRange incomeRange
 ) {}

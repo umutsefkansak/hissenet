@@ -27,10 +27,10 @@ export const calculateRiskProfile = async (selectedOptionIndexes) => {
 
 export const translateRiskProfile = (riskProfile) => {
     const translations = {
-        'CONSERVATIVE': 'Muhafazakar',
+        'CONSERVATIVE': 'Düşük Risk',
         'MODERATE': 'Orta Risk',
-        'AGGRESSIVE': 'Agresif',
-        'VERY_AGGRESSIVE': 'Çok Agresif'
+        'AGGRESSIVE': 'Yüksek Risk',
+        'VERY_AGGRESSIVE': 'Çok Yüksek Risk'
     };
     return translations[riskProfile] || riskProfile;
 };

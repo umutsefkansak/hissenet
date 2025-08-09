@@ -7,7 +7,11 @@ import {
     CorporateContactInfoSection,
     FormActions
 } from '../../../components/CreateCustomer';
-import { createCorporateCustomer,mapCorporateFormDataToCustomerDto,handleCustomerApiError } from '../../../server/customer';
+import {
+    createCorporateCustomer,
+    mapCorporateFormDataToCustomerDto,
+    handleCustomerApiError
+} from '../../../server/customer';
 import { createAddress, mapFormDataToAddressDto, handleAddressApiError } from '../../../server/address';
 import styles from '../CreateCustomer.module.css';
 
@@ -47,7 +51,7 @@ const CorporateCustomer = () => {
         requiredFields: [
             'companyName', 'taxNumber', 'taxOffice', 'establishmentDate', 'sector',
             'authorizedPersonName', 'authorizedPersonTcNumber', 'authorizedPersonPhone', 'authorizedPersonEmail',
-            'phoneNumber', 'email', 'addressType', 'street', 'city'
+            'phoneNumber', 'email', 'addressType', 'street', 'city','commissionRate'
         ]
     };
 

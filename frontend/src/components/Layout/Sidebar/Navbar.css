@@ -164,7 +164,6 @@
   background: #1d293d;
   z-index: 1001;
   transition: all 0.3s ease;
-  overflow-y: auto;
 }
 
 .drawer-menu.open {

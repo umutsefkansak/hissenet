@@ -38,6 +38,7 @@ export default function ActiveCustomerCard() {
   return (
     <DashboardCard
       title="Aktif Müşteri"
+      className='no-hover'
       value={
         activeCustomerCount !== null
           ? activeCustomerCount.toLocaleString('tr-TR')

@@ -35,6 +35,7 @@ export default function MostActiveStockCard() {
   return (
     <DashboardCard
       title="En Çok İşlem Gören Hisse"
+      className='no-hover'
       value={topCode !== null ? topCode : "Yükleniyor..."}
       subtitle=""
       iconVariant="volume"

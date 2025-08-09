@@ -11,6 +11,19 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Intercepts incoming HTTP requests and enforces per-client rate limiting
+ * using Bucket4j token buckets. Adds remaining limit information to
+ * response headers and throws a domain-specific exception when limits are
+ * exceeded.
+ *
+ * Responsibilities:
+ * - Create and cache token buckets per client IP
+ * - Consume a token for each request and expose remaining tokens
+ * - Signal rate limit exceedance via {@link RateLimitException}
+ *
+ * Author: Furkan Can
+ */
 @Configuration
 public class RateLimitInterceptor implements HandlerInterceptor {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
@@ -20,6 +33,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         this.rateLimitConfig = rateLimitConfig;
     }
     @Override
+    /**
+     * Applies rate limiting before controller execution.
+     * @return true if request is allowed, otherwise throws {@link RateLimitException}
+     */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String ipAddress = getClientIP(request);
 
@@ -37,6 +54,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     }
 
+    /**
+     * Determines the client IP using X-Forwarded-For when present,
+     * falling back to the remote address.
+     */
     private String getClientIP(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {

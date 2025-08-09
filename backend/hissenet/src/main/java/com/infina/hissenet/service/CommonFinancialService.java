@@ -9,6 +9,7 @@ import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.mapper.StockTransactionMapper;
 import com.infina.hissenet.repository.StockTransactionRepository;
+import com.infina.hissenet.service.abstracts.ICommonFinancialService;
 import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,22 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Common financial operations that aggregate and compute portfolio/transaction metrics.
+ * Extracted to be reused by multiple domain services such as portfolio and stock transactions.
+ *
+ * <p>Responsibilities:</p>
+ * - Merge BUY transactions by stock code and compute effective quantities and averages
+ * - Compute customer-position quantities across portfolios
+ *
+ * <p>Notes:</p>
+ * - Stream-based aggregations are used for readability and maintainability
+ * - Monetary fields are handled with BigDecimal using safe rounding modes
+ *
+ * @author Furkan Can
+ */
 @Service
-public class CommonFinancialService {
+public class CommonFinancialService implements ICommonFinancialService {
     private final StockTransactionRepository stockTransactionRepository;
     private final StockTransactionMapper stockTransactionMapper;
     private final CustomerService customerService;
@@ -29,6 +44,7 @@ public class CommonFinancialService {
         this.customerService = customerService;
     }
 
+    @Override
     public List<StockTransactionResponse> getAllBuyTransactions(Long portfolioId) {
         return stockTransactionRepository.findByPortfolioId(portfolioId).stream()
                 .filter(tx -> tx.getTransactionType() == StockTransactionType.BUY
@@ -40,6 +56,7 @@ public class CommonFinancialService {
                 .filter(response -> response.quantity() > 0)
                 .toList();
     }
+    @Override
     public StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
         if (transactions == null || transactions.isEmpty()) {
             throw new IllegalArgumentException(MessageUtils.getMessage("transaction.list.empty"));
@@ -100,6 +117,7 @@ public class CommonFinancialService {
                 baseResponse.updatedAt()
         );
     }
+    @Override
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {
         Customer customer = customerService.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException(customerId));

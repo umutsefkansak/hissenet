@@ -25,6 +25,16 @@ import java.util.List;
 
 
 
+/**
+ * Provides portfolio CRUD and value computations, including total value,
+ * total cost, and profit/loss metrics computed from merged BUY transactions.
+ *
+ * <p>Design notes:</p>
+ * - Delegates aggregation logic to common financial service for reuse
+ * - Uses defensive BigDecimal handling to avoid overflow on large datasets
+ *
+ * @author Furkan Can
+ */
 @Service
 public class PortfolioService extends GenericServiceImpl<Portfolio,Long> implements IPortfolioService {
     private final PortfolioRepository portfolioRepository;

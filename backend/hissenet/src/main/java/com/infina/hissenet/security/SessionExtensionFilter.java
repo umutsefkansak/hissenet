@@ -35,6 +35,13 @@ import java.util.concurrent.Executors;
  */
 @Component
 public class SessionExtensionFilter implements Filter {
+    /**
+     * Extends Redis session TTL and JWT expiration for active users
+     * without blocking the request pipeline. Uses in-memory throttling
+     * to limit Redis load and a small thread pool for async work.
+     *
+     * Author: Furkan Can
+     */
     private final RedisTokenService redisTokenService;
 
     private final ConcurrentHashMap<String, Long> lastExtendedTimes = new ConcurrentHashMap<>();

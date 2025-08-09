@@ -25,6 +25,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Manages stock transaction lifecycle and portfolio consistency.
+ *
+ * <p>Responsibilities:</p>
+ * - Create stock transactions from orders and validate business rules
+ * - Process settlements and update portfolio values atomically
+ * - Move transactions across portfolios with authorization checks
+ *
+ * <p>Integration:</p>
+ * - Relies on cache for current prices and financial service for aggregations
+ *
+ * @author Furkan Can
+ */
 @Service
 public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
 

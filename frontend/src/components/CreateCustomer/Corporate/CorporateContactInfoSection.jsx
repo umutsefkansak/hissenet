@@ -98,7 +98,7 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                     value={formData.commissionRate}
                     onChange={handleInputChange}
                     error={errors.commissionRate}
-                    placeholder="Varsayılan oran kullanılacak"
+                    placeholder="Komisyon oranı giriniz"
                     step="0.01"
                     min="0"
                     max="100"

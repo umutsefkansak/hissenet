@@ -9,7 +9,11 @@ import {
 } from '../../../components/CreateCustomer';
 import { RiskAssessmentModal } from '../../../components/RiskAssessment';
 import { translateRiskProfile } from '../../../server/riskAssessment';
-import { createIndividualCustomer, mapFormDataToCustomerDto, handleCustomerApiError } from '../../../server/customer';
+import {
+    createIndividualCustomer,
+    mapFormDataToCustomerDto,
+    handleCustomerApiError
+} from '../../../server/customer';
 import { createAddress, mapFormDataToAddressDto, handleAddressApiError } from '../../../server/address';
 import styles from '../CreateCustomer.module.css';
 
@@ -51,7 +55,7 @@ const IndividualCustomer = () => {
         requiredFields: [
             'firstName', 'lastName', 'tcNumber', 'birthDate', 'birthPlace',
             'educationLevel', 'gender', 'phoneNumber', 'email', 'addressType',
-            'street', 'city', 'monthlyIncome'
+            'street', 'city', 'monthlyIncome','commissionRate'
         ]
     };
 
@@ -127,6 +131,7 @@ const IndividualCustomer = () => {
             console.error('Customer/Address creation error:', error);
 
             let errorMessage = handleCustomerApiError(error);
+
 
             if (error.message && error.message.includes('address')) {
                 errorMessage = handleAddressApiError(error);

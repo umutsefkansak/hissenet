@@ -13,6 +13,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Handles authentication lifecycle such as login and logout,
+ * issuing JWT tokens and managing session state via Redis.
+ *
+ * <p>Security considerations:</p>
+ * - Passwords are verified using a strong encoder
+ * - JWT tokens are stored server-side with a session key for revocation
+ *
+ * @author Furkan Can
+ */
 @Service
 public class AuthService implements IAuthService {
     private final EmployeeService employeeService;

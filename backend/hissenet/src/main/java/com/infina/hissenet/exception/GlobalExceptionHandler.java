@@ -35,15 +35,23 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Centralized REST exception handling producing RFC 7807 Problem Details
+ * responses with localized titles and consistent structure.
+ *
+ * Responsibilities:
+ * - Maps domain/business exceptions to appropriate HTTP status codes
+ * - Includes timestamps and error details for client diagnostics
+ * - Uses MessageUtils for i18n-ready titles
+ *
+ * Author: Furkan Can
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // 404 - Not Found
     @ExceptionHandler({
             NotFoundException.class,
-            VerificationCodeNotFoundException.class,
-            RoleNotFoundException.class,
-            CustomerNotFoundException.class
     })
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());

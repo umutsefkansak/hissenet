@@ -25,6 +25,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Manages stock transaction lifecycle and portfolio consistency.
+ *
+ * <p>Responsibilities:</p>
+ * - Create stock transactions from orders and validate business rules
+ * - Process settlements and update portfolio values atomically
+ * - Move transactions across portfolios with authorization checks
+ *
+ * <p>Integration:</p>
+ * - Relies on cache for current prices and financial service for aggregations
+ *
+ * @author Furkan Can
+ */
 @Service
 public class StockTransactionService extends GenericServiceImpl<StockTransaction, Long> implements IStockTransactionService {
 
@@ -144,16 +157,31 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
     private StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
        return commonFinancialService.mergeTransactions(transactions);
     }
+    @Transactional
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
-        StockTransaction transaction = stockTransactionRepository.findById(transactionId).orElseThrow(()->new NotFoundException(MessageUtils.getMessage("stock.transaction.not.found", transactionId)));
-        Long oldPortfolioId = transaction.getPortfolio().getId();
-        Portfolio portfolio=portfolioService.findById(portfolioId).orElseThrow(()->new NotFoundException(MessageUtils.getMessage("portfolio.not.found", portfolioId)));
-        if (!portfolio.getCustomer().getId().equals(transaction.getPortfolio().getCustomer().getId())) {
-            throw new UnauthorizedOperationException(MessageUtils.getMessage("stock.transaction.unauthorized.portfolio"));        }
-        transaction.setPortfolio(portfolio);
-        save(transaction);
-        portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
-        portfolioService.updatePortfolioValues(oldPortfolioId);
+        StockTransaction transaction = stockTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException("Stock Transaction not found"));
+
+        Portfolio oldPortfolio = transaction.getPortfolio();
+        Portfolio newPortfolio = portfolioService.findById(portfolioId)
+                .orElseThrow(() -> new NotFoundException("New Portfolio not found"));
+
+        // Yetki kontrolü - Müşteri aynı mı
+        if (!oldPortfolio.getCustomer().getId().equals(newPortfolio.getCustomer().getId())) {
+            throw new UnauthorizedOperationException("You are not authorized to modify this portfolio");
+        }
+
+        String stockCode = transaction.getStockCode();
+        Long customerId = oldPortfolio.getCustomer().getId();
+
+        // Doğrudan güncelleme - update sorgusu ile bulk işlem
+        int updatedCount = stockTransactionRepository.updatePortfolioIdByCustomerIdAndStockCode(
+                portfolioId, customerId, stockCode
+        );
+
+        // Portföy değerlerini güncelle
+        portfolioService.updatePortfolioValues(portfolioId);
+        portfolioService.updatePortfolioValues(oldPortfolio.getId());
     }
     // aktif hisse adedini döndüren methot
     public Integer getQuantityForStockTransactionWithStream(Long customerId, String stockCode) {

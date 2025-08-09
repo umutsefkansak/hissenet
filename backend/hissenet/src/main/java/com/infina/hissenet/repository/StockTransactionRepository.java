@@ -4,6 +4,7 @@ import com.infina.hissenet.entity.StockTransaction;
 import com.infina.hissenet.entity.enums.StockTransactionType;
 import com.infina.hissenet.entity.enums.TransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -103,5 +104,19 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
             @Param("statuses") TransactionStatus statuses
     );
 
+    List<StockTransaction> findByPortfolio_Customer_IdAndStockCode(Long portfolioCustomerİd, String stockCode);
+
+    @Modifying
+    @Query("UPDATE StockTransaction st SET st.portfolio.id = :newPortfolioId " +
+            "WHERE st.portfolio.customer.id = :customerId AND st.stockCode = :stockCode")
+    int updatePortfolioIdByCustomerIdAndStockCode(@Param("newPortfolioId") Long newPortfolioId,
+                                                  @Param("customerId") Long customerId,
+                                                  @Param("stockCode") String stockCode);
+
+
 
 }
+
+
+
+

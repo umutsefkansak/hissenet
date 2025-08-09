@@ -205,9 +205,9 @@ const CustomerDetailPage = () => {
   const getOrderTypeText = (type) => {
     switch (type) {
       case 'BUY':
-        return 'Alım';
+	        return 'Alım';
       case 'SELL':
-        return 'Satım';
+	        return 'Satım';
       default:
         return type;
     }
@@ -220,9 +220,9 @@ const CustomerDetailPage = () => {
       case 'OPEN':
         return 'Beklemede';
       case 'FILLED':
-        return 'Onaylandı';
+	        return 'Onaylandı';
       case 'COMPLETED':
-        return 'Tamamlandı';
+	        return 'Tamamlandı';
       case 'CANCELLED':
         return 'İptal Edildi';
       case 'REJECTED':
@@ -265,8 +265,8 @@ const CustomerDetailPage = () => {
     return (
       <div className="customer-detail-page">
         <div className="error-container">
-          <h2>Müşteri Bulunamadı</h2>
-          <p>Belirtilen ID'ye sahip müşteri bulunamadı.</p>
+	          <h2>Müşteri Bulunamadı</h2>
+	          <p>Belirtilen ID'ye sahip müşteri bulunamadı.</p>
           <button className="btn-primary" onClick={handleBack}>
             Geri Dön
           </button>

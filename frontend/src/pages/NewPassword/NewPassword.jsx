@@ -22,7 +22,7 @@ const NewPassword = () => {
     const token = searchParams.get('token');
     
     if (!token || token.trim() === '') {
-      setError('Geçersiz link. Lütfen e-postanızdaki linki kullanın.');
+      setError('Bağlantının süresi dolmuş. Lütfen yeni bir bağlantı isteyin.');
       setTokenLoading(false);
       return;
     }

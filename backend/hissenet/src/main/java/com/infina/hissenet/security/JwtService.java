@@ -13,6 +13,12 @@ import java.util.Date;
 
 @Service
 public class JwtService implements IJwtService {
+    /**
+     * Issues, validates, and refreshes JWT tokens used by the platform.
+     * Integrates with user service to resolve identities during validation.
+     *
+     * Author: Furkan Can
+     */
     private final EmployeeService employeeService;
     @Value("${jwt.secret}")
     private String JWT_SECRET;

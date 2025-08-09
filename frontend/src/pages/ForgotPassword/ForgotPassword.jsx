@@ -24,12 +24,12 @@ const ForgotPassword = () => {
       
       if (result.success) {
         setSuccess(true);
-        setEmail(''); // Form'u temizle
+        setEmail('');
         setTimeout(() => {
           setSuccess(false);
         }, 3000);
       } else {
-        // API error response'u string'e çevir
+        
         const errorMessage = typeof result.error === 'object' 
           ? result.error.message || result.error.detail || 'Şifre sıfırlama linki gönderilemedi.'
           : result.error || 'Şifre sıfırlama linki gönderilemedi.';
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
           </div>
           <h1 className="forgot-password-title">Şifremi Unuttum</h1>
           <p className="forgot-password-description">
-            E-posta adresinizi girin, size şifre sıfırlama linki gönderelim.
+           Şifrenizi sıfırlamak için e-posta adresinizi giriniz.
           </p>
         </div>
 

@@ -89,27 +89,27 @@ const ContactInfoSection = ({ formData, handleInputChange, errors }) => {
                 errors={errors}
             />
 
-            <div className={styles.formRow}>
-                <FormInput
-                    label="Bölge"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    error={errors.state}
-                    required
-                    placeholder="Marmara"
-                />
+            {/*<div className={styles.formRow}>*/}
+            {/*    <FormInput*/}
+            {/*        label="Bölge"*/}
+            {/*        name="state"*/}
+            {/*        value={formData.state}*/}
+            {/*        onChange={handleInputChange}*/}
+            {/*        error={errors.state}*/}
+            {/*        required*/}
+            {/*        placeholder="Marmara"*/}
+            {/*    />*/}
 
-                <FormInput
-                    label="Ülke"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    error={errors.country}
-                    required
-                    placeholder="Turkey"
-                />
-            </div>
+            {/*    <FormInput*/}
+            {/*        label="Ülke"*/}
+            {/*        name="country"*/}
+            {/*        value={formData.country}*/}
+            {/*        onChange={handleInputChange}*/}
+            {/*        error={errors.country}*/}
+            {/*        required*/}
+            {/*        placeholder="Türkiye"*/}
+            {/*    />*/}
+            {/*</div>*/}
         </div>
     );
 };

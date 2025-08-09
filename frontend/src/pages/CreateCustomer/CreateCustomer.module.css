@@ -41,6 +41,7 @@
 
 .formSection {
     margin-bottom: 35px;
+    text-align: left;
 }
 
 .sectionTitle {
@@ -50,6 +51,7 @@
     margin-bottom: 20px;
     padding-bottom: 8px;
     border-bottom: 2px solid #e2e8f0;
+    text-align: left;
 }
 
 .formRow {

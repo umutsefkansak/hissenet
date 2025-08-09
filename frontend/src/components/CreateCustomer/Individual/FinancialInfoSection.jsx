@@ -2,7 +2,7 @@ import React from 'react';
 import FormInput from '../../Form/FormInput';
 import { translateRiskProfile } from '../../../server/riskAssessment';
 import FormSelect from "../../Form/FormSelect";
-import { sectorOptions } from '../../../constants/CreateCustomer/formOptions';
+import { sectorOptions, professionOptions } from '../../../constants/CreateCustomer/formOptions';
 import styles from '../../../pages/CreateCustomer/CreateCustomer.module.css';
 
 const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnalysis, riskAssessmentResult }) => {
@@ -11,12 +11,14 @@ const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnaly
             <h3 className={styles.sectionTitle}>FİNANSAL BİLGİLER</h3>
 
             <div className={styles.formRow}>
-                <FormInput
+                <FormSelect
                     label="Meslek"
                     name="profession"
                     value={formData.profession}
                     onChange={handleInputChange}
-                    placeholder="Meslek"
+                    error={errors.profession}
+                    options={professionOptions}
+                    placeholder="Meslek seçiniz"
                 />
 
                 <FormInput

@@ -19,19 +19,18 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   const isCorporate = customer?.customerType === 'CORPORATE';
 
   const {
-    step,         // 'IDLE' | 'ASK_ID' | 'ASK_CODE'
-    start,        // kimlik modalını aç
-    cancel,       // akışı iptal et
+    step,         
+    start,        
+    cancel,       
     confirmIdentity,
     confirmCode,
     modalOpen,
-    modalProps,           // { variant, title, message, ... }
+    modalProps,          
     closeModal,
-    // ↓ deneme hakkı bilgisi
     maxAttempts,
     attemptsLeft,
   } = useAuthFlow(async () => {
-    // Doğrulama BAŞARILI: şimdi gerçek güncellemeyi yap
+
     if (!pendingUpdateData) return;
 
     try {
@@ -41,7 +40,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
       onClose();
     } catch (err) {
       console.error('Customer update error:', err);
-      // You can show a toast or a modal here if you like
+   
     } finally {
       setLoading(false);
     }
@@ -51,7 +50,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
     if (customer && isOpen) {
       const initialData = isCorporate
         ? {
-          // Kurumsal: yetkili kişi adı tek alandan gelir
           firstName: customer.authorizedPersonName || '',
           lastName: '',
           email: customer.email || '',
@@ -77,7 +75,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
     }));
   };
 
-  // Verilerin değişip değişmediğini kontrol et
    const hasChanges = () => {
     return (
       formData.firstName !== originalData.firstName ||
@@ -89,13 +86,11 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     if (!hasChanges()) {
       onClose();
       return;
     }
 
-    // Backend'e gönderilecek veriyi hazırla
     const updateData = isCorporate
       ? {
         id: customer.id,
@@ -115,8 +110,21 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
 
     setPendingUpdateData(updateData);
 
-    start();
-
+   
+    if (customer.tcNumber) {
+      confirmIdentity(customer.tcNumber);
+    } else {
+      console.error('TC Number bulunamadı, doğrulama yapılamıyor');
+      try {
+        setLoading(true);
+        await onUpdate(updateData);
+        onClose();
+      } catch (err) {
+        console.error('Customer update error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
    const handleCancel = () => {
@@ -236,7 +244,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
           message={modalProps.message}
           onClose={closeModal}
         />
-      )}
+        )}
     </>
   );
 };

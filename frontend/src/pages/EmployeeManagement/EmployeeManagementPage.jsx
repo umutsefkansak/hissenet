@@ -1,9 +1,9 @@
 import React, { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmployees from '../../hooks/EmployeeManagement/useEmployees';
-import EmployeeTable from '../../components/EmployeeManagement/EmployeeTable';
-import EmployeeForm from '../../components/EmployeeManagement/EmployeeForm';
-import EmployeeModal from '../../components/EmployeeManagement/EmployeeModal';
+import EmployeeTable from '../../components/employeeManagement/EmployeeTable';
+import EmployeeForm from '../../components/employeeManagement/EmployeeForm';
+import EmployeeModal from '../../components/employeeManagement/EmployeeModal';
 import SearchInput from '../../components/common/SearchInput/SearchInput';
 import './EmployeeManagementPage.css';
 import Pagination from "../../components/common/Pagination/Pagination";

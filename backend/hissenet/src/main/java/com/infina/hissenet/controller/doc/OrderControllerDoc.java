@@ -250,5 +250,25 @@ public interface OrderControllerDoc {
 	    		    }
 	    		)
 	    		com.infina.hissenet.common.ApiResponse<Long> getTodayOrderCount();
+	    	
+	    	@Operation(
+	    		    summary = "Belirli bir müşteriye ait tüm emirleri (yeniden eskiye) getirir",
+	    		    description = """
+	    		        Verilen müşteri ID'sine ait tüm emirleri, oluşturulma tarihine göre azalan
+	    		        (createdAt DESC) sıralama ile döndürür. Dönen payload, getOrdersByCustomerId ile
+	    		        aynıdır; yalnızca sıralama farkı vardır.
+	    		        """,
+	    		    responses = {
+	    		        @ApiResponse(
+	    		            responseCode = "200",
+	    		            description = "Müşteriye ait emirler (yeniden eskiye) başarıyla getirildi",
+	    		            content = @Content(schema = @Schema(implementation = OrderResponse.class))
+	    		        )
+	    		    }
+	    		)
+	    		com.infina.hissenet.common.ApiResponse<List<OrderResponse>> getOrdersByCustomerIdSorted(
+	    		    @Parameter(description = "Müşteri ID", required = true, example = "101")
+	    		    Long customerId
+	    		);
 
 }

@@ -471,5 +471,13 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.countTodayOrders(startOfDay, endOfDay);
 	}
+	
+	@Transactional(readOnly = true)
+	public List<OrderResponse> getOrdersByCustomerIdSorted(Long customerId) {
+	    List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+	    return orders.stream()
+	            .map(orderMapper::toResponse)
+	            .toList();
+	}
 
 }

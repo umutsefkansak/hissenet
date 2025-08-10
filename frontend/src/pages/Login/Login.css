@@ -8,6 +8,8 @@
   padding: 20px;
   position: relative;
   overflow: hidden;
+  width: 100vw;        /* Bu satırı ekleyin */
+  box-sizing: border-box; /* Bu satırı ekleyin */
 }
 
 /* Animated background elements */
@@ -18,10 +20,10 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(30, 58, 138, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, rgba(96, 165, 250, 0.1) 0%, transparent 50%);
+  background:
+          radial-gradient(circle at 20% 20%, rgba(30, 58, 138, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 40% 60%, rgba(96, 165, 250, 0.1) 0%, transparent 50%);
   animation: float 20s ease-in-out infinite;
   z-index: 0;
 }
@@ -33,9 +35,9 @@
   left: 50%;
   width: 300px;
   height: 300px;
-  background: 
-    linear-gradient(45deg, rgba(30, 58, 138, 0.05), rgba(59, 130, 246, 0.05)),
-    radial-gradient(circle, rgba(96, 165, 250, 0.1) 0%, transparent 70%);
+  background:
+          linear-gradient(45deg, rgba(30, 58, 138, 0.05), rgba(59, 130, 246, 0.05)),
+          radial-gradient(circle, rgba(96, 165, 250, 0.1) 0%, transparent 70%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: pulse 4s ease-in-out infinite;
@@ -56,10 +58,10 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 24px;
-  box-shadow: 
-    0 20px 40px rgba(30, 58, 138, 0.1),
-    0 0 0 1px rgba(30, 58, 138, 0.1);
-  padding: 48px;
+  box-shadow:
+          0 20px 40px rgba(30, 58, 138, 0.1),
+          0 0 0 1px rgba(30, 58, 138, 0.1);
+  padding: 40px;
   width: 100%;
   max-width: 420px;
   text-align: center;
@@ -73,33 +75,32 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px) translateX(-15%);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) translateX(-15%);
+    transform: translateY(0);
   }
 }
 
 /* Brand Section */
 .brand-section {
-  margin-bottom: 32px;
   animation: fadeIn 1s ease-out 0.2s both;
+  overflow: visible;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
+  overflow: visible;
 }
 
 .logo-image {
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 100px;
   object-fit: contain;
-  border-radius: 28px;
-  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.1);
   transition: transform 0.3s ease;
 }
 
@@ -107,9 +108,39 @@
   transform: scale(1.05);
 }
 
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #093652;
+  margin: 16px 0 8px 0;
+  text-align: center;
+  background-clip: text;
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Form Section */
@@ -120,11 +151,11 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   text-align: left;
 }
 
@@ -145,9 +176,9 @@
 .form-input:focus {
   outline: none;
   border-color: #1e3a8a;
-  box-shadow: 
-    0 0 0 4px rgba(30, 58, 138, 0.1),
-    0 8px 32px rgba(30, 58, 138, 0.2);
+  box-shadow:
+          0 0 0 4px rgba(30, 58, 138, 0.1),
+          0 8px 32px rgba(30, 58, 138, 0.2);
   background: rgba(255, 255, 255, 0.95);
   transform: translateY(-2px);
 }
@@ -211,8 +242,8 @@
 }
 
 .form-options {
-  text-align: right;
-  margin-top: 8px;
+  text-align: center;
+
 }
 
 .forgot-link {
@@ -247,7 +278,7 @@
 .login-button {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1d293d 0%, #1f3557 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -277,9 +308,9 @@
 
 .login-button:hover {
   transform: translateY(-2px);
-  box-shadow: 
-    0 12px 40px rgba(30, 58, 138, 0.4),
-    0 0 0 4px rgba(30, 58, 138, 0.1);
+  box-shadow:
+          0 12px 40px rgba(30, 58, 138, 0.4),
+          0 0 0 4px rgba(30, 58, 138, 0.1);
 }
 
 .login-button:active {
@@ -326,17 +357,27 @@
     border-radius: 20px;
     transform: translateX(-10%);
   }
-  
+
   .logo-image {
-    width: 100px;
-    height: 100px;
+    width: 64px;
+    height: 64px;
   }
-  
+
+  .login-title {
+    font-size: 24px;
+    margin: 12px 0 6px 0;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    margin: 0 0 20px 0;
+  }
+
   .form-input {
     padding: 14px 16px;
     font-size: 16px;
   }
-  
+
   .login-button {
     padding: 14px;
     font-size: 16px;
@@ -348,9 +389,13 @@
     padding: 24px 20px;
     transform: translateX(-5%);
   }
-  
+
   .logo-image {
-    width: 80px;
-    height: 80px;
+    width: 56px;
+    height: 56px;
   }
-} 
+
+  .login-title {
+    font-size: 22px;
+  }
+}

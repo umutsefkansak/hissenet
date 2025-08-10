@@ -7,6 +7,7 @@ import com.infina.hissenet.entity.enums.RiskProfile;
 import com.infina.hissenet.validation.MinAge;
 import com.infina.hissenet.validation.UniqueValue;
 import com.infina.hissenet.validation.UniqueValueType;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
@@ -37,6 +38,7 @@ public record IndividualCustomerUpdateRequest(
         String profession,
         String educationLevel,
         RiskProfile riskProfile,
+        @DecimalMin(value = "0.0", message = "{validation.commission.negative}")
         BigDecimal commissionRate,
         IncomeRange incomeRange
 ) {}

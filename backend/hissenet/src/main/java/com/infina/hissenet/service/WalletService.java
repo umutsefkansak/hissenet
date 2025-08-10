@@ -167,8 +167,16 @@ public class WalletService extends GenericServiceImpl<Wallet, Long> implements I
     private void processSettlement(WalletTransaction transaction) {
         Wallet wallet = transaction.getWallet();
         if (transaction.getTransactionType() == TransactionType.STOCK_PURCHASE) {
-
-            wallet.transferBlockedToBalance(transaction.getAmount());
+            // Eski kod - Hata fırlatıyordu
+            // wallet.transferBlockedToBalance(transaction.getAmount());
+            
+            // Yeni kod - Kontrol ediyor
+            if (wallet.getBlockedBalance().compareTo(transaction.getAmount()) < 0) {
+                // Mevcut bakiyeyi kullan
+                wallet.transferBlockedToBalance(wallet.getBlockedBalance());
+            } else {
+                wallet.transferBlockedToBalance(transaction.getAmount());
+            }
         } else if (transaction.getTransactionType() == TransactionType.STOCK_SALE) {
             wallet.unblockBalance(transaction.getAmount());
         }

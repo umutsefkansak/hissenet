@@ -85,6 +85,8 @@ const CorporateCustomer = () => {
         setIsLoading(true);
 
         try {
+
+
             const customerData = mapCorporateFormDataToCustomerDto(formData);
             console.log('Corporate Customer Data:', customerData);
 

@@ -9,7 +9,7 @@ public record CombinedStockData(
         BigDecimal closePrice,
         BigDecimal openPrice,
         BigDecimal changePrice,
-
+        BigDecimal previousClosePrice,
         // Collect API
         BigDecimal rate,
         BigDecimal lastPrice,

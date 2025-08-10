@@ -57,6 +57,11 @@ mail:
   templates:
     enabled: true
 
+fetch:
+  request-timeout: 6s
+  concurrency: 12
+  retry: 1
+
 stock:
   cache:
     default:
@@ -64,18 +69,24 @@ stock:
       ttl: 5m
       max-size: 1000
   scheduler:
+    refresh:
+      rate: 3s
+      initial-delay: 0s
+
     publish:
       topic: /topic/prices
       rate: 30s
-      initial-delay: 0s
+      initial-delay: 30s
+
     borsa-istanbul-publish:
       topic: /topic/bist100
+      rate: 10s
       initial-delay: 0s
-      rate: 30s
 
 collectapi:
-  apikey: ${COLLECTAPI_APIKEY}
+  api-key: ${COLLECTAPI_APIKEY}
   base-url: https://api.collectapi.com/economy
+  cooldown: 30s
   endpoints:
     stocks: /hisseSenedi
     borsaIstanbul: /borsaIstanbul
@@ -93,6 +104,5 @@ infina:
     publish:
       topic: /topic/infina-prices
       rate: 30s
-      initial-delay: 0s
+      initial-delay: 30s
       error-topic: /topic/infina-prices-error
-

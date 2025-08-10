@@ -11,6 +11,7 @@ const StockItem = ({ stock, onSelect, isSelected }) => {
     lastPrice = null,
     openPrice = null,
     changePrice = null,
+    previousClosePrice = null,
     rate = null,
     max = null,
     min = null,
@@ -42,6 +43,7 @@ const StockItem = ({ stock, onSelect, isSelected }) => {
       <div className={styles.column}>
         <div className={styles.priceRow}>{formatPrice(lastPrice)}</div>
         <div className={styles.subText}>Açılış: {formatPrice(openPrice)}</div>
+        <div className={styles.subText}>Önceki Kapanış: {formatPrice(previousClosePrice)}</div>
       </div>
 
       {/* Column: Değişim */}

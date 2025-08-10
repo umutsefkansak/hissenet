@@ -4,7 +4,7 @@
  */
 export const formatPrice = price =>
     price != null
-        ? `${price.toFixed(2)} ₺`
+        ? `${price.toFixed(2)}₺`
         : '—';
 
 /**

@@ -23,9 +23,9 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background-color:#0c1947 ;
+  background: linear-gradient(135deg, #1d293d 0%, #374151 100%);
   color: #eef0f7;
-  border: 1px solid #040d2c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
@@ -33,9 +33,10 @@
 }
 
 .balance-button:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #1e3a8a 100%);
-  color: #1e3a8a;
-  border-color: #1e3a8a;
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .customer-top-section {

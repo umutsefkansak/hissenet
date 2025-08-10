@@ -154,5 +154,16 @@ public interface IOrderService {
      * @return bloke edilen hisse miktarı
      */
     BigDecimal getBlockedStockQuantity(Long customerId, String stockCode);
+    
+    /**
+     * Retrieves all orders placed by the given customer, sorted by creation time (newest first).
+     *
+     * <p>Returns the same payload as {@link #getOrdersByCustomerId(Long)} but ordered
+     * by {@code createdAt DESC} for convenient, timeline-like views.</p>
+     *
+     * @param customerId the ID of the customer
+     * @return list of order responses sorted by createdAt descending
+     */
+    List<OrderResponse> getOrdersByCustomerIdSorted(Long customerId);
 
 }

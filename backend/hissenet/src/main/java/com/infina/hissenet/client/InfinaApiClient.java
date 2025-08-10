@@ -19,19 +19,23 @@ public class InfinaApiClient {
     public Mono<HisseApiResponse> fetchPriceByCodeAndDate(String assetCode, String date) {
         return infinaApiWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(props.getEndpoint())            // "/HisseFiyat"
+                        .path(props.getEndpoint())
                         .queryParam("api_key", props.getApiKey())
                         .queryParam("asset_code", assetCode)
                         .queryParam("data_date", date)
-                        .build()
-                )
+                        .build())
                 .retrieve()
                 .bodyToMono(HisseApiResponse.class)
-//                .doOnNext(response ->
-//                        System.out.println("Infina API response for " + assetCode + "@" + date + " -> " + response)
-//                )
-                .doOnError(err ->
-                        System.err.println("Error fetching Infina price: " + err.getMessage())
-                );
+                .doOnNext(resp -> {
+                    int n = 0;
+                    if (resp != null && resp.result() != null && resp.result().data() != null && resp.result().data().HisseFiyat() != null)
+                        n = resp.result().data().HisseFiyat().size();
+                    //System.out.println("[InfinaApiClient] " + assetCode + " @" + date + " → kayıt=" + n);
+                })
+                .onErrorResume(err -> {
+                    //System.out.println("[InfinaApiClient] HATA " + assetCode + " @" + date + ": " + err.getMessage());
+                    return Mono.just(new HisseApiResponse(null));
+                });
     }
+
 }

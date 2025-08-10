@@ -1,40 +1,41 @@
 package com.infina.hissenet.service;
 
-import com.infina.hissenet.client.CollectApiClient;
-import com.infina.hissenet.dto.response.BorsaIstanbulApiResponse;
 import com.infina.hissenet.dto.response.BorsaIstanbulResult;
-import org.springframework.cache.annotation.Cacheable;
+import com.infina.hissenet.service.abstracts.IBorsaIstanbulCacheService;
+import com.infina.hissenet.service.abstracts.ICacheFacade;
+import com.infina.hissenet.service.abstracts.ICacheRefreshService;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class BorsaIstanbulCacheService {
+public class BorsaIstanbulCacheService implements IBorsaIstanbulCacheService {
     public static final String CACHE_NAME = "bist100";
-    private static final String CACHE_KEY  = "'ALL'";
 
-    private final CollectApiClient client;
+    private final ICacheFacade cache;
+    private final ICacheRefreshService<BorsaIstanbulResult> refresher;
 
-    public BorsaIstanbulCacheService(CollectApiClient client) {
-        this.client = client;
+    public BorsaIstanbulCacheService(ICacheFacade cache, ICacheRefreshService<BorsaIstanbulResult> refresher) {
+        this.cache = cache;
+        this.refresher = refresher;
     }
 
-    /**
-     * İlk çağrıda:
-     *  1) API’den listeyi çekip bloklar,
-     *  2) sonucu cache’e yazar.
-     * Sonraki 5dk içinde (TTL’e göre) direkt cache’den döner.
-     */
-    @Cacheable(cacheNames = CACHE_NAME, key = CACHE_KEY)
+    @Override
     public List<BorsaIstanbulResult> getAll() {
-        BorsaIstanbulApiResponse resp = client.fetchBorsaIstanbul()
-                .onErrorReturn(new BorsaIstanbulApiResponse(false, Collections.emptyList()))
-                .block();
+        return cache.getSnapshot(CACHE_NAME);
+    }
 
-        return resp != null && resp.result() != null
-                ? resp.result()
-                : Collections.emptyList();
+    @Override
+    public Optional<BorsaIstanbulResult> getByCode(String code) {
+        return cache.findByCode(CACHE_NAME, code, r -> String.valueOf(r.current()));
+    }
+
+    @Override
+    public Mono<Void> refreshAsync() {
+        return refresher.buildSnapshot()
+                .doOnNext(list -> cache.putIfNonEmpty(CACHE_NAME, list))
+                .then();
     }
 }

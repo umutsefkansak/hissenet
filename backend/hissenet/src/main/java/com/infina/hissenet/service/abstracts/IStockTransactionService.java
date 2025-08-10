@@ -46,4 +46,6 @@ public interface IStockTransactionService {
      * @return Toplam hisse sayısı
      */
     Integer getTotalStock(Long customerId);
+
+    List<StockTransaction> transactionsListByCustomerIdAndStockCode(Long customerId, String stockCode);
 }

@@ -1,3 +1,38 @@
+.nameWithLogo {
+  display: flex;
+  align-items: center; /* logo ve yazılar dikey ortalansın */
+  gap: 30px; /* logo ile yazılar arasında boşluk */
+}
+
+.logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%; /* yuvarlak görünüm */
+  object-fit: cover;
+  opacity: 0.85;
+  flex-shrink: 0; /* logo küçülmesin */
+  transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+  opacity: 1;
+}
+
+.nameText {
+  display: flex;
+  flex-direction: column; /* code ve text alt alta */
+}
+
+.code {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.textRow {
+  font-size: 14px;
+  color: #666;
+}
 /* Dikey sütun: rate ve changePrice alt alta */
 .changeColumn {
   display: flex;

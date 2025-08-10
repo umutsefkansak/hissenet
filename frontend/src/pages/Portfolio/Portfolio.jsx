@@ -263,18 +263,18 @@ const Portfolio = () => {
       return groups;
     }, {});
 
-    // Convert to array and sort by quantity
-    const stockArray = Object.values(stockGroups).sort((a, b) => b.totalQuantity - a.totalQuantity);
+    // Convert to array and sort by current value
+    const stockArray = Object.values(stockGroups).sort((a, b) => b.totalValue - a.totalValue);
     
-    // Calculate total quantity for percentages
-    const totalQuantity = stockArray.reduce((sum, stock) => sum + stock.totalQuantity, 0);
+    // Calculate total value for percentages
+    const totalValue = stockArray.reduce((sum, stock) => sum + stock.totalValue, 0);
     
     // Calculate percentages and degrees for pie chart
     let currentDegree = 0;
     const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316'];
     
     return stockArray.map((stock, index) => {
-      const percentage = totalQuantity > 0 ? (stock.totalQuantity / totalQuantity) * 100 : 0;
+      const percentage = totalValue > 0 ? (stock.totalValue / totalValue) * 100 : 0;
       const degree = (percentage / 100) * 360;
       const startDegree = currentDegree;
       currentDegree += degree;

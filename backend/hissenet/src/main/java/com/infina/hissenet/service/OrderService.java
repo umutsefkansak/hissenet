@@ -11,10 +11,12 @@ import java.util.stream.Collectors;
 
 import com.infina.hissenet.dto.response.*;
 
+import com.infina.hissenet.entity.StockTransaction;
 import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,11 +166,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	 */
 	private void validateSellOrder(Long customerId, String stockCode, BigDecimal requestedQuantity) {
 		BigDecimal availableQuantity = getAvailableStockQuantityForSale(customerId, stockCode);
-		
+
 		if (requestedQuantity.compareTo(availableQuantity) > 0) {
 			BigDecimal blockedQuantity = getBlockedStockQuantity(customerId, stockCode);
 			BigDecimal totalOwned = getOwnedStockQuantity(customerId, stockCode);
-			
+
 			throw new InsufficientStockException(
 				String.format(
 					"Yetersiz hisse! İstenen: %s, Toplam: %s, Blokede (T+2): %s, Satılabilir: %s. " +
@@ -279,9 +281,9 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	 */
 	@Transactional(readOnly = true)
 	public BigDecimal getAvailableStockQuantityForSale(Long customerId, String stockCode) {
-		BigDecimal totalOwned = getOwnedStockQuantity(customerId, stockCode);
+		BigDecimal totalOwned = BigDecimal.valueOf(stockTransactionService.getQuantityForStockTransactionWithStream(customerId,stockCode));
 		BigDecimal blockedQuantity = getBlockedStockQuantity(customerId, stockCode);
-		
+
 		BigDecimal availableForSale = totalOwned.subtract(blockedQuantity);
 		return availableForSale.max(BigDecimal.ZERO); // Negatif olamaz
 	}
@@ -292,21 +294,19 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	 */
 	@Transactional(readOnly = true)
 	public BigDecimal getBlockedStockQuantity(Long customerId, String stockCode) {
-		List<Order> sellOrders = orderRepository
-			.findByCustomerIdAndStockCodeAndStatus(customerId, stockCode, OrderStatus.FILLED)
-			.stream()
-			.filter(order -> order.getType() == OrderType.SELL)
-			.toList();
-		
+		// STOCK TRANSACTİONDAN DENE
+		List<StockTransaction> sellOrders = stockTransactionService.transactionsListByCustomerIdAndStockCode(customerId,stockCode);
+
+
+		System.out.println(sellOrders);
+
 		BigDecimal blockedQuantity = BigDecimal.ZERO;
 		LocalDateTime now = LocalDateTime.now();
-		
-		for (Order order : sellOrders) {
-			LocalDateTime settlementTime = calculateT2SettlementTime(order.getCreatedAt());
-			
-			// Eğer henüz T+2 süresi dolmadıysa, bu hisse blokede
+
+		for (StockTransaction transaction : sellOrders) {
+			LocalDateTime settlementTime = transaction.getSettlementDate();
 			if (now.isBefore(settlementTime)) {
-				blockedQuantity = blockedQuantity.add(order.getQuantity());
+				blockedQuantity = blockedQuantity.add(BigDecimal.valueOf(transaction.getQuantity()));
 			}
 		}
 		
@@ -319,8 +319,9 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	 * Production: 2 iş günü
 	 */
 	private LocalDateTime calculateT2SettlementTime(LocalDateTime orderTime) {
-		// Test modunda 1 dakika
-		return orderTime.plusMinutes(1);
+
+		// Test modunda 1.5 dakika (1 dakika 30 saniye) scheuladn dolayo
+		return orderTime.plusMinutes(1).plusSeconds(30);
 		
 		// Production'da 2 iş günü kullanmak için:
 		// return calculateTPlus2BusinessDays(orderTime);
@@ -402,7 +403,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		for (Order order : sellOrders) {
 			LocalDateTime settlementTime = calculateT2SettlementTime(order.getCreatedAt());
 			
-			// Henüz settle olmamış ve en erken olan
+
 			if (now.isBefore(settlementTime)) {
 				if (earliest == null || settlementTime.isBefore(earliest)) {
 					earliest = settlementTime;

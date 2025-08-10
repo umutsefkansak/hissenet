@@ -100,6 +100,15 @@ export const orderApi = {
   }
   const result = await response.json();
   return result.data;
+ },
+
+ getAvailableQuantity: async (customerId, stockCode) => {
+  const response = await fetch(`${BASE_URL}/available-quantity?customerId=${customerId}&stockCode=${stockCode}`);
+  if (!response.ok) {
+    throw new Error('Satılabilir hisse miktarı getirilemedi');
+  }
+  const result = await response.json();
+  return result.data;
  }
 
 };

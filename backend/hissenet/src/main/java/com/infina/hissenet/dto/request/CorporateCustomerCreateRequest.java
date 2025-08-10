@@ -30,6 +30,8 @@ public record CorporateCustomerCreateRequest(
         @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "{validation.phone.invalid}") String authorizedPersonPhone,
         @Pattern(regexp = "^[1-9][0-9]{10}$", message = "{validation.tc.number.invalid}") String authorizedPersonTcNumber,
         @Email(message = "{validation.email.invalid}") String authorizedPersonEmail,
-        String taxOffice
+        String taxOffice,
+        Long createdByEmployeeId
+
 
 ) {}

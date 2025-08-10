@@ -57,6 +57,7 @@ function AppContent() {
         <Route path="/transaction-history" element={<TransactionHistory/>} />
       </Routes>
       <ToastContainer />
+      {!isAuthPage && <Chatbot />}
     </div>
   );
 }
@@ -65,7 +66,6 @@ function App() {
   return (
     <Router>
       <AppContent />
-      <Chatbot />
     </Router>
   );
 }

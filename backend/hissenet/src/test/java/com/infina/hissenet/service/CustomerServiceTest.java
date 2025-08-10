@@ -106,7 +106,7 @@ class CustomerServiceTest {
                 "john.doe@example.com", "+905551234567", "Turkish", "John", null, "Doe",
                 "12345678901", LocalDate.of(1990, 1, 1), "Istanbul", Gender.MALE,
                 "Jane Doe", "Jack Doe", "Engineer", "University", RiskProfile.MODERATE,
-                BigDecimal.valueOf(0.25), IncomeRange.RANGE_0_10K
+                BigDecimal.valueOf(0.25), IncomeRange.RANGE_0_10K, null
         );
 
         corporateCustomer = new CorporateCustomer();
@@ -131,7 +131,7 @@ class CustomerServiceTest {
                 "info@company.com", "+905551234568", "Turkish", "Test Company Ltd.",
                 "1234567890", "TR123456", LocalDate.of(2010, 5, 15), "Technology",
                 "John Smith", "CEO", "www.testcompany.com", BigDecimal.valueOf(0.15),
-                "+905551234569", "98765432101", "john.smith@testcompany.com", "Kadıköy"
+                "+905551234569", "98765432101", "john.smith@testcompany.com", "Kadıköy", null
         );
     }
 
@@ -303,7 +303,7 @@ class CustomerServiceTest {
                 "newemail@example.com", "+905559876543", "Turkish", "Jane", null, "Smith",
                 "98765432109", LocalDate.of(1992, 5, 15), "Ankara", Gender.FEMALE,
                 "Mary Smith", "Bob Smith", "Doctor", "PhD", RiskProfile.CONSERVATIVE,
-                BigDecimal.valueOf(0.20), IncomeRange.RANGE_ABOVE_100K
+                BigDecimal.valueOf(0.20), IncomeRange.RANGE_ABOVE_100K, null
         );
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(individualCustomer));
@@ -326,7 +326,7 @@ class CustomerServiceTest {
         // Given
         IndividualCustomerUpdateRequest updateRequest = new IndividualCustomerUpdateRequest(
                 "existing@example.com", null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null
         );
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(individualCustomer));
@@ -342,7 +342,7 @@ class CustomerServiceTest {
         // Given
         IndividualCustomerUpdateRequest updateRequest = new IndividualCustomerUpdateRequest(
                 null, null, null, null, null, null, "11111111111", null, null, null,
-                null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null
         );
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(individualCustomer));
@@ -358,7 +358,7 @@ class CustomerServiceTest {
         // Given
         IndividualCustomerUpdateRequest updateRequest = new IndividualCustomerUpdateRequest(
                 null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null
         );
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(corporateCustomer));
@@ -380,7 +380,7 @@ class CustomerServiceTest {
                 "newcorp@example.com", "+905559876544", "Turkish", "New Company Name",
                 "9876543210", "TR654321", LocalDate.of(2015, 3, 20), "Finance",
                 "Jane Smith", "CTO", "www.newcomp.com", BigDecimal.valueOf(0.18),
-                "+905559876545", "11122233344", "jane.smith@newcomp.com", "Beyoğlu"
+                "+905559876545", "11122233344", "jane.smith@newcomp.com", "Beyoğlu", null
         );
 
         when(customerRepository.findById(2L)).thenReturn(Optional.of(corporateCustomer));

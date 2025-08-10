@@ -2,7 +2,7 @@
   padding: 30px;
   background: white;
   border-radius: 8px;
-  width: 90%;
+  width:100%;
   max-width: 1200px;
   margin: 40px auto;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -221,6 +221,7 @@
 .transaction-history th {
   text-transform: none !important;
 }
+
 .sortable-header {
   cursor: pointer;
   user-select: none;
@@ -245,7 +246,57 @@
   color: #0d6efd;
 }
 
-/* ExportMenu için ek stil */
 .transaction-history .export-dropdown {
   margin-left: auto;
+}
+
+.action-col {
+  background: #f8f9fa;
+  font-weight: 700;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  text-align: left;
+}
+
+.action-cell {
+  white-space: nowrap;
+}
+
+.table-action-btn {
+  padding: 10px 14px;
+  background: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(30,58,138,.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-action-btn:hover {
+  background: #274bb6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30,58,138,.3);
+}
+
+.table-action-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(30,58,138,.2);
+}
+
+.table-action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30,58,138,.25);
+}
+
+.transaction-status.canceled {
+  background: #ffe4e6;
+  color: #b42318;
 }

@@ -33,8 +33,10 @@ public record EmployeeUpdateRequest(
 		@Pattern(regexp = "^\\+?[0-9\\-\\s]{7,20}$", message = "{validation.emergency.contact.phone.invalid}")
 	    String emergencyContactPhone,
 
-	    Set<Long> roleIds
-	    
+	    Set<Long> roleIds,
+		Long updatedByEmployeeId
+
+
 ) {
 
 }

@@ -58,6 +58,12 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
             employee.setRoles(Set.copyOf(roles));
         }
 
+        if (request.createdByEmployeeId() != null) {
+            Employee createdByEmployee = findById(request.createdByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(request.createdByEmployeeId()));
+            employee.setCreatedBy(createdByEmployee);
+        }
+
         Employee saved = save(employee);
         return employeeMapper.toResponse(saved);
     }
@@ -104,6 +110,12 @@ public class EmployeeService extends GenericServiceImpl<Employee, Long> implemen
             }
         } else {
             System.out.println("No role update requested for employee " + existing.getId());
+        }
+
+        if (request.updatedByEmployeeId() != null) {
+            Employee updatedByEmployee = findById(request.updatedByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(request.updatedByEmployeeId()));
+            existing.setUpdatedBy(updatedByEmployee);
         }
 
 

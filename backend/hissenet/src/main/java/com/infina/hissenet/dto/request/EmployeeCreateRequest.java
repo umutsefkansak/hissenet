@@ -48,7 +48,9 @@ public record EmployeeCreateRequest(
 
 		@NotNull(message = "{validation.role.ids.required}")
 		@Size(min = 1, message = "{validation.role.ids.min}")
-		Set<@NotNull(message = "{validation.role.id.required}") Long> roleIds
+		Set<@NotNull(message = "{validation.role.id.required}") Long> roleIds,
+
+		Long createdByEmployeeId
 
 ) {}
 

@@ -90,6 +90,8 @@ const useCorporateFormValidation = (initialData, validationConfig) => {
                 newErrors.commissionRate = 'Geçerli bir sayı giriniz';
             } else if (commission < 0) {
                 newErrors.commissionRate = 'Komisyon oranı negatif olamaz';
+            }else if (commission > 1) {
+                newErrors.commissionRate = 'Komisyon oranı %100\'den fazla olamaz';
             }
         }
 

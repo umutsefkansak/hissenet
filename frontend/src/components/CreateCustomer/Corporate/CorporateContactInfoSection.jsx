@@ -95,10 +95,19 @@ const CorporateContactInfoSection = ({ formData, handleInputChange, errors }) =>
                     label="Komisyon Oranı (%)"
                     name="commissionRate"
                     type="number"
-                    value={formData.commissionRate}
-                    onChange={handleInputChange}
+                    value={formData.commissionRate * 100}
+                    onChange={(e) => {
+                        const percentValue = parseFloat(e.target.value) || 0;
+                        const decimalValue = percentValue / 100;
+                        handleInputChange({
+                            target: {
+                                name: 'commissionRate',
+                                value: decimalValue.toString()
+                            }
+                        });
+                    }}
                     error={errors.commissionRate}
-                    placeholder="Komisyon oranı giriniz"
+                    placeholder="Örn: 0.1 (%0.1 için)"
                     step="0.01"
                     min="0"
                     max="100"

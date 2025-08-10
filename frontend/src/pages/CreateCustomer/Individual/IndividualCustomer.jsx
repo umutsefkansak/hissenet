@@ -98,11 +98,10 @@ const IndividualCustomer = () => {
         setIsLoading(true);
 
         try {
+
             const customerData = mapFormDataToCustomerDto(formData, riskAssessmentResult);
-            console.log('Customer Data:', customerData);
 
             const customerResponse = await createIndividualCustomer(customerData);
-            console.log('Customer Response:', customerResponse);
 
             if (customerResponse && customerResponse.data) {
                 const customerId = customerResponse.data.id;

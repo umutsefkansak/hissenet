@@ -3,10 +3,14 @@ import api from './api';
 
 export const createIndividualCustomer = async (customerData) => {
     try {
-        console.log('Creating customer with data:', customerData);
-        console.log('Customer API endpoint: /customers/individual (base: /api/v1)');
-        const response = await api.post('/customers/individual', customerData);
-        console.log('Customer API response:', response.data);
+        const createdByEmployeeId = localStorage.getItem('personnelId') ?
+            parseInt(localStorage.getItem('personnelId')) : null;
+
+        const dataWithCreator = {
+            ...customerData,
+            createdByEmployeeId: createdByEmployeeId
+        };
+        const response = await api.post('/customers/individual', dataWithCreator);
         return response.data;
     } catch (error) {
         console.error('Individual customer creation error:', error);
@@ -18,7 +22,14 @@ export const createIndividualCustomer = async (customerData) => {
 
 export const createCorporateCustomer = async (customerData) => {
     try {
-        const response = await api.post('/customers/corporate', customerData);
+        const createdByEmployeeId = localStorage.getItem('personnelId') ?
+            parseInt(localStorage.getItem('personnelId')) : null;
+
+        const dataWithCreator = {
+            ...customerData,
+            createdByEmployeeId: createdByEmployeeId
+        };
+        const response = await api.post('/customers/corporate', dataWithCreator);
         return response.data;
     } catch (error) {
         console.error('Corporate customer creation error:', error);
@@ -47,8 +58,16 @@ export const getAllCustomers = async () => {
 };
 export const updateIndividualCustomer = async (id, data) => {
     try {
-        console.log('Updating individual customer with data:', data);
-        const response = await api.put(`/customers/individual/${id}`, data);
+        const updatedByEmployeeId = localStorage.getItem('personnelId') ?
+            parseInt(localStorage.getItem('personnelId')) : null;
+
+        const dataWithUpdater = {
+            ...data,
+            updatedByEmployeeId: updatedByEmployeeId
+        };
+
+        console.log('Updating individual customer with data:', dataWithUpdater);
+        const response = await api.put(`/customers/individual/${id}`, dataWithUpdater);
         return response.data;
     } catch (error) {
         console.error('Update individual customer error:', error);
@@ -59,8 +78,16 @@ export const updateIndividualCustomer = async (id, data) => {
 
 export const updateCorporateCustomer = async (id, data) => {
     try {
-        console.log('Updating corporate customer with data:', data);
-        const response = await api.put(`/customers/corporate/${id}`, data);
+        const updatedByEmployeeId = localStorage.getItem('personnelId') ?
+            parseInt(localStorage.getItem('personnelId')) : null;
+
+        const dataWithUpdater = {
+            ...data,
+            updatedByEmployeeId: updatedByEmployeeId
+        };
+
+        console.log('Updating corporate customer with data:', dataWithUpdater);
+        const response = await api.put(`/customers/corporate/${id}`, dataWithUpdater);
         return response.data;
     } catch (error) {
         console.error('Update corporate customer error:', error);

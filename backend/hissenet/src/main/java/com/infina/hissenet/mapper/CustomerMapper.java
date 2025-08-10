@@ -22,6 +22,7 @@ public interface CustomerMapper {
     @Mapping(target = "nationality", defaultValue = "TR")
     @Mapping(target = "riskProfile", source = "riskProfile")
     @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
+    @Mapping(target = "createdBy", ignore = true)
     IndividualCustomer toEntity(IndividualCustomerCreateRequest createDto);
 
     @Mapping(target = "id", ignore = true)
@@ -34,6 +35,7 @@ public interface CustomerMapper {
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "nationality", defaultValue = "TR")
     @Mapping(target = "commissionRate", expression = "java(createDto.commissionRate() != null ? createDto.commissionRate() : com.infina.hissenet.constants.CustomerConstants.DEFAULT_COMMISSION_RATE)")
+    @Mapping(target = "createdBy", ignore = true)
     CorporateCustomer toEntity(CorporateCustomerCreateRequest createDto);
 
     default CustomerDto toDto(Customer customer) {
@@ -107,6 +109,7 @@ public interface CustomerMapper {
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "commissionRate", source = "commissionRate")
+    @Mapping(target = "createdBy", ignore = true)
     void updateIndividualCustomerFromDto(IndividualCustomerUpdateRequest updateDto, @MappingTarget IndividualCustomer customer);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -116,5 +119,6 @@ public interface CustomerMapper {
     @Mapping(target = "customerNumber", ignore = true)
     @Mapping(target = "addresses", ignore = true)
     @Mapping(target = "commissionRate", source = "commissionRate")
+    @Mapping(target = "createdBy", ignore = true)
     void updateCorporateCustomerFromDto(CorporateCustomerUpdateRequest updateDto, @MappingTarget CorporateCustomer customer);
 }

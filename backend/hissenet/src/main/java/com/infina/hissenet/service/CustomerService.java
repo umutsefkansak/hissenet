@@ -9,17 +9,20 @@ import com.infina.hissenet.dto.request.IndividualCustomerCreateRequest;
 import com.infina.hissenet.dto.request.IndividualCustomerUpdateRequest;
 import com.infina.hissenet.entity.CorporateCustomer;
 import com.infina.hissenet.entity.Customer;
+import com.infina.hissenet.entity.Employee;
 import com.infina.hissenet.entity.IndividualCustomer;
 import com.infina.hissenet.event.CustomerCreatedEvent;
 import com.infina.hissenet.exception.customer.CustomerNotFoundException;
 import com.infina.hissenet.exception.customer.EmailAlreadyExistsException;
 import com.infina.hissenet.exception.customer.TaxNumberAlreadyExistsException;
 import com.infina.hissenet.exception.customer.TcNumberAlreadyExistsException;
+import com.infina.hissenet.exception.employee.EmployeeNotFoundException;
 import com.infina.hissenet.mapper.CustomerMapper;
 import com.infina.hissenet.repository.CorporateCustomerRepository;
 import com.infina.hissenet.repository.CustomerRepository;
 import com.infina.hissenet.repository.IndividualCustomerRepository;
 import com.infina.hissenet.service.abstracts.ICustomerService;
+import com.infina.hissenet.service.abstracts.IEmployeeService;
 import com.infina.hissenet.utils.GenericServiceImpl;
 import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,17 +45,19 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
     private final CorporateCustomerRepository corporateCustomerRepository;
 
     private final CustomerMapper customerMapper;
+    private final IEmployeeService employeeService;
     private final ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository, IndividualCustomerRepository individualCustomerRepository, CorporateCustomerRepository corporateCustomerRepository,
-                           CustomerMapper customerMapper, ApplicationEventPublisher eventPublisher) {
+                           CustomerMapper customerMapper, IEmployeeService employeeService, ApplicationEventPublisher eventPublisher) {
         super(customerRepository);
         this.customerRepository = customerRepository;
         this.individualCustomerRepository = individualCustomerRepository;
         this.corporateCustomerRepository = corporateCustomerRepository;
         this.customerMapper = customerMapper;
+        this.employeeService = employeeService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -62,6 +67,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         IndividualCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.INDIVIDUAL_CUSTOMER_PREFIX));
+
+        if (createDto.createdByEmployeeId() != null) {
+            Employee employee = employeeService.findById(createDto.createdByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(createDto.createdByEmployeeId()));
+            customer.setCreatedBy(employee);
+        }
 
         IndividualCustomer savedCustomer = (IndividualCustomer) save(customer);
 
@@ -76,6 +87,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
 
         CorporateCustomer customer = customerMapper.toEntity(createDto);
         customer.setCustomerNumber(generateCustomerNumber(CustomerConstants.CORPORATE_CUSTOMER_PREFIX));
+
+        if (createDto.createdByEmployeeId() != null) {
+            Employee employee = employeeService.findById(createDto.createdByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(createDto.createdByEmployeeId()));
+            customer.setCreatedBy(employee);
+        }
 
         CorporateCustomer savedCustomer = (CorporateCustomer) save(customer);
 
@@ -161,6 +178,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
             }
         }
 
+        if (updateDto.updatedByEmployeeId() != null) {
+            Employee updatedByEmployee = employeeService.findById(updateDto.updatedByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(updateDto.updatedByEmployeeId()));
+            individualCustomer.setUpdatedBy(updatedByEmployee);
+        }
+
         customerMapper.updateIndividualCustomerFromDto(updateDto, individualCustomer);
         Customer updatedCustomer = update(individualCustomer);
         return customerMapper.toDto(updatedCustomer);
@@ -188,6 +211,12 @@ public class CustomerService extends GenericServiceImpl<Customer, Long> implemen
             if (corporateCustomerRepository.existsByTaxNumberAndIdNot(updateDto.taxNumber(), id)) {
                 throw new TaxNumberAlreadyExistsException(updateDto.taxNumber());
             }
+        }
+
+        if (updateDto.updatedByEmployeeId() != null) {
+            Employee updatedByEmployee = employeeService.findById(updateDto.updatedByEmployeeId())
+                    .orElseThrow(() -> new EmployeeNotFoundException(updateDto.updatedByEmployeeId()));
+            corporateCustomer.setUpdatedBy(updatedByEmployee);
         }
 
         customerMapper.updateCorporateCustomerFromDto(updateDto, corporateCustomer);

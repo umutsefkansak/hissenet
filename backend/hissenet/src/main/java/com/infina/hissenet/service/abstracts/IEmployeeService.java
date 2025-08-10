@@ -1,6 +1,7 @@
 package com.infina.hissenet.service.abstracts;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.infina.hissenet.dto.request.ForgotPasswordRequest;
 import org.springframework.data.domain.Page;
@@ -78,4 +79,5 @@ public interface IEmployeeService extends UserDetailsService {
 
     Page<EmployeeResponse> getAllEmployeesPageable(int page, int size, String sortBy, String sortDir);
 
+    Optional<Employee> findById(Long id);
 }

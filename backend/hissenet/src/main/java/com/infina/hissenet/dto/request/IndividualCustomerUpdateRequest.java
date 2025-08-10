@@ -40,5 +40,7 @@ public record IndividualCustomerUpdateRequest(
         RiskProfile riskProfile,
         @DecimalMin(value = "0.0", message = "{validation.commission.negative}")
         BigDecimal commissionRate,
-        IncomeRange incomeRange
+        IncomeRange incomeRange,
+        Long updatedByEmployeeId
+
 ) {}

@@ -1,10 +1,10 @@
 package com.infina.hissenet.entity.enums;
 
 public enum RiskProfile {
-    CONSERVATIVE("Muhafazakar"),
+    CONSERVATIVE("Düşük Risk"),
     MODERATE("Orta Risk"),
-    AGGRESSIVE("Agresif"),
-    VERY_AGGRESSIVE("Çok Agresif");
+    AGGRESSIVE("Yüksek Risk"),
+    VERY_AGGRESSIVE("Çok Yüksek Risk");
 
     private final String displayName;
 

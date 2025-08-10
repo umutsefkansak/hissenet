@@ -144,4 +144,12 @@ public class OrderController implements OrderControllerDoc {
 				((com.infina.hissenet.service.OrderService) service).getEnhancedPortfolioByCustomerId(customerId));
 	}
 	
+	@GetMapping("/by-customer/sorted")
+	public ApiResponse<List<OrderResponse>> getOrdersByCustomerIdSorted(@RequestParam Long customerId) {
+	    return ApiResponse.ok(
+	            MessageUtils.getMessage("order.customer.list.sorted.retrieved.successfully"),
+	            service.getOrdersByCustomerIdSorted(customerId)
+	    );
+	}
+	
 }

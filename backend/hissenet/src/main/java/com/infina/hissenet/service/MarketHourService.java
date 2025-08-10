@@ -1,5 +1,6 @@
 package com.infina.hissenet.service;
 
+import com.infina.hissenet.service.abstracts.IMarketHourService;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Service
-public class MarketHourService {
+public class MarketHourService implements IMarketHourService {
 
     private static final LocalTime MARKET_OPEN= LocalTime.of(10, 0);
     private static final LocalTime MARKET_CLOSE = LocalTime.of(18, 0);

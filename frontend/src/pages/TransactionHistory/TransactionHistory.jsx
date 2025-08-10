@@ -1,51 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./TransactionHistory.css";
 import Pagination from "../../components/common/Pagination/Pagination";
+import ExportMenu from "../../components/common/Export/ExportMenu";
+import SortableHeader from "../../components/common/Sorting/SortableHeader";
 import { orderApi } from "../../server/order";
+import { sortList } from "../../components/common/Sorting/sortUtils";
 
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
-const DEFAULT_PAGE_SIZE = 10;
-
-let __pdfFontLoaded = false;
-let __pdfFontName = "helvetica"; 
-const arrayBufferToBase64 = (buffer) => {
-  let binary = "";
-  const bytes = new Uint8Array(buffer);
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-  }
-  return btoa(binary);
-};
-
-const tryLoadFont = async (doc, fileName, fontName) => {
-  const url = `${process.env.PUBLIC_URL}/fonts/${fileName}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Font not found: ${url}`);
-  const buf = await res.arrayBuffer();
-  const base64 = arrayBufferToBase64(buf);
-  doc.addFileToVFS(fileName, base64);
-  doc.addFont(fileName, fontName, "normal");
-  return fontName;
-};
-
-const loadPdfFont = async (doc) => {
-  if (__pdfFontLoaded) return __pdfFontName;
-
-  try {
-    __pdfFontName = await tryLoadFont(doc, "NotoSans-Regular.ttf", "NotoSans");
-  } catch {
-    try {
-      __pdfFontName = await tryLoadFont(doc, "DejaVuSans.ttf", "DejaVuSans");
-    } catch {
-      __pdfFontName = "helvetica";
-    }
-  }
-  __pdfFontLoaded = true;
-  return __pdfFontName;
-};
+const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -55,8 +16,7 @@ const TransactionHistory = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -131,12 +91,11 @@ const TransactionHistory = () => {
       });
     }
 
-    if (typeFilter !== "ALL") {
-      arr = arr.filter((o) => o.type === typeFilter);
-    }
+    // Sıralama uygula
+    arr = sortList(arr, sortConfig.key, sortConfig.direction);
 
     return arr;
-  }, [orders, searchTerm, typeFilter]);
+  }, [orders, searchTerm, sortConfig]);
 
   const totalElements = filteredOrders.length;
   const totalPages = Math.max(1, Math.ceil(totalElements / pageSize));
@@ -144,10 +103,6 @@ const TransactionHistory = () => {
   useEffect(() => {
     if (page > totalPages - 1) setPage(0);
   }, [totalPages, page]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [typeFilter]);
 
   const start = page * pageSize;
   const end = start + pageSize;
@@ -157,94 +112,26 @@ const TransactionHistory = () => {
   const handlePageSizeChange = (newSize ) => { setPageSize(newSize); setPage(0); };
   const onChangeSearch = (e) => { setSearchTerm(e.target.value); setPage(0); };
 
-  const exportToExcelCSV = () => {
-    const data = filteredOrders;
-    const headers = ["Tarih","Hisse","Adet","Fiyat","Toplam","İşlem Türü","İşlem Durumu","Blokaj","Emir Tipi"];
-
-    const escape = (val) => {
-      const s = (val ?? "").toString();
-      const escaped = s.replace(/"/g, '""');
-      return `"${escaped}"`;
-    };
-
-    const rows = data.map((o) => {
-      const tarih = o.createdAt ? new Date(o.createdAt).toLocaleString("tr-TR") : "-";
-      const hisse = o.stockCode ?? "";
-      const adet = Number(o.quantity ?? 0).toLocaleString("tr-TR");
-      const fiyat = Number(o.price ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺";
-      const toplam = Number(o.totalAmount ?? 0).toLocaleString("tr-TR") + " ₺";
-      const islemTuru = getOrderTypeLabel(o.type);
-      const islemDurumu = getOrderStatusLabel(o.status);
-      const blokaj = Number(o.blockedBalance ?? 0) ? Number(o.blockedBalance).toLocaleString("tr-TR") + " ₺" : "Yok";
-      const emirTipi = getOrderCategoryLabel(o.category);
-
-      return [tarih,hisse,adet,fiyat,toplam,islemTuru,islemDurumu,blokaj,emirTipi].map(escape).join(",");
-    });
-
-    const csv = [headers.map(escape).join(","), ...rows].join("\r\n");
-    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const now = new Date();
-    const stamp = now.toISOString().replace(/[:.]/g, "-");
-    a.download = `tum-islemler-${stamp}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+    setPage(0);
   };
 
-  const exportToPDF = async () => {
-    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-
-    const fontName = await loadPdfFont(doc); 
-    doc.setFont(fontName, "normal");
-
-    doc.setFontSize(14);
-    doc.text("Tüm İşlemler", 40, 40);
-
-    const head = [[
-      "Tarih","Hisse","Adet","Fiyat","Toplam","İşlem Türü","İşlem Durumu","Blokaj","Emir Tipi",
-    ]];
-
-    const body = filteredOrders.map((o) => ([
-      o.createdAt ? new Date(o.createdAt).toLocaleString("tr-TR") : "-",
-      o.stockCode ?? "",
-      Number(o.quantity ?? 0).toLocaleString("tr-TR"),
-      Number(o.price ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺",
-      Number(o.totalAmount ?? 0).toLocaleString("tr-TR") + " ₺",
-      getOrderTypeLabel(o.type),
-      getOrderStatusLabel(o.status),
-      Number(o.blockedBalance ?? 0) ? Number(o.blockedBalance).toLocaleString("tr-TR") + " ₺" : "Yok",
-      getOrderCategoryLabel(o.category),
-    ]));
-
-    autoTable(doc, {
-      head,
-      body,
-      startY: 60,
-      styles: { font: fontName, fontSize: 9, cellPadding: 6, overflow: "linebreak" },
-      headStyles: { font: fontName, fillColor: [232, 232, 232] },
-      theme: "striped",
-      didDrawPage: () => {
-        const pageCount = doc.getNumberOfPages();
-        const pageSize = doc.internal.pageSize;
-        const pageWidth = pageSize.getWidth();
-        const pageHeight = pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text(
-          `Sayfa ${doc.internal.getCurrentPageInfo().pageNumber} / ${pageCount}`,
-          pageWidth - 80,
-          pageHeight - 20
-        );
-      },
-    });
-
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    doc.save(`tum-islemler-${stamp}.pdf`);
-  };
+  // Export için sütun tanımları
+  const exportColumns = [
+    { key: 'createdAt', label: 'Tarih', formatter: (value) => value ? new Date(value).toLocaleString("tr-TR") : "-" },
+    { key: 'stockCode', label: 'Hisse' },
+    { key: 'quantity', label: 'Adet', formatter: (value) => Number(value || 0).toLocaleString("tr-TR") },
+    { key: 'price', label: 'Fiyat', formatter: (value) => Number(value || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺" },
+    { key: 'totalAmount', label: 'Toplam', formatter: (value) => Number(value || 0).toLocaleString("tr-TR") + " ₺" },
+    { key: 'type', label: 'İşlem Türü', formatter: (value) => getOrderTypeLabel(value) },
+    { key: 'status', label: 'İşlem Durumu', formatter: (value) => getOrderStatusLabel(value) },
+    { key: 'blockedBalance', label: 'Blokaj', formatter: (value) => Number(value || 0) ? Number(value).toLocaleString("tr-TR") + " ₺" : "Yok" },
+    { key: 'category', label: 'Emir Tipi', formatter: (value) => getOrderCategoryLabel(value) }
+  ];
 
   if (loading) {
     return (
@@ -272,51 +159,6 @@ const TransactionHistory = () => {
       </div>
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => setTypeFilter("ALL")}
-            style={{
-              padding: "8px 10px",
-              borderRadius: 6,
-              border: "1px solid #d0d5dd",
-              background: typeFilter === "ALL" ? "#e8eefc" : "#fff",
-              color: "#111",
-              cursor: "pointer",
-              fontWeight: 600
-            }}
-          >
-            Tümü
-          </button>
-          <button
-            onClick={() => setTypeFilter("BUY")}
-            style={{
-              padding: "8px 10px",
-              borderRadius: 6,
-              border: "1px solid #d0d5dd",
-              background: typeFilter === "BUY" ? "#e3f2fd" : "#fff",
-              color: "#1976d2",
-              cursor: "pointer",
-              fontWeight: 600
-            }}
-          >
-            Alış
-          </button>
-          <button
-            onClick={() => setTypeFilter("SELL")}
-            style={{
-              padding: "8px 10px",
-              borderRadius: 6,
-              border: "1px solid #d0d5dd",
-              background: typeFilter === "SELL" ? "#fff3cd" : "#fff",
-              color: "#856404",
-              cursor: "pointer",
-              fontWeight: 600
-            }}
-          >
-            Satış
-          </button>
-        </div>
-
         <input
           type="text"
           value={searchTerm}
@@ -333,54 +175,73 @@ const TransactionHistory = () => {
           }}
         />
 
-        <button
-          onClick={exportToExcelCSV}
-          style={{
-            padding: "8px 12px",
-            borderRadius: 6,
-            border: "1px solid #0d6efd",
-            background: "#e7f1ff",
-            color: "#0d47a1",
-            fontWeight: 600,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-          title="Excel (CSV) olarak indir"
-        >
-          Excel’e Aktar
-        </button>
-
-        <button
-          onClick={exportToPDF}
-          style={{
-            padding: "8px 12px",
-            borderRadius: 6,
-            border: "1px solid #dc3545",
-            background: "#fdecec",
-            color: "#a10000",
-            fontWeight: 600,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-          title="PDF olarak indir"
-        >
-          PDF’e Aktar
-        </button>
+        <ExportMenu
+          data={filteredOrders}
+          columns={exportColumns}
+          filename="tum-islemler"
+          pdfTitle="Tüm İşlemler"
+          pdfSubtitle={`Toplam ${totalElements} işlem`}
+        />
       </div>
 
       <div className="transaction-table-container">
         <table className="transaction-table">
           <thead>
             <tr>
-              <th>Tarih</th>
-              <th>Hisse</th>
-              <th>Adet</th>
-              <th>Fiyat</th>
-              <th>Toplam</th>
-              <th>İşlem Türü</th>
-              <th>İşlem Durumu</th>
-              <th>Blokaj</th>
-              <th>Emir Tipi</th>
+              <SortableHeader
+                columnKey="createdAt"
+                label="Tarih"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="stockCode"
+                label="Hisse"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="quantity"
+                label="Adet"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="price"
+                label="Fiyat"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="totalAmount"
+                label="Toplam"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="type"
+                label="İşlem Türü"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="status"
+                label="İşlem Durumu"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="blockedBalance"
+                label="Blokaj"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                columnKey="category"
+                label="Emir Tipi"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
             </tr>
           </thead>
           <tbody>

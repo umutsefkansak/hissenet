@@ -84,7 +84,7 @@ public class Wallet extends BaseEntity {
         this.lastTransactionDate = LocalDateTime.now();
     }
     public void subtractBalance(BigDecimal amount) {
-        if (!hasSufficientBalance(amount)) {
+        if (!hasSufficientAvailableBalance(amount)) {
             throw new RuntimeException("Insufficient balance. Required: " + amount + ", Available: " + this.balance);
         }
         this.balance = this.balance.subtract(amount);

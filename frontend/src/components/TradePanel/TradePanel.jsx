@@ -43,7 +43,7 @@ const TradePanel = ({ stock, onBack }) => {
   const unitPrice = category === 'LIMIT' ? parseFloat(price) || 0 : (stock.lastPrice || 0);
   const totalNumber = quantity && unitPrice ? unitPrice * Number(quantity) : 0;
   const commissionNumber = totalNumber * commissionRate;
-  const netNumber = totalNumber - commissionNumber;
+  const netNumber = totalNumber + commissionNumber;
 
   const total = totalNumber.toFixed(2);
   const commission = commissionNumber.toFixed(2);

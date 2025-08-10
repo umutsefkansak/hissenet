@@ -1,155 +1,214 @@
 import React, { useState, useRef, useEffect } from 'react';
+import styles from './Chatbot.module.css';
+import ChatIcon from '../Icons/ChatIcon';
+import RefreshIcon from '../Icons/RefreshIcon';
+import SendIcon from '../Icons/SendIcon';
+import AIRobotIcon from '../Icons/AIRobotIcon';
+import ArrowRightIcon from '../Icons/ArrowRightIcon';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]); 
-  const chatboxRef = useRef(null);
+    const [input, setInput] = useState('');
+    const [messages, setMessages] = useState([
+        {
+            sender: 'bot',
+            text: 'Merhaba! Ben HisseNet hisse alım satım platformu asistanıyım. Size nasıl yardımcı olabilirim?'
+        }
+    ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(true);
+    const chatboxRef = useRef(null);
+    const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (chatboxRef.current) {
-      chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
-    }
-  }, [messages]);
+    const suggestions = [
+        "Bugünün en çok yükselen hisse senetleri hangileri?",
+        "BIST 100 endeksi nasıl performans gösteriyor?",
+        "Nasıl hisse senedi alım emri verebilirim?",
+        "Portföyümde hangi hisseler var?",
+        "Bu hafta hangi şirketler temettü dağıtacak?",
+        "Dolar/TL kuru bugün nasıl?"
+    ];
 
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
-  };
+    useEffect(() => {
+        if (chatboxRef.current) {
+            chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
+        }
+    }, [messages]);
 
-  const sendMessage = async () => {
-    const trimmed = input.trim();
-    if (!trimmed) return;
+    const toggleChat = () => {
+        setIsOpen(!isOpen);
+        if (!isOpen) {
+            setTimeout(() => {
+                if (chatboxRef.current) {
+                    chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
+                }
+            }, 50);
+        }
+    };
 
-    setMessages(prev => [...prev, { sender: 'user', text: trimmed }]);
-    setInput('');
+    const sendMessage = async (messageText = null) => {
+        const messageToSend = messageText || input.trim();
+        if (!messageToSend || isLoading) return;
 
-    try {
-        const url = "http://localhost:8000/api/chat/";
+        if (messageText) {
+            setShowSuggestions(false);
+        }
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed }),
-      });
+        setMessages(prev => [...prev, { sender: 'user', text: messageToSend }]);
+        setInput('');
+        setIsLoading(true);
 
-      const data = await response.json();
-      console.log(response);
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }, 0);
 
-      console.log(data);
+        try {
+            const url = "http://localhost:8000/api/chat/";
 
-      setMessages(prev => [...prev, { sender: 'bot', text: data.response }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Bir hata oluştu.' }]);
-    }
-  };
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: messageToSend }),
+            });
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+            const data = await response.json();
 
-  return (
-    <>
-      <button
-        onClick={toggleChat}
-        style={{
-          position: 'fixed',
-          bottom: 20,
-          right: 20,
-          zIndex: 1001,
-          backgroundColor: '#17313E',
-          color: 'white',
-          border: 'none',
-          padding: '14px 16px',
-          borderRadius: '50%',
-          fontSize: 20,
-          cursor: 'pointer',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-        }}
-        aria-label="Chat Aç/Kapat"
-      >
-        💬
-      </button>
+            setMessages(prev => [...prev, { sender: 'bot', text: data.response }]);
+        } catch (error) {
+            setMessages(prev => [...prev, { sender: 'bot', text: 'Bir hata oluştu. Lütfen tekrar deneyin.' }]);
+        } finally {
+            setIsLoading(false);
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                }
+            }, 100);
+        }
+    };
 
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 80,
-            right: 20,
-            width: 350,
-            height: 500,
-            background: '#ffffff',
-            border: '1px solid #ddd',
-            borderRadius: 16,
-            boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            zIndex: 1000,
-          }}
-        >
-          <div class='you-text margin: 10'> Merhaba, ben HisseNet hisse alım satım platformu asistanıyım. Size nasıl yardımcı olabilirim?</div>
-          <div
-            ref={chatboxRef}
-            style={{
-              flex: 1,
-              padding: 16,
-              overflowY: 'auto',
-              fontSize: 15,
-            }}
-          >
-            {messages.map((msg, i) => (
-              <div key={i} style={{ marginBottom: 10 }}>
-                <strong style={{ color: msg.sender === 'user' ? '#447D9B' : '#415E72' }}>
-                  {msg.sender === 'user' ? 'Sen:': 'Asistan:'}
-                </strong>{' '}
-                {msg.text}
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              borderTop: '1px solid #eee',
-              padding: 10,
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Asistan'a sor"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              style={{
-                flex: 1,
-                padding: 10,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                outline: 'none',
-              }}
-            />
+    const clearChat = () => {
+        setMessages([
+            {
+                sender: 'bot',
+                text: 'Merhaba! Ben HisseNet hisse alım satım platformu asistanıyım. Size nasıl yardımcı olabilirim?'
+            }
+        ]);
+        setShowSuggestions(true);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        sendMessage(suggestion);
+    };
+
+    return (
+        <div className={styles.chatbotContainer}>
             <button
-              onClick={sendMessage}
-              style={{
-                backgroundColor: '#415E72',
-                color: 'white',
-                border: 'none',
-                padding: '10px 14px',
-                marginLeft: 8,
-                borderRadius: 8,
-                cursor: 'pointer',
-              }}
+                onClick={toggleChat}
+                className={styles.toggleButton}
+                aria-label="Chat Aç/Kapat"
             >
-              Gönder
+                <ChatIcon className={styles.toggleButtonIcon} />
             </button>
-          </div>
+
+            {isOpen && (
+                <div className={styles.chatContainer}>
+                    <div className={styles.chatHeader}>
+                        <span>HisseNet Asistan</span>
+                        <button
+                            onClick={clearChat}
+                            className={styles.clearButton}
+                            aria-label="Sohbeti Temizle"
+                            title="Sohbeti Temizle"
+                        >
+                            <RefreshIcon className={styles.refreshIcon} />
+                        </button>
+                    </div>
+
+                    <div ref={chatboxRef} className={styles.chatBox}>
+                        {messages.map((msg, i) => (
+                            <div key={i} className={styles.message}>
+                                <div className={msg.sender === 'user' ? styles.userMessage : styles.botMessage}>
+                                    <div className={`${styles.messageContent} ${msg.sender === 'user' ? styles.userMessageContent : styles.botMessageContent}`}>
+                                        {msg.sender === 'bot' && <AIRobotIcon className={styles.aiIcon} />}
+                                        <span>{msg.text}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Suggestions - Sadece ilk mesajdan sonra ve henüz kullanıcı mesaj göndermemişse göster */}
+                        {showSuggestions && messages.length === 1 && (
+                            <div className={styles.suggestionsContainer}>
+                                {suggestions.slice(0, 3).map((suggestion, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleSuggestionClick(suggestion)}
+                                        className={styles.suggestionButton}
+                                        style={{
+                                            animationDelay: `${index * 100}ms`
+                                        }}
+                                    >
+                                        <span className={styles.suggestionText}>
+                                            {suggestion}
+                                        </span>
+                                        <ArrowRightIcon className={styles.suggestionArrow} />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {isLoading && (
+                            <div className={styles.message}>
+                                <div className={styles.botMessage}>
+                                    <div className={`${styles.messageContent} ${styles.botMessageContent}`}>
+                                        <AIRobotIcon className={styles.aiIcon} />
+                                        <div className={styles.loadingContainer}>
+                                            <div className={styles.loadingDots}>
+                                                <div className={styles.loadingDot}></div>
+                                                <div className={styles.loadingDot}></div>
+                                                <div className={styles.loadingDot}></div>
+                                            </div>
+                                            Yazıyor...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.inputContainer}>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder="Mesajınızı yazın..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className={styles.textInput}
+                            disabled={isLoading}
+                        />
+                        <button
+                            onClick={() => sendMessage()}
+                            className={styles.sendButton}
+                            disabled={!input.trim() || isLoading}
+                            aria-label="Mesaj Gönder"
+                        >
+                            <SendIcon className={styles.sendButtonIcon} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-    </>
-  );
+    );
 };
 
 export default Chatbot;

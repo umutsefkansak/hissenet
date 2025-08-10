@@ -74,7 +74,7 @@ class StockTransactionServiceTest {
 
         when(portfolioService.getCustomerFirstPortfolio(1L)).thenReturn(portfolio);
         when(cacheManagerService.getCachedByCode("THYAO")).thenReturn(new CombinedStockData(
-                "THYAO", null, null, null, null, new BigDecimal("21.00"), null, null, null, null, null, null, null
+                "THYAO", null, null, null, null, null, new BigDecimal("21.00"), null, null, null, null, null, null, null
         ));
 
         when(jpaRepository.save(any(StockTransaction.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -113,7 +113,7 @@ class StockTransactionServiceTest {
 
         when(portfolioService.getCustomerFirstPortfolio(1L)).thenReturn(portfolio);
         when(cacheManagerService.getCachedByCode("THYAO")).thenReturn(new CombinedStockData(
-                "THYAO", null, null, null, null, new BigDecimal("21.00"), null, null, null, null, null, null, null
+                "THYAO", null, null, null,null, null, new BigDecimal("21.00"), null, null, null, null, null, null, null
         ));
         when(commonFinancialService.getQuantityForStockTransactionWithStream(1L, "THYAO")).thenReturn(50);
 

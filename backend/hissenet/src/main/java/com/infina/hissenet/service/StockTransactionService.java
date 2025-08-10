@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -134,29 +135,29 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
                         StockTransactionType.BUY,
                         StockTransactionType.SELL
                 );
-        System.out.println(transactionsReadyForSettlement.toString());
+
+        LocalDateTime now = LocalDateTime.now();
 
         for (StockTransaction transaction : transactionsReadyForSettlement) {
-            processStockSettlement(transaction);
+            Duration timeToSettlement = Duration.between(now, transaction.getSettlementDate());
+            if (!timeToSettlement.isNegative() && timeToSettlement.getSeconds() <= 10) {
+
+                processStockSettlement(transaction);
+            }
         }
     }
 
     private void processStockSettlement(StockTransaction transaction) {
-        // Settlement işlemlerini burada yapabilirsin (gerekirse)
-        // Örneğin portfolio güncellemeleri vb.
+
 
         transaction.setTransactionStatus(TransactionStatus.SETTLED);
-        // Settlement tarihini güncelleyebilirsin veya ayrı bir actualSettlementDate alanı ekleyebilirsin
 
         save(transaction);
 
-        // Portfolio değerlerini güncelle
         portfolioService.updatePortfolioValues(transaction.getPortfolio().getId());
     }
 
-    private StockTransactionResponse mergeTransactions(List<StockTransaction> transactions) {
-       return commonFinancialService.mergeTransactions(transactions);
-    }
+
     @Transactional
     public void updatePortfolioIdForStockTransactions(Long transactionId,Long portfolioId) {
         StockTransaction transaction = stockTransactionRepository.findById(transactionId)
@@ -178,7 +179,6 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         int updatedCount = stockTransactionRepository.updatePortfolioIdByCustomerIdAndStockCode(
                 portfolioId, customerId, stockCode
         );
-
         // Portföy değerlerini güncelle
         portfolioService.updatePortfolioValues(portfolioId);
         portfolioService.updatePortfolioValues(oldPortfolio.getId());
@@ -194,6 +194,11 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
             result+=getAllBuyTransactions(portfolio.getId()).size();
         }
         return result;
+    }
+    public List<StockTransaction> transactionsListByCustomerIdAndStockCode(Long customerId,String stockCode) {
+        return stockTransactionRepository.findByCustomerIdAndStockCodeAndTypeAndStatusIn(customerId,
+                stockCode,StockTransactionType.SELL, TransactionStatus.COMPLETED
+                );
     }
 
 }

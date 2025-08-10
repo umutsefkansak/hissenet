@@ -135,4 +135,35 @@ public interface IOrderService {
      */
     Long getTodayOrderCount();
 
+    /**
+     * T+2 settlement kurallarına uygun olarak satılabilir hisse miktarını hesaplar.
+     * Bloke edilen (T+2 bekleyen) hisseleri çıkarır.
+     *
+     * @param customerId müşteri ID'si
+     * @param stockCode hisse senedi kodu
+     * @return satılabilir hisse miktarı
+     */
+    BigDecimal getAvailableStockQuantityForSale(Long customerId, String stockCode);
+
+    /**
+     * T+2 settlement nedeniyle bloke edilen hisse miktarını hesaplar.
+     * Test modunda: 1 dakika, Production'da: 2 iş günü
+     *
+     * @param customerId müşteri ID'si
+     * @param stockCode hisse senedi kodu
+     * @return bloke edilen hisse miktarı
+     */
+    BigDecimal getBlockedStockQuantity(Long customerId, String stockCode);
+    
+    /**
+     * Retrieves all orders placed by the given customer, sorted by creation time (newest first).
+     *
+     * <p>Returns the same payload as {@link #getOrdersByCustomerId(Long)} but ordered
+     * by {@code createdAt DESC} for convenient, timeline-like views.</p>
+     *
+     * @param customerId the ID of the customer
+     * @return list of order responses sorted by createdAt descending
+     */
+    List<OrderResponse> getOrdersByCustomerIdSorted(Long customerId);
+
 }

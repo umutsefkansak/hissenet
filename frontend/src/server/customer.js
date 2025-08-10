@@ -145,7 +145,6 @@ const parseFullName = (fullName) => {
 
 const formatPhoneForBackend = (phone) => {
     if (!phone) return null;
-    // +90 prefix'i ekle
     const cleanPhone = phone.replace(/\D/g, '');
     return '+90' + cleanPhone;
 };
@@ -155,7 +154,7 @@ const mapGenderToEnum = (gender) => {
     const genderMap = {
         'erkek': 'MALE',
         'kadin': 'FEMALE',
-	        'kadın': 'FEMALE',
+        'kadın': 'FEMALE',
         'diger': 'OTHER',
         'diğer': 'OTHER'
     };
@@ -197,7 +196,7 @@ export const handleCustomerApiError = (error) => {
             }
             return 'Form verilerini kontrol edin';
 
-        case 409: 
+        case 409:
             if (data.detail) {
                 if (data.detail.includes('email')) {
 	                    return 'Bu e-posta adresi zaten kullanılıyor';

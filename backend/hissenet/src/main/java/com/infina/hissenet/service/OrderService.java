@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.infina.hissenet.dto.response.PopularStockCodesResponse;
+import com.infina.hissenet.dto.response.*;
 
+import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
@@ -20,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.infina.hissenet.dto.request.OrderCreateRequest;
 import com.infina.hissenet.dto.request.OrderUpdateRequest;
-import com.infina.hissenet.dto.response.OrderResponse;
-import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
-import com.infina.hissenet.dto.response.RecentOrderResponse;
 import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.enums.OrderCategory;
@@ -38,7 +36,10 @@ import com.infina.hissenet.utils.GenericServiceImpl;
 import com.infina.hissenet.utils.MessageUtils;
 
 import static com.infina.hissenet.constants.OrderConstants.COMMISSION_RATE;
-
+/**
+* t+2 ile ilgili işlemler biraz kafa karıştırıcı olacağı için
+* methodlara yorum satırı ekledim :DD
+* */
 @Service
 public class OrderService extends GenericServiceImpl<Order, Long> implements IOrderService {
 
@@ -75,6 +76,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 
 		if (request.price() == null || request.quantity() == null) {
 			throw new IllegalArgumentException(MessageUtils.getMessage("order.price.quantity.required"));
+		}
+
+		// t+2 sürede satış sınırı için
+		if (request.type() == OrderType.SELL) {
+			validateSellOrder(request.customerId(), request.stockCode(), request.quantity());
 		}
 
 		Order order = orderMapper.toEntity(request);
@@ -149,6 +155,30 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 			walletService.processStockPurchase(request.customerId(), totalAmount, commission);
 		} else if (request.type() == OrderType.SELL) {
 			walletService.processStockSale(request.customerId(), totalAmount, commission);
+		}
+	}
+
+	/**
+	 * Satış emri öncesi T+2 settlement güvenlik kontrolü yapcaz
+	 * Bloke edilen hisseleri hesaplayarak aşırı satışı engellemek amacımız
+	 */
+	private void validateSellOrder(Long customerId, String stockCode, BigDecimal requestedQuantity) {
+		BigDecimal availableQuantity = getAvailableStockQuantityForSale(customerId, stockCode);
+		
+		if (requestedQuantity.compareTo(availableQuantity) > 0) {
+			BigDecimal blockedQuantity = getBlockedStockQuantity(customerId, stockCode);
+			BigDecimal totalOwned = getOwnedStockQuantity(customerId, stockCode);
+			
+			throw new InsufficientStockException(
+				String.format(
+					"Yetersiz hisse! İstenen: %s, Toplam: %s, Blokede (T+2): %s, Satılabilir: %s. " +
+					"T+2 settlement nedeniyle satılan hisseler geçici olarak bloke edilmiştir.",
+					requestedQuantity,
+					totalOwned,
+					blockedQuantity,
+					availableQuantity
+				)
+			);
 		}
 	}
 
@@ -243,6 +273,59 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		return totalBuy.subtract(totalSell);
 	}
 
+	/**
+	 * T+2 settlement kurallarına uygun olarak satılabilir hisse miktarını hesaplar
+	 * Bloke edilen (T+2 bekleyen) hisseleri çıkarır
+	 */
+	@Transactional(readOnly = true)
+	public BigDecimal getAvailableStockQuantityForSale(Long customerId, String stockCode) {
+		BigDecimal totalOwned = getOwnedStockQuantity(customerId, stockCode);
+		BigDecimal blockedQuantity = getBlockedStockQuantity(customerId, stockCode);
+		
+		BigDecimal availableForSale = totalOwned.subtract(blockedQuantity);
+		return availableForSale.max(BigDecimal.ZERO); // Negatif olamaz
+	}
+
+	/**
+	 * T+2 settlement nedeniyle bloke edilen hisse miktarını hesaplar
+	 * Test modunda: 1 dakika, Production'da: 2 iş günü
+	 */
+	@Transactional(readOnly = true)
+	public BigDecimal getBlockedStockQuantity(Long customerId, String stockCode) {
+		List<Order> sellOrders = orderRepository
+			.findByCustomerIdAndStockCodeAndStatus(customerId, stockCode, OrderStatus.FILLED)
+			.stream()
+			.filter(order -> order.getType() == OrderType.SELL)
+			.toList();
+		
+		BigDecimal blockedQuantity = BigDecimal.ZERO;
+		LocalDateTime now = LocalDateTime.now();
+		
+		for (Order order : sellOrders) {
+			LocalDateTime settlementTime = calculateT2SettlementTime(order.getCreatedAt());
+			
+			// Eğer henüz T+2 süresi dolmadıysa, bu hisse blokede
+			if (now.isBefore(settlementTime)) {
+				blockedQuantity = blockedQuantity.add(order.getQuantity());
+			}
+		}
+		
+		return blockedQuantity;
+	}
+
+	/**
+	 * T+2 settlement zamanını hesaplar
+	 * Test modu: 1 dakika (hızlı test için)
+	 * Production: 2 iş günü
+	 */
+	private LocalDateTime calculateT2SettlementTime(LocalDateTime orderTime) {
+		// Test modunda 1 dakika
+		return orderTime.plusMinutes(1);
+		
+		// Production'da 2 iş günü kullanmak için:
+		// return calculateTPlus2BusinessDays(orderTime);
+	}
+
 	@Transactional(readOnly = true)
 	public List<PortfolioStockQuantityResponse> getPortfolioByCustomerId(Long customerId) {
 		List<Order> filledOrders = orderRepository.findByCustomerIdAndStatus(customerId, OrderStatus.FILLED);
@@ -276,6 +359,58 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 					return new PortfolioStockQuantityResponse(stockCode, netQuantity, averagePrice);
 				})
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Enhanced portfolio with T+2 settlement information
+	 */
+	@Transactional(readOnly = true)
+	public List<EnhancedPortfolioStockResponse> getEnhancedPortfolioByCustomerId(Long customerId) {
+		List<PortfolioStockQuantityResponse> basicPortfolio = getPortfolioByCustomerId(customerId);
+		
+		return basicPortfolio.stream().map(stock -> {
+			String stockCode = stock.stockCode();
+			BigDecimal totalQuantity = stock.netQuantity();
+			BigDecimal blockedQuantity = getBlockedStockQuantity(customerId, stockCode);
+			BigDecimal availableQuantity = totalQuantity.subtract(blockedQuantity);
+			LocalDateTime earliestUnblock = getEarliestUnblockTime(customerId, stockCode);
+			
+			return com.infina.hissenet.dto.response.EnhancedPortfolioStockResponse.of(
+				stockCode,
+				totalQuantity,
+				availableQuantity,
+				blockedQuantity,
+				stock.averagePrice(),
+				earliestUnblock
+			);
+		}).collect(Collectors.toList());
+	}
+
+	/**
+	 * En erken unlock zamanını
+	 */
+	private LocalDateTime getEarliestUnblockTime(Long customerId, String stockCode) {
+		List<Order> sellOrders = orderRepository
+			.findByCustomerIdAndStockCodeAndStatus(customerId, stockCode, OrderStatus.FILLED)
+			.stream()
+			.filter(order -> order.getType() == OrderType.SELL)
+			.toList();
+		
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime earliest = null;
+		
+		for (Order order : sellOrders) {
+			LocalDateTime settlementTime = calculateT2SettlementTime(order.getCreatedAt());
+			
+			// Henüz settle olmamış ve en erken olan
+			if (now.isBefore(settlementTime)) {
+				if (earliest == null || settlementTime.isBefore(earliest)) {
+					earliest = settlementTime;
+				}
+			}
+		}
+		
+		return earliest;
 	}
 
 	@Transactional(readOnly = true)
@@ -335,6 +470,14 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
 		LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59, 999_999_999);
 		return orderRepository.countTodayOrders(startOfDay, endOfDay);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<OrderResponse> getOrdersByCustomerIdSorted(Long customerId) {
+	    List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+	    return orders.stream()
+	            .map(orderMapper::toResponse)
+	            .toList();
 	}
 
 }

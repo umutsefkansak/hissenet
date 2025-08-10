@@ -8,6 +8,7 @@ import com.infina.hissenet.dto.response.OrderResponse;
 import com.infina.hissenet.dto.response.PopularStockCodesResponse;
 import com.infina.hissenet.dto.response.PortfolioStockQuantityResponse;
 import com.infina.hissenet.dto.response.RecentOrderResponse;
+import com.infina.hissenet.dto.response.EnhancedPortfolioStockResponse;
 import com.infina.hissenet.service.abstracts.IOrderService;
 
 import com.infina.hissenet.utils.MessageUtils;
@@ -110,6 +111,45 @@ public class OrderController implements OrderControllerDoc {
 	@GetMapping("/today/count")
 	public ApiResponse<Long> getTodayOrderCount() {
 	    return ApiResponse.ok(MessageUtils.getMessage("order.today.count.retrieved.successfully"),  service.getTodayOrderCount());
+	}
+
+	/**
+	 * T+2 settlement kurallarına göre satılabilir hisse miktarını dönecek
+	 */
+	@GetMapping("/available-quantity")
+	public ApiResponse<BigDecimal> getAvailableStockQuantityForSale(
+			@RequestParam Long customerId,
+			@RequestParam String stockCode) {
+		return ApiResponse.ok("Satılabilir hisse miktarı başarıyla hesaplandı",
+				service.getAvailableStockQuantityForSale(customerId, stockCode));
+	}
+
+	/**
+	 * T+2 settlement nedeniyle bloke edilen hisse miktarını dönecek
+	 */
+	@GetMapping("/blocked-quantity")
+	public ApiResponse<BigDecimal> getBlockedStockQuantity(
+			@RequestParam Long customerId,
+			@RequestParam String stockCode) {
+		return ApiResponse.ok("Bloke edilen hisse miktarı başarıyla hesaplandı",
+				service.getBlockedStockQuantity(customerId, stockCode));
+	}
+
+	/**
+	 * T+2 settlement bilgileri ile enhanced portfolio döner babuş
+	 */
+	@GetMapping("/enhanced-portfolio")
+	public ApiResponse<List<EnhancedPortfolioStockResponse>> getEnhancedPortfolio(@RequestParam Long customerId) {
+		return ApiResponse.ok("Detaylı portföy bilgileri başarıyla alındı",
+				((com.infina.hissenet.service.OrderService) service).getEnhancedPortfolioByCustomerId(customerId));
+	}
+	
+	@GetMapping("/by-customer/sorted")
+	public ApiResponse<List<OrderResponse>> getOrdersByCustomerIdSorted(@RequestParam Long customerId) {
+	    return ApiResponse.ok(
+	            MessageUtils.getMessage("order.customer.list.sorted.retrieved.successfully"),
+	            service.getOrdersByCustomerIdSorted(customerId)
+	    );
 	}
 	
 }

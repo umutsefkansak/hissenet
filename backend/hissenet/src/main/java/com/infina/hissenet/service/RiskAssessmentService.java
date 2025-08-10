@@ -74,10 +74,10 @@ public class RiskAssessmentService implements IRiskAssessmentService {
 
     private String getRiskDescription(RiskProfile profile) {
         return switch (profile) {
-            case CONSERVATIVE -> "Muhafazakar yatırımcı profili. Düşük riskli yatırımlar önerilir.";
+            case CONSERVATIVE -> "Düşük riskli yatırımcı profili. Düşük riskli yatırımlar önerilir.";
             case MODERATE -> "Orta riskli yatırımcı profili. Dengeli portföy önerilir.";
-            case AGGRESSIVE -> "Agresif yatırımcı profili. Yüksek getirili yatırımlar yapabilir.";
-            case VERY_AGGRESSIVE -> "Çok agresif yatırımcı profili. En yüksek riskli yatırımlar yapabilir.";
+            case AGGRESSIVE -> "Yüksek riskli yatırımcı profili. Yüksek getirili yatırımlar yapabilir.";
+            case VERY_AGGRESSIVE -> "Çok yüksek riskli yatırımcı profili. En yüksek riskli yatırımlar yapabilir.";
         };
     }
 }

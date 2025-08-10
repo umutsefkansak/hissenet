@@ -203,6 +203,11 @@ const useEmployees = (usePagination = false) => {
         try {
             const response = await createEmployee(employeeData);
             if (response.success) {
+                if (usePagination) {
+                    await fetchEmployeesPageable(paginationParams);
+                } else {
+                    await fetchEmployees();
+                }
                 return { success: true, data: response.data };
             } else {
                 setError(response.error);
@@ -224,6 +229,12 @@ const useEmployees = (usePagination = false) => {
         try {
             const response = await updateEmployee(employeeData);
             if (response.success) {
+                // Başarılı güncelleme sonrası listeyi yenile
+                if (usePagination) {
+                    await fetchEmployeesPageable(paginationParams);
+                } else {
+                    await fetchEmployees();
+                }
                 return { success: true, data: response.data };
             } else {
                 setError(response.error);

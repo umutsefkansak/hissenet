@@ -17,6 +17,7 @@ import com.infina.hissenet.exception.riskassessment.InvalidAnswerException;
 import com.infina.hissenet.exception.riskassessment.RiskAssessmentException;
 import com.infina.hissenet.exception.role.RoleAlreadyExistsException;
 import com.infina.hissenet.exception.role.RoleNotFoundException;
+import com.infina.hissenet.exception.stock.BadRequestStockException;
 import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCancelledException;
 import com.infina.hissenet.exception.transaction.TransactionAlreadyCompletedException;
@@ -163,7 +164,7 @@ public class GlobalExceptionHandler {
 
     // 400 Bad Request
     @ExceptionHandler({
-            InsufficientStockException.class
+            InsufficientStockException.class, BadRequestStockException.class
     })
     public ProblemDetail badRequestException(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());

@@ -23,7 +23,8 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(Caffeine<Object,Object> caffeine) {
-        CaffeineCacheManager mgr = new CaffeineCacheManager( CombinedCacheService.CACHE_NAME,
+        CaffeineCacheManager mgr = new CaffeineCacheManager(
+                CombinedCacheService.CACHE_NAME,
                 BorsaIstanbulCacheService.CACHE_NAME);
         mgr.setCaffeine(caffeine);
         return mgr;

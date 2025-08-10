@@ -52,7 +52,8 @@ const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnaly
                     type="number"
                     value={formData.commissionRate}
                     onChange={handleInputChange}
-                    placeholder="Varsayılan oran kullanılacak"
+                    error={errors.commissionRate}
+                    placeholder="Komisyon oranı giriniz"
                     step="0.01"
                     min="0"
                     max="100"
@@ -61,24 +62,21 @@ const FinancialInfoSection = ({ formData, handleInputChange, errors, onRiskAnaly
 
             <div className={styles.formRow}>
                 <div className={styles.riskAnalysisContainer}>
+                    <label className={styles.riskAnalysisLabel}>
+                        Risk Analiz Testi <span className={styles.required}>*</span>
+                    </label>
                     <button
                         type="button"
                         className={styles.riskAnalysisBtn}
                         onClick={onRiskAnalysis}
                     >
-                        Risk Analizi
+                        Risk Analiz Testi
                     </button>
-                    {riskAssessmentResult ? (
+                    {riskAssessmentResult && (
                         <div className={styles.riskResultDisplay}>
                             <span className={styles.riskResultLabel}>Sonuç:</span>
                             <span className={styles.riskResultValue}>
                                 {translateRiskProfile(riskAssessmentResult.riskProfile)}
-                            </span>
-                        </div>
-                    ) : (
-                        <div className={styles.riskWarningDisplay}>
-                            <span className={styles.riskWarningText}>
-                                Risk analizi yapılması zorunludur
                             </span>
                         </div>
                     )}

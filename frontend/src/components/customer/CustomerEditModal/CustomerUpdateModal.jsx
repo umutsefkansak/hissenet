@@ -89,7 +89,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     if (!hasChanges()) {
       onClose();
       return;
@@ -115,8 +114,24 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
 
     setPendingUpdateData(updateData);
 
-    start();
-
+    // TC Number ile otomatik doğrulama başlat - form açmadan
+    if (customer.tcNumber) {
+      console.log('TC Number ile doğrulama başlatılıyor:', customer.tcNumber);
+      // useAuthFlow'daki confirmIdentity'i direkt çağır
+      confirmIdentity(customer.tcNumber);
+    } else {
+      console.error('TC Number bulunamadı, doğrulama yapılamıyor');
+      // TC Number yoksa direkt güncelleme yap
+      try {
+        setLoading(true);
+        await onUpdate(updateData);
+        onClose();
+      } catch (err) {
+        console.error('Customer update error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
    const handleCancel = () => {
@@ -236,7 +251,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
           message={modalProps.message}
           onClose={closeModal}
         />
-      )}
+        )}
     </>
   );
 };

@@ -14,6 +14,12 @@ export default function PopularStocks({ className }) {
     <div className={`${styles.container} ${className || ''}`}>
       <h3 className={styles.title}>Popüler Hisseler</h3>
       <table className={styles.table}>
+        <colgroup>
+    <col className={styles.colCode} /> {/* Hisseler */}
+    <col className={styles.colNum} />  {/* Fiyat */}
+    <col className={styles.colNum} />  {/* Değişim */}
+    <col className={styles.colNum} />  {/* Oran */}
+  </colgroup>
         <thead>
           <tr>
             <th>Hisseler</th>

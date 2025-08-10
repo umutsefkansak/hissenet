@@ -1,5 +1,4 @@
 const BASE_URL = '/api/v1/orders';
-const STOCK_TX_BASE_URL = '/api/v1/stock-transactions';
 
 export const orderApi = {
   getOrdersByCustomerId: async (customerId) => {
@@ -84,23 +83,6 @@ export const orderApi = {
     return response.json();
   },
 
-  getQuantityForStockTransaction: async (cursomerId, stockCode) => {
-  const response = await fetch(`${BASE_URL}/quantity/${cursomerId}/${stockCode}`);
-  if (!response.ok) {
-    throw new Error('Hisse adedi getirilemedi');
-  }
-  const result = await response.json();
-  return result.data;
- },
-
- getQuantityForStockTransaction: async (customerId, stockCode) => {
-  const response = await fetch(`${STOCK_TX_BASE_URL}/quantity/${customerId}/${stockCode}`);
-  if (!response.ok) {
-    throw new Error('Hisse adedi getirilemedi');
-  }
-  const result = await response.json();
-  return result.data;
- },
 
  getAvailableQuantity: async (customerId, stockCode) => {
   const response = await fetch(`${BASE_URL}/available-quantity?customerId=${customerId}&stockCode=${stockCode}`);

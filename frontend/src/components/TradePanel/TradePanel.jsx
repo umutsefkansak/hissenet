@@ -72,7 +72,7 @@ const TradePanel = ({ stock, onBack }) => {
       return;
     }
     try {
-      const resp = await orderApi.getQuantityForStockTransaction(customerId, stock.code);
+      const resp = await orderApi.getAvailableQuantity(customerId, stock.code);
       const q = Math.max(0, normalizeApiNumber(resp));
       setSellableQty(q);
     } catch {
@@ -162,16 +162,7 @@ const TradePanel = ({ stock, onBack }) => {
       return;
     }
 
-    if (type === 'SELL' && Number(quantity) > effectiveSellable) {
-      openModal({
-        variant: 'warning',
-        title: 'Yetersiz Hisse',
-        message: `Satılabilir (T+2): ${effectiveSellable}. Daha fazla satamazsınız.`,
-        confirmText: 'Tamam',
-        onClose: closeModal,
-      });
-      return;
-    }
+    
 
     openModal({
       variant: 'confirm',
@@ -212,11 +203,9 @@ const TradePanel = ({ stock, onBack }) => {
             title: 'İşlem Başarılı',
             message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri${statusStr && statusStr !== 'FILLED' ? ` (${statusStr})` : ''} gönderildi.`,
             confirmText: 'Tamam',
-            onClose: () => {
-              closeModal();
-              setQuantity('');
-              setTotalInput('');
-            },
+                         onClose: () => {
+               closeModal();
+             },
           });
         } catch (err) {
           setIsSubmitting(false);
@@ -277,25 +266,11 @@ const TradePanel = ({ stock, onBack }) => {
             type="number"
             min="0"
             value={quantity}
-            disabled={isSubmitting || (type === 'SELL' && sellDisabled)}
+            disabled={isSubmitting}
             onChange={e => {
               const val = Number(e.target.value);
               if (val < 0) return;
-              if (type === 'SELL' && val > effectiveSellable) {
-                openModal({
-                  variant: 'warning',
-                  title: 'Maksimum Adet Aşıldı',
-                  message: `Bu anda en fazla ${effectiveSellable} adet satabilirsiniz.`,
-                  confirmText: 'Tamam',
-                  onConfirm: () => {
-                    setQuantity(String(effectiveSellable));
-                    closeModal();
-                  },
-                  onClose: closeModal,
-                });
-              } else {
-                setQuantity(e.target.value);
-              }
+              setQuantity(e.target.value);
             }}
             placeholder="Adet"
           />
@@ -308,28 +283,11 @@ const TradePanel = ({ stock, onBack }) => {
             min="0"
             value={totalInput}
             disabled={isSubmitting}
-            onChange={e => {
-              const value = parseFloat(e.target.value);
-              if (value < 0) return;
-              if (type === 'SELL' && category === 'LIMIT') {
-                const maxTotal = effectiveSellable * unitPrice;
-                if (value > maxTotal) {
-                  openModal({
-                    variant: 'warning',
-                    title: 'Maksimum Tutar Aşıldı',
-                    message: `Maksimum ${maxTotal.toFixed(2)} TL değerinde satış yapabilirsiniz.`,
-                    confirmText: 'Tamam',
-                    onConfirm: () => {
-                      setTotalInput(maxTotal.toFixed(2));
-                      closeModal();
-                    },
-                    onClose: closeModal,
-                  });
-                  return;
-                }
-              }
-              setTotalInput(e.target.value);
-            }}
+                         onChange={e => {
+               const value = parseFloat(e.target.value);
+               if (value < 0) return;
+               setTotalInput(e.target.value);
+             }}
             placeholder="Toplam Tutar"
           />
         </div>
@@ -370,12 +328,12 @@ const TradePanel = ({ stock, onBack }) => {
           <div><span>Net Tutar:</span><span>{net} TL</span></div>
         </div>
 
-        <button
-          className={styles.actionBtn}
-          onClick={handleSubmit}
-          disabled={isSubmitting || (type === 'SELL' && sellDisabled)}
-          title={(type === 'SELL' && sellDisabled) ? 'Satış için satılabilir (T+2) adet yok' : ''}
-        >
+                 <button
+           className={styles.actionBtn}
+           onClick={handleSubmit}
+           disabled={isSubmitting}
+           title=""
+         >
           {type === 'BUY' ? 'Alış Emri Ver' : 'Satış Emri Ver'}
         </button>
       </div>

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 /**
  * Service interface for wallet operations.
  * Handles creation, update, retrieval, and wallet management operations.
+ * @author Atalay Berk Cirak
  */
 public interface IWalletService {
     /**

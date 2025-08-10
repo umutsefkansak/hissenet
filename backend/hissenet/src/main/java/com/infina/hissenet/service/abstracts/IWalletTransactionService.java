@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Service interface for wallet transaction operations.
  * Handles creation, update, retrieval, and listing of wallet transactions.
+ * @author Atalay Berk Cirak
  */
 
 public interface IWalletTransactionService {

@@ -1,96 +1,73 @@
-const BASE_URL = '/api/v1/orders';
+import api from './api';
 
 export const orderApi = {
   getOrdersByCustomerId: async (customerId) => {
-    const response = await fetch(`${BASE_URL}/by-customer?customerId=${customerId}`);
-    if (!response.ok) {
-      throw new Error('Müşteri siparişleri getirilemedi');
-    }
-    return response.json();
+    const res = await api.get('/orders/by-customer', { params: { customerId } });
+    return res.data;
   },
 
   createOrder: async (orderData) => {
-    const response = await fetch(`${BASE_URL}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
-    });
-
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || 'Emir oluşturulamadı');
+    try {
+      const res = await api.post('/orders', orderData);
+      return res.data;
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Emir oluşturulamadı';
+      throw new Error(msg);
     }
-
-    return response.json();
   },
 
-
   getTodayTotalTradeVolume: async () => {
-    const response = await fetch(`${BASE_URL}/filled/today/volume`);
-    if (!response.ok) {
-      throw new Error('Bugünkü toplam işlem hacmi alınamadı');
-    }
-    return response.json();
+    const res = await api.get('/orders/filled/today/volume');
+    return res.data;
   },
 
   getLastFiveOrders: async () => {
-    const response = await fetch(`${BASE_URL}/recent`);
-    if (!response.ok) {
-      throw new Error('Son 5 emir getirilemedi');
-    }
-    return response.json();
+    const res = await api.get('/orders/recent');
+    return res.data;
   },
 
   getTodayFilledOrders: async () => {
-    const response = await fetch(`${BASE_URL}/filled/today`);
-    if (!response.ok) {
-      throw new Error("Bugünkü FILLED emirleri alınamadı");
-    }
-    return response.json();
+    const res = await api.get('/orders/filled/today');
+    return res.data;
   },
 
   getPopularStockCodes: async () => {
-    const response = await fetch(`${BASE_URL}/popular`);
-    if (!response.ok) {
-      throw new Error('En popüler hisseler getirilemedi');
-    }
-    return response.json();
+    const res = await api.get('/orders/popular');
+    return res.data;
   },
 
   getTotalTradeVolume: async () => {
-    const response = await fetch(`${BASE_URL}/volume/total`);
-    if (!response.ok) {
-      throw new Error('Toplam işlem hacmi alınamadı');
-    }
-    return response.json();
+    const res = await api.get('/orders/volume/total');
+    return res.data;
   },
 
   getAllOrders: async () => {
-    const response = await fetch(`${BASE_URL}`);
-    if (!response.ok) {
-      throw new Error('Tüm emirler getirilemedi');
-    }
-    return response.json();
+    const res = await api.get('/orders');
+    return res.data;
   },
-  
+
   getTodayOrderCount: async () => {
-    const response = await fetch(`${BASE_URL}/today/count`);
-    if (!response.ok) {
-      throw new Error('Bugünkü toplam emir sayısı alınamadı');
-    }
-    return response.json();
+    const res = await api.get('/orders/today/count');
+    return res.data;
   },
 
+  getAvailableQuantity: async (customerId, stockCode) => {
+    const res = await api.get('/orders/available-quantity', { params: { customerId, stockCode } });
+    return res.data?.data;
+  },
 
- getAvailableQuantity: async (customerId, stockCode) => {
-  const response = await fetch(`${BASE_URL}/available-quantity?customerId=${customerId}&stockCode=${stockCode}`);
-  if (!response.ok) {
-    throw new Error('Satılabilir hisse miktarı getirilemedi');
-  }
-  const result = await response.json();
-  return result.data;
- }
+  updateOrder: async (orderId, updateData) => {
+    try {
+      const res = await api.patch(`/orders/${orderId}`, updateData);
+      return res.data;
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Emir güncellenemedi';
+      throw new Error(msg);
+    }
+  },
 
+  getOrdersByCustomerIdSorted: async (customerId) => {
+    const res = await api.get('/orders/by-customer/sorted', { params: { customerId } });
+    return res.data;
+  },
 };

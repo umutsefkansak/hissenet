@@ -5,6 +5,7 @@ import ExportMenu from "../../components/common/Export/ExportMenu";
 import SortableHeader from "../../components/common/Sorting/SortableHeader";
 import { orderApi } from "../../server/order";
 import { sortList } from "../../components/common/Sorting/sortUtils";
+import Modal from "../../components/common/Modal/Modal";
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -16,16 +17,33 @@ const TransactionHistory = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [targetOrder, setTargetOrder] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const [scopedCustomerId, setScopedCustomerId] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setLoading(true);
+        const cidRaw = localStorage.getItem("customerId");
+        const cid = cidRaw ? cidRaw.toString().trim() : null;
+        setScopedCustomerId(cid || null);
+
         const res = await orderApi.getAllOrders();
-        const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        const all = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        let list = all;
+        if (cid) {
+          list = all.filter(o => {
+            const oid = o?.customerId ?? o?.customerID ?? o?.customer_id ?? o?.customer?.id;
+            return String(oid ?? "") === String(cid);
+          });
+        }
         setOrders(list);
       } catch (err) {
-        console.error(err);
         setError("Emirler alınamadı.");
       } finally {
         setLoading(false);
@@ -35,26 +53,32 @@ const TransactionHistory = () => {
   }, []);
 
   const getOrderTypeLabel = (type) => (type === "BUY" ? "Alış" : type === "SELL" ? "Satış" : type);
-  const getOrderTypeClass  = (type) => (type === "BUY" ? "buy"  : type === "SELL" ? "sell"  : "");
+  const getOrderTypeClass = (type) => (type === "BUY" ? "buy" : type === "SELL" ? "sell" : "");
+
   const getOrderStatusLabel = (status) => {
     switch (status) {
       case "OPEN": return "Açık";
       case "FILLED": return "Gerçekleşti";
-      case "CANCELED": return "İptal Edildi";
+      case "CANCELED":
+      case "CANCELLED": return "İptal Edildi";
       case "REJECTED": return "Reddedildi";
       case "FAILED": return "Başarısız";
       default: return status;
     }
   };
+
   const getOrderStatusClass = (status) => {
     switch (status) {
       case "FILLED": return "completed";
       case "OPEN": return "pending";
+      case "CANCELED":
+      case "CANCELLED": return "canceled";
       case "REJECTED": return "rejected";
       case "FAILED": return "failed";
       default: return "";
     }
   };
+
   const getOrderCategoryLabel = (c) => (c === "MARKET" ? "Piyasa" : c === "LIMIT" ? "Limit" : c);
   const formatDate = (s) => (s ? new Date(s).toLocaleString("tr-TR") : "-");
   const formatBlockedBalance = (b) => {
@@ -80,7 +104,6 @@ const TransactionHistory = () => {
         const categoryRaw = normalized(o.category);
         const price = normalized(Number(o.price) ? Number(o.price).toLocaleString("tr-TR") : "");
         const total = normalized(Number(o.totalAmount) ? Number(o.totalAmount).toLocaleString("tr-TR") : "");
-
         return (
           code.includes(q) ||
           typeLabel.includes(q) || typeRaw.includes(q) ||
@@ -91,9 +114,7 @@ const TransactionHistory = () => {
       });
     }
 
-    // Sıralama uygula
     arr = sortList(arr, sortConfig.key, sortConfig.direction);
-
     return arr;
   }, [orders, searchTerm, sortConfig]);
 
@@ -109,28 +130,53 @@ const TransactionHistory = () => {
   const paginatedOrders = filteredOrders.slice(start, end);
 
   const handlePageChange = (pageZeroBased) => setPage(pageZeroBased);
-  const handlePageSizeChange = (newSize ) => { setPageSize(newSize); setPage(0); };
+  const handlePageSizeChange = (newSize) => { setPageSize(newSize); setPage(0); };
   const onChangeSearch = (e) => { setSearchTerm(e.target.value); setPage(0); };
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc"
     }));
     setPage(0);
   };
 
-  // Export için sütun tanımları
+  const openCancelModal = (order) => {
+    setTargetOrder(order);
+    setShowCancelModal(true);
+  };
+
+  const closeCancelModal = () => {
+    if (isCancelling) return;
+    setShowCancelModal(false);
+    setTargetOrder(null);
+  };
+
+  const confirmCancel = async () => {
+    if (!targetOrder) return;
+    try {
+      setIsCancelling(true);
+      await orderApi.updateOrder(targetOrder.id, { status: "CANCELED" });
+      setOrders(prev => prev.map(o => (o.id === targetOrder.id ? { ...o, status: "CANCELED" } : o)));
+      if (window?.showToast) window.showToast("Emir iptal edildi", "success", 2500);
+      closeCancelModal();
+    } catch (err) {
+      if (window?.showToast) window.showToast(err.message || "İptal işlemi başarısız", "error", 3500);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const exportColumns = [
-    { key: 'createdAt', label: 'Tarih', formatter: (value) => value ? new Date(value).toLocaleString("tr-TR") : "-" },
-    { key: 'stockCode', label: 'Hisse' },
-    { key: 'quantity', label: 'Adet', formatter: (value) => Number(value || 0).toLocaleString("tr-TR") },
-    { key: 'price', label: 'Fiyat', formatter: (value) => Number(value || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺" },
-    { key: 'totalAmount', label: 'Toplam', formatter: (value) => Number(value || 0).toLocaleString("tr-TR") + " ₺" },
-    { key: 'type', label: 'İşlem Türü', formatter: (value) => getOrderTypeLabel(value) },
-    { key: 'status', label: 'İşlem Durumu', formatter: (value) => getOrderStatusLabel(value) },
-    { key: 'blockedBalance', label: 'Blokaj', formatter: (value) => Number(value || 0) ? Number(value).toLocaleString("tr-TR") + " ₺" : "Yok" },
-    { key: 'category', label: 'Emir Tipi', formatter: (value) => getOrderCategoryLabel(value) }
+    { key: "createdAt", label: "Tarih", formatter: (value) => (value ? new Date(value).toLocaleString("tr-TR") : "-") },
+    { key: "stockCode", label: "Hisse" },
+    { key: "quantity", label: "Adet", formatter: (value) => Number(value || 0).toLocaleString("tr-TR") },
+    { key: "price", label: "Fiyat", formatter: (value) => Number(value || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₺" },
+    { key: "totalAmount", label: "Toplam", formatter: (value) => Number(value || 0).toLocaleString("tr-TR") + " ₺" },
+    { key: "type", label: "İşlem Türü", formatter: (value) => getOrderTypeLabel(value) },
+    { key: "status", label: "İşlem Durumu", formatter: (value) => getOrderStatusLabel(value) },
+    { key: "blockedBalance", label: "Blokaj", formatter: (value) => Number(value || 0) ? Number(value).toLocaleString("tr-TR") + " ₺" : "Yok" },
+    { key: "category", label: "Emir Tipi", formatter: (value) => getOrderCategoryLabel(value) }
   ];
 
   if (loading) {
@@ -154,8 +200,9 @@ const TransactionHistory = () => {
   return (
     <div className="transaction-history">
       <div className="transaction-history-header">
-        <h2>Tüm İşlemler</h2>
-        <span className="transaction-count">Toplam: {totalElements} işlem</span>
+       <h2>{scopedCustomerId ? "Müşterinin İşlemleri" : "Tüm İşlemler"}</h2>
+      <span className="transaction-count">Toplam: {totalElements} işlem</span>
+
       </div>
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
@@ -171,16 +218,15 @@ const TransactionHistory = () => {
             border: "1px solid #d0d5dd",
             background: "#fff",
             color: "#111",
-            outline: "none",
+            outline: "none"
           }}
         />
-
         <ExportMenu
           data={filteredOrders}
           columns={exportColumns}
-          filename="tum-islemler"
-          pdfTitle="Tüm İşlemler"
-          pdfSubtitle={`Toplam ${totalElements} işlem`}
+          filename={scopedCustomerId ? `islemler-${scopedCustomerId}` : "tum-islemler"}
+          pdfTitle={scopedCustomerId ? "Müşterinin İşlemleri" : "Tüm İşlemler"}
+          pdfSubtitle={scopedCustomerId ? `Müşteri ID: ${scopedCustomerId} • Toplam ${totalElements} işlem` : `Toplam ${totalElements} işlem`}
         />
       </div>
 
@@ -188,60 +234,16 @@ const TransactionHistory = () => {
         <table className="transaction-table">
           <thead>
             <tr>
-              <SortableHeader
-                columnKey="createdAt"
-                label="Tarih"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="stockCode"
-                label="Hisse"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="quantity"
-                label="Adet"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="price"
-                label="Fiyat"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="totalAmount"
-                label="Toplam"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="type"
-                label="İşlem Türü"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="status"
-                label="İşlem Durumu"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="blockedBalance"
-                label="Blokaj"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-              <SortableHeader
-                columnKey="category"
-                label="Emir Tipi"
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
+              <SortableHeader columnKey="createdAt" label="Tarih" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="stockCode" label="Hisse" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="quantity" label="Adet" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="price" label="Fiyat" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="totalAmount" label="Toplam" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="type" label="İşlem Türü" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="status" label="İşlem Durumu" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="blockedBalance" label="Blokaj" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="category" label="Emir Tipi" sortConfig={sortConfig} onSort={handleSort} />
+              <th className="action-col">İşlem</th>
             </tr>
           </thead>
           <tbody>
@@ -251,10 +253,7 @@ const TransactionHistory = () => {
                 <td>{order.stockCode}</td>
                 <td>{Number(order.quantity || 0).toLocaleString("tr-TR")}</td>
                 <td>
-                  {Number(order.price || 0).toLocaleString("tr-TR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })} ₺
+                  {Number(order.price || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
                 </td>
                 <td>{Number(order.totalAmount || 0).toLocaleString("tr-TR")} ₺</td>
                 <td>
@@ -269,6 +268,13 @@ const TransactionHistory = () => {
                 </td>
                 <td>{formatBlockedBalance(order.blockedBalance)}</td>
                 <td>{getOrderCategoryLabel(order.category)}</td>
+                <td className="action-cell">
+                  {order.status === "OPEN" ? (
+                    <button className="table-action-btn" onClick={() => openCancelModal(order)}>
+                      İptal Et
+                    </button>
+                  ) : null}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -288,6 +294,29 @@ const TransactionHistory = () => {
           showTotalElements={true}
         />
       </div>
+
+      {showCancelModal && targetOrder && (
+        <Modal
+          variant="confirm"
+          title="Emri iptal et?"
+          message={
+            <>
+              <p><strong>Hisse:</strong> {targetOrder.stockCode}</p>
+              <p>
+                <strong>Adet/Fiyat:</strong>{" "}
+                {Number(targetOrder.quantity || 0).toLocaleString("tr-TR")} /{" "}
+                {Number(targetOrder.price || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+              </p>
+              <p><strong>Toplam:</strong> {Number(targetOrder.totalAmount || 0).toLocaleString("tr-TR")} ₺</p>
+              <p style={{ marginTop: 8 }}>Bu emri iptal etmek istediğinize emin misiniz?</p>
+            </>
+          }
+          confirmText={isCancelling ? "İptal ediliyor..." : "Evet, iptal et"}
+          cancelText="Vazgeç"
+          onConfirm={isCancelling ? undefined : confirmCancel}
+          onClose={closeCancelModal}
+        />
+      )}
     </div>
   );
 };

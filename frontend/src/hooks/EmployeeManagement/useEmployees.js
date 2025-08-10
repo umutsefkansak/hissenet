@@ -108,41 +108,56 @@ const useEmployees = (usePagination = false) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await getAllEmployeesPageable({
-                page: params.page,
-                size: params.size,
+            console.log('API çağrısı parametreleri:', {
+                page: 0,
+                size: 1000,
                 sortBy: params.sortBy,
                 sortDir: params.sortDir,
-                search: params.searchTerm,
-                searchField: params.searchField
+                search: '',
+                searchField: ''
+            });
+
+            const response = await getAllEmployeesPageable({
+                page: 0,
+                size: 1000,
+                sortBy: params.sortBy,
+                sortDir: params.sortDir,
+                search: '',
+                searchField: ''
             });
 
             if (response.success) {
-                let data = response.data.data;
+                let allData = response.data.data.content || [];
 
-                if (params.searchTerm && data.content) {
-                    const filteredContent = filterEmployees(data.content, params.searchTerm, params.searchField);
+                console.log('Backend\'den gelen ham veri:', allData.length, 'kayıt');
 
-                    const startIndex = params.page * params.size;
-                    const endIndex = startIndex + params.size;
-                    const paginatedContent = filteredContent.slice(startIndex, endIndex);
-
-                    data = {
-                        ...data,
-                        content: paginatedContent,
-                        totalElements: filteredContent.length,
-                        totalPages: Math.ceil(filteredContent.length / params.size),
-                        numberOfElements: paginatedContent.length,
-                        number: params.page,
-                        size: params.size,
-                        first: params.page === 0,
-                        last: params.page >= Math.ceil(filteredContent.length / params.size) - 1
-                    };
+                let filteredData = allData;
+                if (params.searchTerm && params.searchTerm.trim()) {
+                    filteredData = filterEmployees(allData, params.searchTerm, params.searchField);
+                    console.log('Filtrelenmiş veri:', filteredData.length, 'kayıt');
                 }
 
-                setPaginationData(data);
+                const startIndex = params.page * params.size;
+                const endIndex = startIndex + params.size;
+                const paginatedContent = filteredData.slice(startIndex, endIndex);
+
+                const paginatedData = {
+                    content: paginatedContent,
+                    totalElements: filteredData.length,
+                    totalPages: Math.ceil(filteredData.length / params.size),
+                    numberOfElements: paginatedContent.length,
+                    number: params.page,
+                    size: params.size,
+                    first: params.page === 0,
+                    last: params.page >= Math.ceil(filteredData.length / params.size) - 1,
+                    empty: filteredData.length === 0
+                };
+
+                console.log('İşlenmiş veri:', paginatedData);
+                setPaginationData(paginatedData);
             } else {
                 setError(response.error);
+                console.error('API hatası:', response.error);
             }
         } catch (err) {
             console.error('Fetch employees pageable error:', err);
@@ -177,9 +192,11 @@ const useEmployees = (usePagination = false) => {
     }, [paginationParams]);
 
     const handleSearch = useCallback((searchTerm, searchField = 'all') => {
+        console.log('Arama yapılıyor:', { searchTerm, searchField });
+
         const newParams = {
             ...paginationParams,
-            searchTerm: searchTerm || '',
+            searchTerm: searchTerm?.trim() || '',
             searchField,
             page: 0
         };
@@ -188,6 +205,8 @@ const useEmployees = (usePagination = false) => {
     }, [paginationParams]);
 
     const handleClearSearch = useCallback(() => {
+        console.log('Arama temizleniyor');
+
         const newParams = {
             ...paginationParams,
             searchTerm: '',
@@ -229,7 +248,6 @@ const useEmployees = (usePagination = false) => {
         try {
             const response = await updateEmployee(employeeData);
             if (response.success) {
-                // Başarılı güncelleme sonrası listeyi yenile
                 if (usePagination) {
                     await fetchEmployeesPageable(paginationParams);
                 } else {

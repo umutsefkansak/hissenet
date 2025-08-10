@@ -30,7 +30,15 @@ export const changePassword = async (email, password, confirmNewPassword) => {
 
 export const createEmployee = async (employeeData) => {
   try {
-    const response = await api.post('/employees', employeeData);
+    const createdByEmployeeId = localStorage.getItem('personnelId') ?
+        parseInt(localStorage.getItem('personnelId')) : null;
+
+    const dataWithCreator = {
+      ...employeeData,
+      createdByEmployeeId: createdByEmployeeId
+    };
+
+    const response = await api.post('/employees', dataWithCreator);
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Create employee error:', error);
@@ -62,13 +70,20 @@ export const getAllEmployeesPageable = async (params = {}) => {
 
 export const updateEmployee = async (employeeData) => {
   try {
-    const response = await api.put('/employees', employeeData);
+    const updatedByEmployeeId = localStorage.getItem('personnelId') ?
+        parseInt(localStorage.getItem('personnelId')) : null;
+
+    const dataWithUpdater = {
+      ...employeeData,
+      updatedByEmployeeId: updatedByEmployeeId
+    };
+    const response = await api.put('/employees', dataWithUpdater);
+
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Update employee error:', error);
     console.error('Error response:', error.response?.data);
     console.error('Error status:', error.response?.status);
-
     const errorMessage = handleEmployeeApiError(error);
     return { success: false, error: errorMessage };
   }

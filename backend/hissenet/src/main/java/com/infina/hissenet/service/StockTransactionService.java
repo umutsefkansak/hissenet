@@ -139,11 +139,7 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         LocalDateTime now = LocalDateTime.now();
 
         for (StockTransaction transaction : transactionsReadyForSettlement) {
-            Duration timeToSettlement = Duration.between(now, transaction.getSettlementDate());
-            if (!timeToSettlement.isNegative() && timeToSettlement.getSeconds() <= 10) {
-
-                processStockSettlement(transaction);
-            }
+          processStockSettlement(transaction);
         }
     }
 

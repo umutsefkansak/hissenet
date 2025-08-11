@@ -42,7 +42,7 @@ const CorporateCustomer = () => {
         state: 'Türkiye',
         country: 'Türkiye',
         postalCode: '',
-        commissionRate: '',
+        commissionRate: '0.0',
 
         nationality: 'T.C.'
     };
@@ -51,7 +51,7 @@ const CorporateCustomer = () => {
         requiredFields: [
             'companyName', 'taxNumber', 'taxOffice', 'establishmentDate', 'sector',
             'authorizedPersonName', 'authorizedPersonTcNumber', 'authorizedPersonPhone', 'authorizedPersonEmail',
-            'phoneNumber', 'email', 'addressType', 'street', 'city','commissionRate'
+            'phoneNumber', 'email', 'addressType', 'street', 'city'
         ]
     };
 

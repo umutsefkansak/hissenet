@@ -5,14 +5,6 @@ const FormActions = ({ onGoBack, onSubmit, isLoading }) => {
     return (
         <div className={styles.formActions}>
             <button
-                type="button"
-                onClick={onGoBack}
-                className={styles.createCustomerBtnSecondary}
-                disabled={isLoading}
-            >
-                Geri
-            </button>
-            <button
                 type="submit"
                 disabled={isLoading}
                 className={styles.createCustomerBtnPrimary}

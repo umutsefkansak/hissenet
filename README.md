@@ -37,29 +37,34 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ## Sistem Mimarisi
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │    Chatbot      │
-│   (React)       │◄──►│  (Spring Boot)  │◄──►│   (Django)      │
-│   Port: 3000    │    │   Port: 8080    │    │   Port: 8000    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Nginx       │    │   SQL Server    │    │ MongoDB Atlas   │
-│   (Reverse      │    │   (Veritabanı)  │    │ (Vektör Arama)  │
-│    Proxy)       │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │
-         │                       │
-         ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐
-│     Redis       │    │  Harici API'lar │
-│   (Önbellek)    │    │ (CollectAPI,    │
-│                 │    │  Infina)        │
-└─────────────────┘    └─────────────────┘
-```
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754927102/dxaazjevy0l20etqwygk.png" alt="HisseNet Sistem Mimarisi" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Resmi yakınlaştırmak için tıklayın</em>
+</div>
+
+### Mimari Bileşenleri:
+
+**Ana Servisler:**
+- **Frontend (React)**: Port 3000 - Kullanıcı arayüzü ve gerçek zamanlı veri görüntüleme
+- **Backend (Spring Boot)**: Port 8080 - İş mantığı, API'lar ve veri işleme
+- **Chatbot (Django)**: Port 8000 - Yapay zeka destekli müşteri hizmetleri
+
+**Veritabanları:**
+- **SQL Server**: Ana iş veritabanı (müşteriler, portföyler, emirler)
+- **Redis**: Önbellekleme ve oturum yönetimi
+- **MongoDB Atlas**: Chatbot için vektör arama veritabanı
+
+**Altyapı Servisleri:**
+- **Nginx**: Web sunucu ve reverse proxy
+- **CollectAPI**: Hisse fiyat verileri
+- **Infina API**: Finansal veri entegrasyonu
+
+**Veri Akışları:**
+- REST API iletişimi (Frontend ↔ Backend)
+- WebSocket gerçek zamanlı veri akışı (/topic/prices, /topic/bist100)
+- Harici API entegrasyonları (Backend → CollectAPI, Infina)
+- Veritabanı bağlantıları (Backend ↔ SQL Server, Redis)
 
 ---
 
@@ -81,6 +86,10 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 - Rol tabanlı erişim kontrolü (ADMIN, EMPLOYEE)
 - Hız sınırlama koruması
 - Redis ile oturum yönetimi
+- Otomatik session uzatma
+- RFC 7807 Problem Details hata formatı
+- CSRF koruması devre dışı (stateless API)
+- HTTP-only cookie güvenliği
 
 ### Yapay Zeka Destekli Hizmet
 - Google Gemini kullanan akıllı chatbot
@@ -383,6 +392,10 @@ services:
 - Redis oturum yönetimi ile JWT token'ları
 - Tüm endpoint'lerde hız sınırlama
 - Geliştirme için CORS yapılandırması
+- IP tabanlı rate limiting (Bucket4j)
+- Session hijacking koruması
+- XSS ve CSRF koruması
+- Güvenli header yapılandırması
 
 ---
 
@@ -404,9 +417,99 @@ services:
 
 ## Lisans
 
-Bu proje Infina Akademi stajında geliştirilmiş yazılımdır. 
+Bu proje Infina Akademi stajında geliştirilmiş yazılımdır.
 
 ---
+
+## Güvenlik Mimarisi ve Senaryoları
+
+### Kimlik Doğrulama Akışı
+1. **Login İşlemi**:
+   - Kullanıcı email/şifre ile giriş yapar
+   - Backend şifreyi BCrypt ile doğrular
+   - JWT token oluşturulur (HS256 algoritması)
+   - Session ID (UUID) oluşturulur
+   - Token Redis'e kaydedilir (7 gün TTL)
+   - HTTP-only cookie olarak sessionId döner
+
+2. **Token Doğrulama**:
+   - Her istekte TokenFilter çalışır
+   - Cookie'den sessionId alınır
+   - Redis'ten JWT token çekilir
+   - Token geçerliliği kontrol edilir
+   - Spring Security context'e kullanıcı bilgileri set edilir
+
+3. **Session Uzatma**:
+   - SessionExtensionFilter her istekte çalışır
+   - Memory cache ile 1 saatte bir Redis'e gider
+   - Session ve token TTL'i 1 saat uzatılır
+   - Async thread pool ile performans optimizasyonu
+
+### Yetkilendirme Sistemi
+- **Public Endpoint'ler**:
+  - `/api/v1/auth/**` - Kimlik doğrulama
+  - `/api/v1/mail/verify` - E-posta doğrulama
+  - `/api/v1/mail/send-password-reset` - Şifre sıfırlama
+  - `/swagger-ui/**` - API dokümantasyonu
+  - `/ws-stock/**` - WebSocket bağlantıları
+
+- **ADMIN Only Endpoint'ler**:
+  - `/api/v1/employees/**` - Çalışan yönetimi
+  - `/api/v1/mail/send-verification` - Doğrulama kodu gönderme
+
+- **Authenticated Endpoint'ler**:
+  - Tüm diğer API'lar (müşteri, portföy, emir vb.)
+
+### Rate Limiting Mekanizması
+- **Bucket4j Token Bucket Algoritması**:
+  - Varsayılan: 100 istek/dakika
+  - IP adresi bazında ayrı bucket'lar
+  - X-Forwarded-For header desteği
+  - ConcurrentHashMap ile thread-safe
+  - Response header'da kalan token sayısı
+
+- **İstisnalar**:
+  - `/error` endpoint'leri
+  - Swagger dokümantasyonu
+  - WebSocket bağlantıları
+
+### Güvenlik Filtreleri
+1. **TokenFilter**: JWT token doğrulama
+2. **SessionExtensionFilter**: Otomatik session uzatma
+3. **RateLimitInterceptor**: Hız sınırlama
+4. **CorsConfig**: Cross-origin resource sharing
+
+### Hata Yönetimi
+- **RFC 7807 Problem Details Format**:
+  - 401 Unauthorized: Kimlik doğrulama hatası
+  - 403 Forbidden: Yetkilendirme hatası
+  - 429 Too Many Requests: Rate limit aşıldı
+  - 500 Internal Server Error: Sunucu hatası
+
+### Güvenlik Özellikleri
+- **JWT Güvenliği**: HS256 imzalama, expiration kontrolü
+- **Session Güvenliği**: UUID session ID, Redis TTL
+- **Cookie Güvenliği**: HTTP-only, secure flag
+- **Header Güvenliği**: XSS koruması, content type validation
+- **IP Güvenliği**: Rate limiting, IP spoofing koruması
+
+### Güvenlik Test Senaryoları
+- **Authentication Test**:
+  - Geçersiz JWT token ile istek
+  - Expired token ile istek
+  - Session ID olmadan istek
+
+- **Authorization Test**:
+  - EMPLOYEE rolü ile ADMIN endpoint'e erişim
+  - Unauthenticated kullanıcı ile protected endpoint'e erişim
+
+- **Rate Limiting Test**:
+  - Dakikada 100+ istek gönderme
+  - Farklı IP'lerden eşzamanlı istekler
+
+- **Session Security Test**:
+  - Session hijacking denemesi
+  - Cookie manipulation testi
 
 ## Destek
 
@@ -415,6 +518,7 @@ Teknik destek veya sorular için:
 - **Frontend Sorunları**: Tarayıcı konsolunu ve React DevTools'u kontrol edin
 - **Chatbot Sorunları**: Django loglarını ve .SECRETS yapılandırmasını kontrol edin
 - **Veritabanı Sorunları**: Bağlantı dizelerini ve kimlik bilgilerini doğrulayın
+- **Güvenlik Sorunları**: JWT token'ları, Redis bağlantısını ve rate limiting loglarını kontrol edin
 
 ---
 

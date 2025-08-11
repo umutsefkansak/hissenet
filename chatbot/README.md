@@ -28,11 +28,11 @@
 
 ## Genel Bakış
 
-HisseNet Asistan, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlendirmesi ve yapay zeka destekli müşteri hizmetleri sunan kapsamlı bir B2B hisse alım satım platformudur. Sistem üç ana bileşenden oluşur:
+Hissenet Asistan projesi, Hissenet ürününü kullanan banka ve aracı kurum personelinin adaptasyon süresini kısaltmak, teknik destek birimlerinin üzerindeki yoğunluğu azaltmak ve işlem süreçlerini daha verimli hale getirmek amacıyla başlatılmıştır. Proje, müşteri memnuniyetini artırmak ve operasyonel verimliliği yükseltmek açısından önem taşımaktadır. Chatbot, semantik arama mantığına dayanan, RAG mimarisi ile geliştirilmiş ve Gemini 2.5 Flash ile kullanıcıya yanıt dönen bir yapıda kurulmuştur. HisseNet uygulamasının kolay kullanılması ve personlin adaptasyonunu hızlandırmak amacıyla geliştirilmiştir.
 
+- **Chatbot**: Google Gemini ve vektör arama kullanan yapay zeka destekli destek sistemi
 - **Backend**: İş mantığı ve gerçek zamanlı veri işleyen Spring Boot projesi
 - **Frontend**: Canlı fiyat akışı ile React tabanlı web uygulaması
-- **Chatbot**: Google Gemini ve vektör arama kullanan yapay zeka destekli destek sistemi
 
 ---
 ### Mimari Bileşenleri:

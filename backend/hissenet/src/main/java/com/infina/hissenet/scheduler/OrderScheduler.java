@@ -1,5 +1,6 @@
 package com.infina.hissenet.scheduler;
 
+import com.infina.hissenet.entity.Customer;
 import com.infina.hissenet.entity.Order;
 import com.infina.hissenet.entity.enums.OrderStatus;
 import com.infina.hissenet.entity.enums.OrderType;
@@ -26,8 +27,11 @@ public class OrderScheduler {
     private final IStockTransactionService stockTransactionService;
     private final MarketHourService marketHourService;
 
-    public OrderScheduler(OrderRepository orderRepository, IWalletService walletService,
-                          ICacheManagerService stockCacheService, IStockTransactionService stockTransactionService, MarketHourService marketHourService) {
+    public OrderScheduler(OrderRepository orderRepository,
+                          IWalletService walletService,
+                          ICacheManagerService stockCacheService,
+                          IStockTransactionService stockTransactionService,
+                          MarketHourService marketHourService) { // CHANGED
         this.orderRepository = orderRepository;
         this.walletService = walletService;
         this.stockCacheService = stockCacheService;
@@ -35,29 +39,37 @@ public class OrderScheduler {
         this.marketHourService = marketHourService;
     }
 
+    private BigDecimal resolveCommissionRate(Customer c) {
+        BigDecimal rate = (c != null ? c.getCommissionRate() : null);
+        return rate != null ? rate : COMMISSION_RATE;
+    }
+
     @Transactional
     @Scheduled(fixedDelay = 2000)
     public void processPendingLimitOrders() {
-  /*      if (!marketHourService.isMarketOpen()){
-            return;
-        }*/
-        List<Order> openOrders = orderRepository.findByStatus(OrderStatus.OPEN);
+        /* if (!marketHourService.isMarketOpen()){
+             return;
+        } */
+
+        List<Order> openOrders = orderRepository.findByStatusWithCustomer(OrderStatus.OPEN); 
 
         for (Order order : openOrders) {
             try {
+                Customer customer = order.getCustomer();
+
                 String stockCode = order.getStockCode();
                 BigDecimal marketPrice = stockCacheService.getCachedByCode(stockCode).lastPrice();
-
                 if (marketPrice == null) {
                     continue;
                 }
 
                 BigDecimal limitPrice = order.getPrice();
                 BigDecimal totalAmount = limitPrice.multiply(order.getQuantity());
-                BigDecimal commission = totalAmount.multiply(COMMISSION_RATE);
+
+                BigDecimal customerRate = resolveCommissionRate(customer); 
+                BigDecimal commission   = totalAmount.multiply(customerRate);
 
                 boolean shouldFill = false;
-
                 if (order.getType() == OrderType.BUY && marketPrice.compareTo(limitPrice) <= 0) {
                     shouldFill = true;
                 } else if (order.getType() == OrderType.SELL && marketPrice.compareTo(limitPrice) >= 0) {
@@ -71,7 +83,6 @@ public class OrderScheduler {
                         } else {
                             walletService.processStockSale(order.getCustomer().getId(), totalAmount, commission);
                         }
-
                         order.setStatus(OrderStatus.FILLED);
                     } catch (Exception e) {
                         order.setStatus(OrderStatus.FAILED);
@@ -82,7 +93,7 @@ public class OrderScheduler {
                 }
 
             } catch (Exception e) {
-
+                //log
             }
         }
     }

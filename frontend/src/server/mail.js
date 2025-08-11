@@ -9,7 +9,6 @@ export const sendVerificationCode = async (email) => {
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send verification code error:', error);
-    // Error response'u daha iyi handle et
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.detail || 'Doğrulama kodu gönderilemedi';
     return { success: false, error: errorMessage };
@@ -25,7 +24,6 @@ export const sendPasswordResetCode = async (email) => {
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send password reset code error:', error);
-    // Error response'u daha iyi handle et
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.detail || 'Şifre sıfırlama kodu gönderilemedi';
     return { success: false, error: errorMessage };
@@ -42,7 +40,6 @@ export const verifyCode = async (email, code) => {
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Verify code error:', error);
-    // Error response'u daha iyi handle et
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.detail || 'Kod doğrulanamadı';
     return { success: false, error: errorMessage };
@@ -72,7 +69,6 @@ export const sendPasswordChangeToken = async (email) => {
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send password change token error:', error);
-    // Error response'u daha iyi handle et
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.detail || 'Şifre değiştirme linki gönderilemedi';
     return { success: false, error: errorMessage };
@@ -88,9 +84,32 @@ export const verifyPasswordChangeToken = async (token) => {
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Verify password change token error:', error);
-    // Error response'u daha iyi handle et
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.detail || 'Şifre değiştirme linki doğrulanamadı';
     return { success: false, error: errorMessage };
   }
-}; 
+};
+
+export const sendNotification = async (notificationData) => {
+  try {
+    const response = await api.post('/send-notification', notificationData);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Send notification error:', error);
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.detail || 'Bildirim gönderilemedi';
+    return { success: false, error: errorMessage };
+  }
+};
+
+export const sendMail = async (mailData) => {
+  try {
+    const response = await api.post('/mail/send', mailData);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Send mail error:', error);
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.detail || 'Mail gönderilemedi';
+    return { success: false, error: errorMessage };
+  }
+};

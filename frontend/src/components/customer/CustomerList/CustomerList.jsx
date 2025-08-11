@@ -17,7 +17,7 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
 
   const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'asc' });
 
@@ -124,11 +124,17 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
             type="text"
             placeholder="Müşteri adının ilk harfini yazın..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(0); 
+            }}
             className="search-input-customer"
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => setSearchTerm('')}>
+            <button className="clear-search" onClick={() => {
+              setSearchTerm('');
+              setPage(0); 
+            }}>
               ×
             </button>
           )}

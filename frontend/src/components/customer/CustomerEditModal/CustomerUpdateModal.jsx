@@ -141,10 +141,12 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
 
     setPendingUpdateData(updateData);
 
-    if (customer.tcNumber) {
-      confirmIdentity(customer.tcNumber);
+
+    if (customer.tcNumber || customer.taxNumber) {
+      const identityNumber = customer.tcNumber || customer.taxNumber;
+      confirmIdentity(identityNumber);
     } else {
-      console.error('TC Number bulunamadı, doğrulama yapılamıyor');
+      console.error('TC Number veya Tax Number bulunamadı, doğrulama yapılamıyor');
       try {
         setLoading(true);
         await onUpdate(updateData);

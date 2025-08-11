@@ -522,7 +522,7 @@ const Portfolio = () => {
               <FaChevronLeft size={22} />
             </button>
             <h3 style={{ minWidth: 180, textAlign: 'center', margin: 0 }}>
-              {activeTab === 'portfolio' ? 'Portföy İçeriği' : 'Hisse Geçmişi'}
+              {activeTab === 'portfolio' ? 'Portföy İçeriği' : 'İşlem Geçmişi'}
             </h3>
             <button
               className="tab-arrow"

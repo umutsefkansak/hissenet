@@ -248,18 +248,30 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	}
 
 	private LocalDateTime calculateTPlus2BusinessDays(LocalDateTime startDateTime) {
-		int businessDaysAdded = 0;
-		LocalDateTime result = startDateTime;
+	    // int businessDaysAdded = 0;
+	    // LocalDateTime result = startDateTime;
+	    //
+	    // while (businessDaysAdded < 2) {
+	    //     result = result.plusDays(1);
+	    //     DayOfWeek day = result.getDayOfWeek();
+	    //     if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
+	    //         businessDaysAdded++;
+	    //     }
+	    // }
+	    //
+	    // return result;
 
-		while (businessDaysAdded < 2) {
-			result = result.plusDays(1);
-			DayOfWeek day = result.getDayOfWeek();
-			if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY) {
-				businessDaysAdded++;
-			}
-		}
+	    // Yeni: T+1 dakika + hafta sonu koruması
+	    LocalDateTime result = startDateTime.plusMinutes(1);
+	    DayOfWeek day = result.getDayOfWeek();
 
-		return result;
+	    if (day == DayOfWeek.SATURDAY) {
+	        result = result.plusDays(2).withHour(0).withMinute(0).withSecond(0).withNano(0);
+	    } else if (day == DayOfWeek.SUNDAY) {
+	        result = result.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+	    }
+
+	    return result;
 	}
 
 	@Transactional(readOnly = true)

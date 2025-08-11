@@ -79,6 +79,9 @@ export default function useAuthFlow(onSuccessRedirect) {
         try {
             const customerResp = await getCustomerByEmail(email);
             const customerId = customerResp?.data?.id;
+            const firstName = customerResp?.data?.firstName;
+            const lastName = customerResp?.data?.lastName;
+            const companyName = customerResp?.data?.companyName;
 
             if (!customerId) {
                 openModal('warning', 'Müşteri Bulunamadı', 'Bu e-posta ile kayıtlı müşteri bulunamadı.');
@@ -87,16 +90,17 @@ export default function useAuthFlow(onSuccessRedirect) {
 
             localStorage.setItem('customerId', String(customerId));
             localStorage.setItem('customerEmail', email);
+            localStorage.setItem('customerFirstName', firstName || companyName || '');
+            localStorage.setItem('customerLastName', lastName || '');
 
             setStep('IDLE');
             onSuccessRedirect?.(customerId);
         } catch {
             openModal('error', 'Müşteri Sorgu Hatası', 'Müşteri bilgileri alınırken bir sorun oluştu.');
         }
-        return; // ❗ burada bitiriyoruz
+        return;
     }
 
-    // ❌ Başarısızsa hak kontrolü
     const apiMax = apiData?.maxAttempts ?? maxAttempts;
     const apiRemaining = apiData?.remainingAttempts ?? remainingAttempts;
 

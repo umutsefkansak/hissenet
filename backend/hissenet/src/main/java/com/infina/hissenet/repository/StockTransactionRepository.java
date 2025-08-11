@@ -57,7 +57,7 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     List<StockTransaction> findByStockCode(String stockCode);
 
     // Belirli bir order'a ait işlemler (orijinal metod - geriye uyumluluk için)
-    List<StockTransaction> findByOrderId(Long orderId);
+    Optional<StockTransaction> findByOrderId(Long orderId);
 
     // Tarih aralığına göre işlemler (orijinal metod - geriye uyumluluk için)
     List<StockTransaction> findByTransactionDateBetween(LocalDateTime startDate, LocalDateTime endDate);

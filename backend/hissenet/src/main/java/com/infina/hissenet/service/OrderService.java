@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import com.infina.hissenet.dto.response.*;
 
 import com.infina.hissenet.entity.StockTransaction;
+import com.infina.hissenet.entity.enums.TransactionStatus;
+import com.infina.hissenet.exception.common.NotFoundException;
 import com.infina.hissenet.exception.transaction.InsufficientStockException;
 import com.infina.hissenet.repository.WalletRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
@@ -19,6 +21,7 @@ import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.infina.hissenet.dto.request.OrderCreateRequest;
@@ -53,10 +56,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	private final WalletRepository walletRepository;
 	private final IStockTransactionService stockTransactionService;
 	private final MarketHourService marketHourService;
+	private final TransactionDefinition transactionDefinition;
 
 	public OrderService(OrderRepository orderRepository, CustomerService customerService,
 						OrderMapper orderMapper, IWalletService walletService, ICacheManagerService stockCacheService,
-						WalletRepository walletRepository, IStockTransactionService stockTransactionService, MarketHourService marketHourService) {
+						WalletRepository walletRepository, IStockTransactionService stockTransactionService, MarketHourService marketHourService, TransactionDefinition transactionDefinition) {
 		super(orderRepository);
 		this.orderRepository = orderRepository;
 		this.customerService = customerService;
@@ -66,6 +70,7 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 		this.walletRepository = walletRepository;
 		this.stockTransactionService = stockTransactionService;
 		this.marketHourService = marketHourService;
+		this.transactionDefinition = transactionDefinition;
 	}
 
 	@Transactional
@@ -187,10 +192,11 @@ public class OrderService extends GenericServiceImpl<Order, Long> implements IOr
 	@Transactional
 	public OrderResponse updateOrder(Long id, OrderUpdateRequest request) {
 		Order existing = findById(id).orElseThrow(() -> new OrderNotFoundException(id));
-
+		StockTransaction transaction=stockTransactionService.findByOrderId(id);
 		if (request.status() == OrderStatus.CANCELED) {
 			if (existing.getStatus() == OrderStatus.OPEN) {
 				existing.setStatus(OrderStatus.CANCELED);
+				transaction.setTransactionStatus(TransactionStatus.CANCELLED);
 			}
 		}
 

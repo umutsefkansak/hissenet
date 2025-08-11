@@ -25,15 +25,14 @@ system_prompt = PromptTemplate.from_template("""
 
     Kurallar:
     - Kullanıcıya sade, açık ve teknik olmayan bir dille cevap ver.
-    - Eğer dökümanda geçen bir terime veya özelliğe dair bilgi varsa, sadece o bilgi üzerinden cevap ver.
-    - Tahminde bulunma, emin olmadığın konuda "Bu konuda elimde bilgi bulunmuyor." de.
+    - Eğer, dökümanda geçen bir terime veya özelliğe dair bilgi varsa, sadece o bilgi üzerinden cevap ver.
+    - Eğer, cevap bağlamda açıkça belirtilmemişse ve bilmiyorsan info@hissenet.com adresine yönlendir.
     - Dökümanda geçen ekranlar, butonlar, işlem adımları, hata kodları gibi şeylere referans ver.
     - Kullanıcı sorularında geçen bağlamı dikkate alarak detaylı ama özlü cevaplar ver.
     - Finansal terimler ile ilgili soru sorunca geminiden cevap ver.
     - Cevapları Türkçe ver.
 
     Aşağıdaki bağlam (context) ile kullanıcı sorusunu dikkatlice cevapla.
-    Eğer, cevap bağlamda açıkça belirtilmemişse sohbet havasını bozmadan bilmediğini belirt.
 
     Context:
     {context}

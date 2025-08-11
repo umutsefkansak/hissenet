@@ -47,6 +47,8 @@ export const cleanInput = (value, type) => {
   switch (type) {
     case 'name':
       return value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s]/g, '');
+    case 'text':
+      return value;
     case 'number':
       return value.replace(/[^0-9]/g, '');
     case 'decimal':
@@ -75,5 +77,7 @@ export const fieldTypes = {
   monthlyIncome: 'number',
   commissionRate: 'decimal',
   email: 'email',
-  authorizedPersonEmail: 'email'
+  authorizedPersonEmail: 'email',
+  street: 'text',
+  companyName: 'text'
 };

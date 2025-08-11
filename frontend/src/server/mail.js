@@ -1,11 +1,8 @@
 import api from './api';
 
-// Send verification code
 export const sendVerificationCode = async (email) => {
   try {
-    const response = await api.post('/mail/send-verification', {
-      email
-    });
+    const response = await api.post('/mail/send-verification', { email });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send verification code error:', error);
@@ -15,12 +12,9 @@ export const sendVerificationCode = async (email) => {
   }
 };
 
-// Send password reset code
 export const sendPasswordResetCode = async (email) => {
   try {
-    const response = await api.post('/mail/send-password-reset', {
-      email
-    });
+    const response = await api.post('/mail/send-password-reset', { email });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send password reset code error:', error);
@@ -30,13 +24,9 @@ export const sendPasswordResetCode = async (email) => {
   }
 };
 
-// Verify verification code
 export const verifyCode = async (email, code) => {
   try {
-    const response = await api.post('/mail/verify', {
-      email,
-      code
-    });
+    const response = await api.post('/mail/verify', { email, code });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Verify code error:', error);
@@ -48,9 +38,7 @@ export const verifyCode = async (email, code) => {
 
 export const sendVerificationByIdentification = async (identificationNumber) => {
   try {
-    const response = await api.post('/mail/send-verification-by-identification', {
-      identificationNumber
-    });
+    const response = await api.post('/mail/send-verification-by-identification', { identificationNumber });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('VerificationByIdentification error:', error);
@@ -60,12 +48,9 @@ export const sendVerificationByIdentification = async (identificationNumber) => 
   }
 };
 
-// Send password change token
 export const sendPasswordChangeToken = async (email) => {
   try {
-    const response = await api.post('/mail/send-password-change-token', {
-      email
-    });
+    const response = await api.post('/mail/send-password-change-token', { email });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send password change token error:', error);
@@ -75,12 +60,9 @@ export const sendPasswordChangeToken = async (email) => {
   }
 };
 
-// Verify password change token
 export const verifyPasswordChangeToken = async (token) => {
   try {
-    const response = await api.post('/mail/verify-password-change-token', {
-      token
-    });
+    const response = await api.post('/mail/verify-password-change-token', { token });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Verify password change token error:', error);
@@ -90,9 +72,14 @@ export const verifyPasswordChangeToken = async (token) => {
   }
 };
 
-export const sendNotification = async (notificationData) => {
+export const sendNotification = async ({ email, recipientName, message, title }) => {
   try {
-    const response = await api.post('/send-notification', notificationData);
+    const response = await api.post('/mail/send-notification', {
+      email,
+      recipientName,
+      message,
+      title
+    });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send notification error:', error);
@@ -102,14 +89,19 @@ export const sendNotification = async (notificationData) => {
   }
 };
 
-export const sendMail = async (mailData) => {
+export const sendMail = async ({ to, subject, content, recipientName }) => {
   try {
-    const response = await api.post('/mail/send', mailData);
+    const response = await api.post('/send-notification', {
+      email: to,
+      recipientName,
+      message: content,
+      title: subject
+    });
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Send mail error:', error);
     const errorData = error.response?.data;
-    const errorMessage = errorData?.message || errorData?.detail || 'Mail gönderilemedi';
+    const errorMessage = errorData?.message || errorData?.detail || 'Bildirim gönderilemedi';
     return { success: false, error: errorMessage };
   }
 };

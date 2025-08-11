@@ -9,20 +9,25 @@ export default function TotalTradeVolumeCard() {
   useEffect(() => {
     const fetchVolume = async () => {
       try {
-        const response = await orderApi.getTotalTradeVolume();
+        const response = await orderApi.getTodayTotalTradeVolume();
         setDailyVolume(response.data);
       } catch (error) {
-        console.error('Toplam hacim alınamadı:', error);
+        console.error('Günlük toplam hacim alınamadı:', error);
       }
     };
 
     fetchVolume();
   }, []);
 
+  const formattedVolume =
+    dailyVolume !== null
+      ? `${dailyVolume.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₺`
+      : "Yükleniyor...";
+
   return (
     <DashboardCard
-      title="Toplam Hacim"
-      value={dailyVolume !== null ? `${dailyVolume}₺` : "Yükleniyor..."}
+      title="Günlük Toplam Hacim"
+      value={formattedVolume}
       subtitle=""
       iconVariant="volume"
       icon={<VolumeIcon width={24} height={24} />}

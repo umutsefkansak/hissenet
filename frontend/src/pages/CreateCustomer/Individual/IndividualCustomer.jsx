@@ -48,14 +48,14 @@ const IndividualCustomer = () => {
         profession: '',
         monthlyIncome: '',
         sector: '',
-        commissionRate: ''
+        commissionRate: '0.0'
     };
 
     const validationRules = {
         requiredFields: [
             'firstName', 'lastName', 'tcNumber', 'birthDate', 'birthPlace',
             'educationLevel', 'gender', 'phoneNumber', 'email', 'addressType',
-            'street', 'city', 'monthlyIncome','commissionRate'
+            'street', 'city', 'monthlyIncome'
         ]
     };
 

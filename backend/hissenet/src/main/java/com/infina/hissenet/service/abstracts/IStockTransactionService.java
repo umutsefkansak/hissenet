@@ -48,4 +48,7 @@ public interface IStockTransactionService {
     Integer getTotalStock(Long customerId);
 
     List<StockTransaction> transactionsListByCustomerIdAndStockCode(Long customerId, String stockCode);
+
+    StockTransaction findByOrderId(Long id);
+
 }

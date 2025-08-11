@@ -16,15 +16,14 @@ import com.infina.hissenet.repository.StockTransactionRepository;
 import com.infina.hissenet.service.abstracts.ICacheManagerService;
 import com.infina.hissenet.service.abstracts.IStockTransactionService;
 import com.infina.hissenet.utils.GenericServiceImpl;
-import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Manages stock transaction lifecycle and portfolio consistency.
@@ -195,6 +194,11 @@ public class StockTransactionService extends GenericServiceImpl<StockTransaction
         return stockTransactionRepository.findByCustomerIdAndStockCodeAndTypeAndStatusIn(customerId,
                 stockCode,StockTransactionType.SELL, TransactionStatus.COMPLETED
                 );
+    }
+
+    @Override
+    public StockTransaction findByOrderId(Long id) {
+        return stockTransactionRepository.findByOrderId(id).orElseThrow(()->new NotFoundException("Stock Transaction not found"));
     }
 
 }

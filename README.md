@@ -30,7 +30,7 @@
 
 HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlendirmesi ve yapay zeka destekli müşteri hizmetleri sunan kapsamlı bir B2B hisse alım satım platformudur. Sistem üç ana bileşenden oluşur:
 
-- **Backend**: İş mantığı ve gerçek zamanlı veri işleyen Spring Boot mikroservisi
+- **Backend**: İş mantığı ve gerçek zamanlı veri işleyen Spring Boot projesi
 - **Frontend**: Canlı fiyat akışı ile React tabanlı web uygulaması
 - **Chatbot**: Google Gemini ve vektör arama kullanan yapay zeka destekli destek sistemi
 

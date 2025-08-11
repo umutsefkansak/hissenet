@@ -173,7 +173,7 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ### Chat AI
 <div align="center">
-  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935869/kvgzcdzqwkplcgqks3dv.png" alt="Chat AI" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754951801/cc5vz6ciei2thy9o3jpv.png" alt="Chat AI" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
   <br/>
   <em>Chat AI - Yapay zeka destekli müşteri hizmetleri</em>
 </div>

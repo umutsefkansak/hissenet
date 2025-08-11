@@ -100,7 +100,7 @@
     width: 40px;
     height: 40px;
     border: 3px solid #e5e7eb;
-    border-top: 3px solid #3b82f6;
+    border-top: 3px solid #1d293d ;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -138,7 +138,7 @@
 
 .risk-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(90deg, #253757, #1d293d);
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -257,12 +257,12 @@
 }
 
 .risk-btn-primary {
-    background: #3b82f6;
+    background: #1d293d;
     color: white;
 }
 
 .risk-btn-primary:hover:not(:disabled) {
-    background: #2563eb;
+    background: #293c56;
 }
 
 .risk-btn-primary:disabled {
@@ -322,7 +322,7 @@
 .score-value {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #3b82f6;
+    color: #1d293d;
 }
 
 .profile-value {

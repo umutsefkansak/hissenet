@@ -30,5 +30,9 @@ def createJsonFile(qaData: dict) -> None:
     with open(f"{PATH}steps.json", "w", encoding="utf-8") as file:
         json.dump(qaData, file, indent=4, ensure_ascii=False)
 
-qaData: str = readTxt()
-createJsonFile(qaData=qaData)
+def main():
+    qaData: str = readTxt()
+    createJsonFile(qaData=qaData)
+
+if __name__ == "__main__":
+    main()

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
+import time
 from dotenv import dotenv_values
-from sentence_transformers import SentenceTransformer
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 secrets = dotenv_values(".SECRETS")
 
 PATH: str = secrets["pathPREPROCESS"]
+googleAPIKEY = secrets["googleAPIKEY"]
 
 def getJson() -> json:
     with open(f'{PATH}steps.json', 'r', encoding="utf-8") as file:
@@ -16,29 +18,25 @@ def exportJson(data: json) -> None:
         json.dump(data, file, indent=4, ensure_ascii=False)
 
 def getEmbeddingModel():
-    # model = AutoModel.from_pretrained(f'{PATH}all-MiniLM-L6-v2')
-    # model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    # model = SentenceTransformer(f'{PATH}all-MiniLM-L6-v2')
-    model = SentenceTransformer(f'{PATH}mxbai-embed-large-v1-nli-matryoshka')
-    return model
+    return GoogleGenerativeAIEmbeddings(model="gemini-embedding-001", google_api_key=googleAPIKEY)
 
 def makeEmbedding(text: str, model) -> list:
-    return model.encode(text) 
+    return model.embed_query(text)
 
 def embedQandA(data: json, model) -> json:
     for i in data:
         question: str = i['question'] 
-        answer: str   = i['answer'] 
-
         qEmbedding = makeEmbedding(question, model)
-        aEmbedding = makeEmbedding(answer, model)
-        
-        i.update({"qEmbedding":qEmbedding.tolist()})
-        i.update({"aEmbedding":aEmbedding.tolist()})
+        i.update({"qEmbedding":qEmbedding})
+        time.sleep(3)
 
     return data
 
-data: json = getJson()
-model      = getEmbeddingModel()
-embedQandA(data=data, model=model)
-exportJson(data)
+def main():
+    data = getJson()
+    model = getEmbeddingModel()
+    embedded_data = embedQandA(data, model)
+    exportJson(embedded_data)
+
+if __name__ == "__main__":
+    main()

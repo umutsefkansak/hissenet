@@ -200,12 +200,14 @@
     line-height: 1.4;
     word-wrap: break-word;
     position: relative;
+    text-align: left;
 }
 
 .userMessageContent {
     background: linear-gradient(135deg, #1d293d 0%, #2a3a52 100%);
     color: white;
     border-bottom-right-radius: 4px;
+    text-align: left;
 }
 
 .botMessageContent {
@@ -218,6 +220,7 @@
     align-items: flex-start;
     gap: 10px;
     padding: 14px 16px;
+    text-align: left;
 }
 
 .suggestionsContainer {
@@ -226,6 +229,20 @@
     grid-template-columns: 1fr;
     gap: 6px;
     animation: suggestionsSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s both;
+}
+
+.messageContent ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.messageContent li {
+    margin: 4px 0;
+    list-style-type: disc;
+}
+
+.messageContent strong {
+    font-weight: 600;
 }
 
 @keyframes suggestionsSlideIn {

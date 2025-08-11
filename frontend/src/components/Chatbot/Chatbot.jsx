@@ -6,6 +6,7 @@ import SendIcon from '../Icons/SendIcon';
 import AIRobotIcon from '../Icons/AIRobotIcon';
 import ArrowRightIcon from '../Icons/ArrowRightIcon';
 
+
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState('');
@@ -15,18 +16,28 @@ const Chatbot = () => {
             text: 'Merhaba! Ben HisseNet hisse alım satım platformu asistanıyım. Size nasıl yardımcı olabilirim?'
         }
     ]);
+
     const [isLoading, setIsLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(true);
     const chatboxRef = useRef(null);
     const inputRef = useRef(null);
 
+    const formatMessage = (text) => {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\* (.*?)(?=\n|$)/g, '<li>$1</li>')
+            .replace(/(\d+)\. (.*?)(?=\n|$)/g, '<li><strong>$1.</strong> $2</li>')
+            .replace(/(<li>.*?<\/li>)(?=\s*<li>)/g, '$1')
+            .replace(/(<li>.*<\/li>)/g, '<ul style="margin: 8px 0; padding-left: 20px;">$1</ul>')
+            .replace(/<\/ul>\s*<ul[^>]*>/g, '')
+            .replace(/\n\n+/g, '<br>')
+            .replace(/\n/g, '<br>');
+    };
+
     const suggestions = [
-        "Bugünün en çok yükselen hisse senetleri hangileri?",
-        "BIST 100 endeksi nasıl performans gösteriyor?",
-        "Nasıl hisse senedi alım emri verebilirim?",
-        "Portföyümde hangi hisseler var?",
-        "Bu hafta hangi şirketler temettü dağıtacak?",
-        "Dolar/TL kuru bugün nasıl?"
+        "Yeni bireysel müşteri kaydı nasıl başlatılır?",
+        "Mevcut personelin bilgilerini düzenleyebilir miyim?",
+        "Hisse senedi nedir?",
     ];
 
     useEffect(() => {
@@ -139,7 +150,7 @@ const Chatbot = () => {
                                 <div className={msg.sender === 'user' ? styles.userMessage : styles.botMessage}>
                                     <div className={`${styles.messageContent} ${msg.sender === 'user' ? styles.userMessageContent : styles.botMessageContent}`}>
                                         {msg.sender === 'bot' && <AIRobotIcon className={styles.aiIcon} />}
-                                        <span>{msg.text}</span>
+                                        <span dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }}></span>
                                     </div>
                                 </div>
                             </div>

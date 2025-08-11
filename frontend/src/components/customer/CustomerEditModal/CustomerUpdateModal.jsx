@@ -19,7 +19,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
 
   const isCorporate = customer?.customerType === 'CORPORATE';
 
-  // Email kontrolü fonksiyonu
+
   const checkEmailAvailability = (email) => {
     if (!email || email === originalData.email) {
       setEmailError('');
@@ -83,7 +83,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
 
       setFormData(initialData);
       setOriginalData(initialData);
-      setEmailError(''); // Modal açıldığında email hatasını temizle
+      setEmailError('');
     }
   }, [customer, isOpen, isCorporate]);
 
@@ -94,7 +94,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
       [name]: value,
     }));
 
-    // Email değiştiğinde kontrol et
+  
     if (name === 'email') {
       checkEmailAvailability(value);
     }
@@ -117,9 +117,9 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
       return;
     }
 
-    // Email kontrolü yap
+    
     if (!checkEmailAvailability(formData.email)) {
-      return; // Email hatası varsa submit etme
+      return;
     }
 
     const updateData = isCorporate

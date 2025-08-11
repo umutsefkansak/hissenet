@@ -402,11 +402,7 @@ services:
 
 ---
 
-## 📄 Lisans
 
-Bu proje Infina için geliştirilmiş tescilli yazılımdır. Tüm hakları saklıdır.
-
----
 
 ## 📞 Destek
 

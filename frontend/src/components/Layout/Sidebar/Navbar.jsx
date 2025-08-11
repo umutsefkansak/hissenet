@@ -18,6 +18,8 @@ const Navbar = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isCustomerSubmenuOpen, setIsCustomerSubmenuOpen] = useState(false);
     const [customerId, setCustomerId] = useState(null);
+    const [customerName, setCustomerName] = useState('');
+
 
     const {
         step,         // 'IDLE' | 'ASK_ID' | 'ASK_CODE'
@@ -47,6 +49,10 @@ const Navbar = () => {
 
         if (currentCustomerId) {
             localStorage.setItem('customerId', currentCustomerId);
+            const firstName = localStorage.getItem('customerFirstName') || '';
+            const lastName = localStorage.getItem('customerLastName') || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+            setCustomerName(fullName);
         }
 
         return currentCustomerId;
@@ -80,6 +86,12 @@ const Navbar = () => {
             }
             if (e.key === 'customerId') {
                 setCustomerId(e.newValue);
+            }
+            if (e.key === 'customerFirstName' || e.key === 'customerLastName') {
+                const firstName = localStorage.getItem('customerFirstName') || '';
+                const lastName = localStorage.getItem('customerLastName') || '';
+                const fullName = `${firstName} ${lastName}`.trim();
+                setCustomerName(fullName);
             }
         };
 
@@ -116,6 +128,9 @@ const Navbar = () => {
             // Eğer müşteri girişi yapılmışsa sadece customerId'yi sil
             if (customerId) {
                 localStorage.removeItem('customerId');
+                localStorage.removeItem('customerFirstName');
+                localStorage.removeItem('customerLastName');
+                setCustomerName('');
                 setCustomerId(null);
                 setIsLoggedIn(false);
                 if (isMobile) {
@@ -174,7 +189,7 @@ const Navbar = () => {
                             strokeLinejoin="round"/>
                 </svg>
               </span>
-                            <span className="drawer-menu-text">Ana Sayfa</span>
+                            <span className="drawer-menu-text">{customerName || 'Ana Sayfa'}</span>
                         </div>
                     </div>
                 </Link>

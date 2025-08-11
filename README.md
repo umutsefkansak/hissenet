@@ -264,6 +264,8 @@ HisseNet/
 
 ### Kimlik Doğrulama ve Güvenlik
 - **POST** `/api/v1/auth/login` - Kullanıcı kimlik doğrulama
+- **DELETE** `/api/v1/auth/logout` - Kullanıcı çıkış işlemi
+- **POST** `/api/v1/mail/send` - Genel e-posta gönderme
 - **POST** `/api/v1/mail/send-verification` - Doğrulama kodu gönderme (sadece ADMIN)
 - **POST** `/api/v1/mail/verify` - E-posta kodu doğrulama
 - **POST** `/api/v1/mail/send-password-reset` - Şifre sıfırlama talebi
@@ -273,16 +275,22 @@ HisseNet/
 - **POST** `/api/v1/customers/individual` - Bireysel müşteri oluşturma
 - **POST** `/api/v1/customers/corporate` - Kurumsal müşteri oluşturma
 - **PUT** `/api/v1/customers/individual/{id}` - Bireysel müşteri güncelleme
+- **PUT** `/api/v1/customers/corporate/{id}` - Kurumsal müşteri güncelleme
 - **GET** `/api/v1/customers/{id}` - ID ile müşteri getirme
 - **GET** `/api/v1/customers` - Tüm müşterileri getirme (sayfalanmış)
+- **GET** `/api/v1/customers/page` - Sayfalanmış müşteri listesi
 
 ### Portföy ve Alım Satım
-- **POST** `/api/v1/portfolio` - Portföy oluşturma
-- **GET** `/api/v1/portfolio` - Tüm portföyleri getirme
-- **GET** `/api/v1/portfolio/summary` - Portföy özeti getirme
+- **POST** `/api/v1/portfolio/{customerId}` - Müşteri için portföy oluşturma
+- **PUT** `/api/v1/portfolio/{id}` - Portföy güncelleme
+- **GET** `/api/v1/portfolio/customer/{customerId}` - Müşteri portföylerini getirme
+- **DELETE** `/api/v1/portfolio/{id}` - Portföy silme
+- **PATCH** `/api/v1/portfolio/{id}/values` - Portföy değerlerini güncelleme
 - **POST** `/api/v1/orders` - Alım satım emri oluşturma
+- **PATCH** `/api/v1/orders/{id}` - Emir güncelleme
+- **GET** `/api/v1/orders/{id}` - ID ile emir getirme
 - **GET** `/api/v1/orders` - Tüm emirleri getirme
-- **GET** `/api/v1/orders/portfolio` - Portföy emirlerini getirme
+- **GET** `/api/v1/orders/by-customer` - Müşteri emirlerini getirme
 - **GET** `/api/v1/orders/owned-quantity` - Sahip olunan hisse miktarını getirme
 
 ### Risk Değerlendirmesi
@@ -291,9 +299,17 @@ HisseNet/
 
 ### Cüzdan Yönetimi
 - **POST** `/api/v1/wallet` - Cüzdan oluşturma
-- **GET** `/api/v1/wallet` - Cüzdan bilgilerini getirme
+- **GET** `/api/v1/wallet/customer/{customerId}` - Müşteri cüzdanını getirme
+- **GET** `/api/v1/wallet/customer/{customerId}/balance` - Cüzdan bakiyesini getirme
+- **PUT** `/api/v1/wallet/customer/{customerId}/limits` - Cüzdan limitlerini güncelleme
+- **POST** `/api/v1/wallet/customer/{customerId}/add-balance` - Cüzdana bakiye ekleme
 - **POST** `/api/v1/wallet-transactions` - Cüzdan işlemi oluşturma
-- **GET** `/api/v1/wallet-transactions` - İşlem geçmişini getirme
+- **GET** `/api/v1/wallet-transactions` - Tüm işlemleri getirme
+- **GET** `/api/v1/wallet-transactions/page` - Sayfalanmış işlem listesi
+- **PUT** `/api/v1/wallet-transactions/{transactionId}` - İşlem güncelleme
+- **POST** `/api/v1/wallet-transactions/{transactionId}/complete` - İşlemi tamamlama
+- **POST** `/api/v1/wallet-transactions/{transactionId}/cancel` - İşlemi iptal etme
+- **DELETE** `/api/v1/wallet-transactions/{transactionId}` - İşlem silme
 
 ### Çalışan Yönetimi
 - **POST** `/api/v1/employees` - Çalışan oluşturma (sadece ADMIN)
@@ -301,6 +317,31 @@ HisseNet/
 - **GET** `/api/v1/employees/{id}` - ID ile çalışan getirme
 - **GET** `/api/v1/employees` - Tüm çalışanları getirme
 - **DELETE** `/api/v1/employees/{id}` - Çalışan silme (sadece ADMIN)
+
+### Rol Yönetimi
+- **POST** `/api/v1/roles` - Rol oluşturma
+- **GET** `/api/v1/roles/{id}` - ID ile rol getirme
+- **GET** `/api/v1/roles/name/{name}` - İsim ile rol getirme
+- **GET** `/api/v1/roles` - Tüm rolleri getirme
+- **GET** `/api/v1/roles/page` - Sayfalanmış rol listesi
+- **GET** `/api/v1/roles/active` - Aktif rolleri getirme
+- **GET** `/api/v1/roles/inactive` - Pasif rolleri getirme
+
+### Adres Yönetimi
+- **POST** `/api/v1/addresses` - Adres oluşturma
+- **GET** `/api/v1/addresses/{id}` - ID ile adres getirme
+- **GET** `/api/v1/addresses` - Tüm adresleri getirme
+- **GET** `/api/v1/addresses/page` - Sayfalanmış adres listesi
+- **GET** `/api/v1/addresses/customer/{customerId}` - Müşteri adreslerini getirme
+- **GET** `/api/v1/addresses/customer/{customerId}/primary` - Müşteri ana adresini getirme
+- **PUT** `/api/v1/addresses/{id}` - Adres güncelleme
+- **DELETE** `/api/v1/addresses/{id}` - Adres silme
+- **DELETE** `/api/v1/addresses/customer/{customerId}` - Müşteri tüm adreslerini silme
+
+### Hisse İşlemleri
+- **GET** `/api/v1/stock-transactions/buylist/{portfolioId}` - Portföy alım işlemlerini getirme
+- **PATCH** `/api/v1/stock-transactions/{transactionId}/{portfolioId}` - Hisse işlemini portföye taşıma
+- **GET** `/api/v1/stock-transactions/quantity/{customerId}/{stockCode}` - Müşteri hisse miktarını getirme
 
 ### Gerçek Zamanlı Veri
 - **WebSocket** `/ws-stock` - Gerçek zamanlı veri için STOMP endpoint'i

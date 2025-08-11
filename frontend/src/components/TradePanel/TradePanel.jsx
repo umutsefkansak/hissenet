@@ -67,6 +67,26 @@ const TradePanel = ({ stock, onBack }) => {
     return lines.join('\n');
   };
 
+  const getLimitWarning = (limitPrice, marketPrice, side) => {
+    if (!limitPrice || !marketPrice) return null;
+    if (side === 'BUY') {
+      if (limitPrice > marketPrice) {
+        return `Girdiğiniz limit alış fiyatı (${formatPrice(limitPrice)}) piyasa fiyatının (${formatPrice(marketPrice)}) üzerinde. Emir hemen, piyasa veya daha iyi fiyattan gerçekleşebilir. Bekleyen emir vermek istiyorsanız limit fiyatını piyasa fiyatının altına girin.`;
+      }
+      if (limitPrice < marketPrice * 0.9) {
+        return `Girdiğiniz limit alış fiyatı piyasa fiyatına göre oldukça düşük. Emir uzun süre gerçekleşmeyebilir.`;
+      }
+    } else {
+      if (limitPrice < marketPrice) {
+        return `Girdiğiniz limit satış fiyatı (${formatPrice(limitPrice)}) piyasa fiyatının (${formatPrice(marketPrice)}) altında. Emir hemen, piyasa veya daha iyi fiyattan gerçekleşebilir. Bekleyen emir vermek istiyorsanız limit fiyatını piyasa fiyatının üzerine girin.`;
+      }
+      if (limitPrice > marketPrice * 1.1) {
+        return `Girdiğiniz limit satış fiyatı piyasa fiyatına göre oldukça yüksek. Emir uzun süre gerçekleşmeyebilir.`;
+      }
+    }
+    return null;
+  };
+
   const fetchSellableQty = useCallback(async () => {
     if (!stock?.code || !customerId) {
       setSellableQty(null);
@@ -161,109 +181,142 @@ const TradePanel = ({ stock, onBack }) => {
       return;
     }
 
+    if (category === 'LIMIT') {
+      const limitWarning = getLimitWarning(Number(price), stock.lastPrice || 0, type);
+      if (limitWarning) {
+        openModal({
+          variant: 'confirm',
+          title: 'Fiyat Uyarısı',
+          message: `${limitWarning}\n\nDevam etmek istiyor musunuz?`,
+          cancelText: 'Düzenle',
+          confirmText: 'Devam Et',
+          onConfirm: () => {
+            closeModal();
+            openModal({
+              variant: 'confirm',
+              title: type === 'BUY' ? 'Alış Emrini Onayla' : 'Satış Emrini Onayla',
+              message: buildConfirmMessage(),
+              cancelText: 'Vazgeç',
+              confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
+              onConfirm: () => {
+                closeModal();
+                submitOrder();
+              },
+              onClose: closeModal
+            });
+          },
+          onClose: closeModal
+        });
+        return;
+      }
+    }
+
     openModal({
       variant: 'confirm',
       title: type === 'BUY' ? 'Alış Emrini Onayla' : 'Satış Emrini Onayla',
       message: buildConfirmMessage(),
       cancelText: 'Vazgeç',
       confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
-      onConfirm: async () => {
+      onConfirm: () => {
         closeModal();
-        setIsSubmitting(true);
-
-        const payload = {
-          customerId: Number(customerId),
-          stockCode: stock.code,
-          quantity: Number(quantity),
-          price: category === 'MARKET' ? stock.lastPrice : Number(price),
-          type,
-          category
-        };
-
-        try {
-          const res = await orderApi.createOrder(payload);
-          const statusStrRaw = (res?.data?.status ?? res?.status ?? '').toString();
-          const statusStr = statusStrRaw.toUpperCase();
-          const idForTxn = res?.data?.transactionId || res?.data?.id;
-          const txn = idForTxn ? `TXN-${new Date().getFullYear()}-${String(idForTxn).padStart(6,'0')}` : 'Bilinmiyor';
-
-          try {
-            const customer = await customerApi.getCustomerById(customerId);
-            const to = customer?.email || customer?.data?.email || '';
-            const firstName = customer?.firstName || customer?.data?.firstName || '';
-            const lastName = customer?.lastName || customer?.data?.lastName || '';
-            const companyName = customer?.companyName || customer?.data?.companyName || '';
-            const recipientName = `${firstName} ${lastName}`.trim() || companyName || 'Müşterimiz';
-
-            let subject = '';
-            let content = '';
-
-            if (statusStr === 'FILLED' || (category === 'MARKET' && statusStr !== 'REJECTED')) {
-              subject = `Hisse ${type === 'BUY' ? 'Alım' : 'Satım'} İşlemi Gerçekleşti`;
-              content = `
-                <h2>${subject}</h2>
-                <p>${stock.code} hissesinden ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} işleminiz ${formatPrice(unitPrice)} TL fiyatından gerçekleşti.</p>
-                <p><strong>İşlem Numarası:</strong> ${txn}</p>
-                <p><strong>Toplam:</strong> ${formatPrice(total)} TL</p>
-                <p><strong>Komisyon:</strong> ${formatPrice(commission)} TL</p>
-                <p><strong>Net:</strong> ${formatPrice(net)} TL</p>
-              `;
-            } else if (statusStr === 'OPEN' || category === 'LIMIT') {
-              subject = `Limit ${type === 'BUY' ? 'Alım' : 'Satım'} Emri Alındı`;
-              content = `
-                <h2>${subject}</h2>
-                <p>${stock.code} için ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} limit emriniz oluşturuldu ve beklemede.</p>
-                <p><strong>Limit Fiyat:</strong> ${formatPrice(unitPrice)} TL</p>
-                <p><strong>Emir Durumu:</strong> ${statusStr || 'OPEN'}</p>
-                <p><strong>Emir Numarası:</strong> ${txn}</p>
-              `;
-            } else {
-              subject = `Emir Durumu: ${statusStr || 'Bilinmiyor'}`;
-              content = `
-                <h2>${subject}</h2>
-                <p>${stock.code} için verdiğiniz emir durumu: ${statusStr || 'Bilinmiyor'}.</p>
-                <p><strong>Emir Numarası:</strong> ${txn}</p>
-              `;
-            }
-
-            if (to) {
-              await sendMail({ to, subject, content, recipientName });
-            }
-          } catch {}
-
-          if (type === 'BUY') {
-            await fetchBalance();
-            await fetchSellableQty();
-          } else {
-            if (statusStr === 'FILLED' || category === 'MARKET' || statusStr) {
-              setSellHold((h) => normalizeNumber(h) + Number(quantity));
-            }
-            await fetchSellableQty();
-          }
-
-          setIsSubmitting(false);
-          openModal({
-            variant: 'success',
-            title: 'İşlem Başarılı',
-            message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri gönderildi.`,
-            confirmText: 'Tamam',
-            onClose: () => {
-              closeModal();
-            }
-          });
-        } catch (err) {
-          setIsSubmitting(false);
-          openModal({
-            variant: 'error',
-            title: 'İşlem Başarısız',
-            message: `Emir gönderilemedi.\n${err?.message || err}`,
-            confirmText: 'Tamam',
-            onClose: closeModal
-          });
-        }
+        submitOrder();
       },
       onClose: closeModal
     });
+  };
+
+  const submitOrder = async () => {
+    setIsSubmitting(true);
+    const payload = {
+      customerId: Number(customerId),
+      stockCode: stock.code,
+      quantity: Number(quantity),
+      price: category === 'MARKET' ? stock.lastPrice : Number(price),
+      type,
+      category
+    };
+
+    try {
+      const res = await orderApi.createOrder(payload);
+      const statusStrRaw = (res?.data?.status ?? res?.status ?? '').toString();
+      const statusStr = statusStrRaw.toUpperCase();
+      const idForTxn = res?.data?.transactionId || res?.data?.id;
+      const txn = idForTxn ? `TXN-${new Date().getFullYear()}-${String(idForTxn).padStart(6,'0')}` : 'Bilinmiyor';
+
+      try {
+        const customer = await customerApi.getCustomerById(customerId);
+        const to = customer?.email || customer?.data?.email || '';
+        const firstName = customer?.firstName || customer?.data?.firstName || '';
+        const lastName = customer?.lastName || customer?.data?.lastName || '';
+        const companyName = customer?.companyName || customer?.data?.companyName || '';
+        const recipientName = `${firstName} ${lastName}`.trim() || companyName || 'Müşterimiz';
+
+        let subject = '';
+        let content = '';
+
+        if (statusStr === 'FILLED' || (category === 'MARKET' && statusStr !== 'REJECTED')) {
+          subject = `Hisse ${type === 'BUY' ? 'Alım' : 'Satım'} İşlemi Gerçekleşti`;
+          content = `
+            <h2>${subject}</h2>
+            <p>${stock.code} hissesinden ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} işleminiz ${formatPrice(unitPrice)} TL fiyatından gerçekleşti.</p>
+            <p><strong>İşlem Numarası:</strong> ${txn}</p>
+            <p><strong>Toplam:</strong> ${formatPrice(total)} TL</p>
+            <p><strong>Komisyon:</strong> ${formatPrice(commission)} TL</p>
+            <p><strong>Net:</strong> ${formatPrice(net)} TL</p>
+          `;
+        } else if (statusStr === 'OPEN' || category === 'LIMIT') {
+          subject = `Limit ${type === 'BUY' ? 'Alım' : 'Satım'} Emri Alındı`;
+          content = `
+            <h2>${subject}</h2>
+            <p>${stock.code} için ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} limit emriniz oluşturuldu ve beklemede.</p>
+            <p><strong>Limit Fiyat:</strong> ${formatPrice(unitPrice)} TL</p>
+            <p><strong>Emir Durumu:</strong> ${statusStr || 'OPEN'}</p>
+            <p><strong>Emir Numarası:</strong> ${txn}</p>
+          `;
+        } else {
+          subject = `Emir Durumu: ${statusStr || 'Bilinmiyor'}`;
+          content = `
+            <h2>${subject}</h2>
+            <p>${stock.code} için verdiğiniz emir durumu: ${statusStr || 'Bilinmiyor'}.</p>
+            <p><strong>Emir Numarası:</strong> ${txn}</p>
+          `;
+        }
+
+        if (to) {
+          await sendMail({ to, subject, content, recipientName });
+        }
+      } catch {}
+
+      if (type === 'BUY') {
+        await fetchBalance();
+        await fetchSellableQty();
+      } else {
+        if (statusStr === 'FILLED' || category === 'MARKET' || statusStr) {
+          setSellHold((h) => normalizeNumber(h) + Number(quantity));
+        }
+        await fetchSellableQty();
+      }
+
+      setIsSubmitting(false);
+      openModal({
+        variant: 'success',
+        title: 'İşlem Başarılı',
+        message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri gönderildi.`,
+        confirmText: 'Tamam',
+        onClose: () => {
+          closeModal();
+        }
+      });
+    } catch (err) {
+      setIsSubmitting(false);
+      openModal({
+        variant: 'error',
+        title: 'İşlem Başarısız',
+        message: `Emir gönderilemedi.\n${err?.message || err}`,
+        confirmText: 'Tamam',
+        onClose: closeModal
+      });
+    }
   };
 
   const sellDisabled = type === 'SELL' && effectiveSellable <= 0;
@@ -375,7 +428,7 @@ const TradePanel = ({ stock, onBack }) => {
         <button
           className={styles.actionBtn}
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={isSubmitting || sellDisabled}
           title=""
         >
           {type === 'BUY' ? 'Alış Emri Ver' : 'Satış Emri Ver'}

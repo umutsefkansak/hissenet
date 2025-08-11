@@ -1,4 +1,4 @@
-# 🚀 HisseNet - B2B Alım Satım Platformu
+# HisseNet - B2B Alım Satım Platformu
 
 <div align="center">
   <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754924876/kexgebnphuvu2xsaflhp.png" alt="HisseNet Logo" width="200"/>
@@ -8,7 +8,7 @@
 
 ---
 
-## 📋 İçindekiler
+## İçindekiler
 
 - [Genel Bakış](#genel-bakış)
 - [Sistem Mimarisi](#sistem-mimarisi)
@@ -25,7 +25,7 @@
 
 ---
 
-## 🎯 Genel Bakış
+## Genel Bakış
 
 HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlendirmesi ve yapay zeka destekli müşteri hizmetleri sunan kapsamlı bir B2B hisse alım satım platformudur. Sistem üç ana bileşenden oluşur:
 
@@ -35,7 +35,7 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ---
 
-## 🏗️ Sistem Mimarisi
+## Sistem Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -63,32 +63,32 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ---
 
-## ✨ Özellikler
+## Özellikler
 
-### 🔄 Gerçek Zamanlı Veri Akışı
+### Gerçek Zamanlı Veri Akışı
 - WebSocket/STOMP üzerinden canlı hisse fiyat güncellemeleri
 - BIST100 endeks takibi
 - 3-10 saniyede bir otomatik veri yenileme
 
-### 💼 Portföy Yönetimi
+### Portföy Yönetimi
 - Çoklu portföy desteği
 - Risk profili değerlendirmesi
 - Kar/zarar takibi
 - Hisse miktarı yönetimi
 
-### 🔐 Güvenlik ve Kimlik Doğrulama
+### Güvenlik ve Kimlik Doğrulama
 - JWT tabanlı kimlik doğrulama
 - Rol tabanlı erişim kontrolü (ADMIN, EMPLOYEE)
 - Hız sınırlama koruması
 - Redis ile oturum yönetimi
 
-### 🤖 Yapay Zeka Destekli Hizmet
+### Yapay Zeka Destekli Hizmet
 - Google Gemini kullanan akıllı chatbot
 - Bağlamsal yanıtlar için vektör arama
 - Sohbet geçmişi takibi
 - Türkçe dil desteği
 
-### 📊 Alım Satım İşlemleri
+### Alım Satım İşlemleri
 - Emir yönetimi (alım/satım)
 - Cüzdan işlemleri
 - Müşteri yönetimi (bireysel/kurumsal)
@@ -96,7 +96,7 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ---
 
-## 🛠️ Teknoloji Altyapısı
+## Teknoloji Altyapısı
 
 ### Backend
 - **Java 21** ile **Spring Boot 3.5.4**
@@ -129,7 +129,7 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ---
 
-## 📁 Proje Yapısı
+## Proje Yapısı
 
 ```
 HisseNet/
@@ -169,7 +169,7 @@ HisseNet/
 
 ---
 
-## 📚 API Dokümantasyonu
+## API Dokümantasyonu
 
 ### Kimlik Doğrulama ve Güvenlik
 - **POST** `/api/v1/auth/login` - Kullanıcı kimlik doğrulama
@@ -227,7 +227,7 @@ HisseNet/
 
 ---
 
-## 🚀 Kurulum ve Yapılandırma
+## Kurulum ve Yapılandırma
 
 ### Ön Gereksinimler
 - Java 21 (OpenJDK veya Oracle JDK)
@@ -264,7 +264,7 @@ python manage.py runserver
 
 ---
 
-## 🔧 Ortam Değişkenleri
+## Ortam Değişkenleri
 
 ### Backend (.env)
 ```bash
@@ -298,7 +298,7 @@ projectDIR=./chatbot/
 
 ---
 
-## 🏃‍♂️ Uygulamayı Çalıştırma
+## Uygulamayı Çalıştırma
 
 ### Geliştirme Modu
 1. SQL Server ve Redis'i başlatın
@@ -314,7 +314,7 @@ docker-compose up --build
 
 ---
 
-## 🐳 Docker Dağıtımı
+## Docker Dağıtımı
 
 ### Backend Konteyneri
 ```dockerfile
@@ -366,7 +366,7 @@ services:
 
 ---
 
-## 💻 Geliştirme Kuralları
+## Geliştirme Kuralları
 
 ### Kod Stili
 - **Backend**: Spring Boot konvansiyonlarını takip edin, DTO'lar için MapStruct kullanın
@@ -386,7 +386,7 @@ services:
 
 ---
 
-## 🤝 Katkıda Bulunma
+## Katkıda Bulunma
 
 1. Repository'yi fork edin
 2. Özellik dalı oluşturun (`git checkout -b feature/harika-ozellik`)
@@ -402,9 +402,13 @@ services:
 
 ---
 
+## Lisans
 
+Bu proje Infina Akademi stajında geliştirilmiş yazılımdır. 
 
-## 📞 Destek
+---
+
+## Destek
 
 Teknik destek veya sorular için:
 - **Backend Sorunları**: Spring Boot loglarını ve application.yml yapılandırmasını kontrol edin

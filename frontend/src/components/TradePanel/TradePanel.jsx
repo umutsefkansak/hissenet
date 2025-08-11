@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './TradePanel.module.css';
 import { orderApi } from '../../server/order';
 import { walletApi } from '../../server/wallet';
-import { customerApi} from '../../server/customerApi';
+import { customerApi } from '../../server/customerApi';
+import { sendMail } from '../../server/mail';
 import Modal from '../../components/common/Modal/Modal';
 
 const TradePanel = ({ stock, onBack }) => {
@@ -61,7 +62,7 @@ const TradePanel = ({ stock, onBack }) => {
       `Adet: ${quantity || '-'}`,
       `Toplam: ${total} TL`,
       `Komisyon (%${(commissionRate * 100).toFixed(2)}): ${commission} TL`,
-      `Net: ${net} TL`,
+      `Net: ${net} TL`
     ];
     return lines.join('\n');
   };
@@ -101,9 +102,7 @@ const TradePanel = ({ stock, onBack }) => {
     }
     try {
       const data = await customerApi.getCustomerById(customerId);
-      console.log(customerId)
-      console.log(data.data)
-     const cr = normalizeCommission(data?.data?.commissionRate || 0.005);
+      const cr = normalizeCommission(data?.data?.commissionRate || data?.commissionRate || 0.005);
       setCommissionRate(cr);
     } catch {
       setCommissionRate(0.005);
@@ -157,12 +156,10 @@ const TradePanel = ({ stock, onBack }) => {
         title: 'Eksik / Hatalı Bilgi',
         message: 'Lütfen tüm alanları doğru doldurun.',
         confirmText: 'Tamam',
-        onClose: closeModal,
+        onClose: closeModal
       });
       return;
     }
-
-    
 
     openModal({
       variant: 'confirm',
@@ -180,12 +177,59 @@ const TradePanel = ({ stock, onBack }) => {
           quantity: Number(quantity),
           price: category === 'MARKET' ? stock.lastPrice : Number(price),
           type,
-          category,
+          category
         };
 
         try {
           const res = await orderApi.createOrder(payload);
-          const statusStr = (res?.data?.status ?? res?.status ?? '').toString().toUpperCase();
+          const statusStrRaw = (res?.data?.status ?? res?.status ?? '').toString();
+          const statusStr = statusStrRaw.toUpperCase();
+          const idForTxn = res?.data?.transactionId || res?.data?.id;
+          const txn = idForTxn ? `TXN-${new Date().getFullYear()}-${String(idForTxn).padStart(6,'0')}` : 'Bilinmiyor';
+
+          try {
+            const customer = await customerApi.getCustomerById(customerId);
+            const to = customer?.email || customer?.data?.email || '';
+            const firstName = customer?.firstName || customer?.data?.firstName || '';
+            const lastName = customer?.lastName || customer?.data?.lastName || '';
+            const companyName = customer?.companyName || customer?.data?.companyName || '';
+            const recipientName = `${firstName} ${lastName}`.trim() || companyName || 'Müşterimiz';
+
+            let subject = '';
+            let content = '';
+
+            if (statusStr === 'FILLED' || (category === 'MARKET' && statusStr !== 'REJECTED')) {
+              subject = `Hisse ${type === 'BUY' ? 'Alım' : 'Satım'} İşlemi Gerçekleşti`;
+              content = `
+                <h2>${subject}</h2>
+                <p>${stock.code} hissesinden ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} işleminiz ${formatPrice(unitPrice)} TL fiyatından gerçekleşti.</p>
+                <p><strong>İşlem Numarası:</strong> ${txn}</p>
+                <p><strong>Toplam:</strong> ${formatPrice(total)} TL</p>
+                <p><strong>Komisyon:</strong> ${formatPrice(commission)} TL</p>
+                <p><strong>Net:</strong> ${formatPrice(net)} TL</p>
+              `;
+            } else if (statusStr === 'OPEN' || category === 'LIMIT') {
+              subject = `Limit ${type === 'BUY' ? 'Alım' : 'Satım'} Emri Alındı`;
+              content = `
+                <h2>${subject}</h2>
+                <p>${stock.code} için ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} limit emriniz oluşturuldu ve beklemede.</p>
+                <p><strong>Limit Fiyat:</strong> ${formatPrice(unitPrice)} TL</p>
+                <p><strong>Emir Durumu:</strong> ${statusStr || 'OPEN'}</p>
+                <p><strong>Emir Numarası:</strong> ${txn}</p>
+              `;
+            } else {
+              subject = `Emir Durumu: ${statusStr || 'Bilinmiyor'}`;
+              content = `
+                <h2>${subject}</h2>
+                <p>${stock.code} için verdiğiniz emir durumu: ${statusStr || 'Bilinmiyor'}.</p>
+                <p><strong>Emir Numarası:</strong> ${txn}</p>
+              `;
+            }
+
+            if (to) {
+              await sendMail({ to, subject, content, recipientName });
+            }
+          } catch {}
 
           if (type === 'BUY') {
             await fetchBalance();
@@ -201,11 +245,11 @@ const TradePanel = ({ stock, onBack }) => {
           openModal({
             variant: 'success',
             title: 'İşlem Başarılı',
-            message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri${statusStr && statusStr !== 'FILLED' ? ` (${statusStr})` : ''} gönderildi.`,
+            message: `${type === 'BUY' ? 'Alış' : 'Satış'} emri gönderildi.`,
             confirmText: 'Tamam',
-                         onClose: () => {
-               closeModal();
-             },
+            onClose: () => {
+              closeModal();
+            }
           });
         } catch (err) {
           setIsSubmitting(false);
@@ -214,11 +258,11 @@ const TradePanel = ({ stock, onBack }) => {
             title: 'İşlem Başarısız',
             message: `Emir gönderilemedi.\n${err?.message || err}`,
             confirmText: 'Tamam',
-            onClose: closeModal,
+            onClose: closeModal
           });
         }
       },
-      onClose: closeModal,
+      onClose: closeModal
     });
   };
 
@@ -283,11 +327,11 @@ const TradePanel = ({ stock, onBack }) => {
             min="0"
             value={totalInput}
             disabled={isSubmitting}
-                         onChange={e => {
-               const value = parseFloat(e.target.value);
-               if (value < 0) return;
-               setTotalInput(e.target.value);
-             }}
+            onChange={e => {
+              const value = parseFloat(e.target.value);
+              if (value < 0) return;
+              setTotalInput(e.target.value);
+            }}
             placeholder="Toplam Tutar"
           />
         </div>
@@ -328,12 +372,12 @@ const TradePanel = ({ stock, onBack }) => {
           <div><span>Net Tutar:</span><span>{net} TL</span></div>
         </div>
 
-                 <button
-           className={styles.actionBtn}
-           onClick={handleSubmit}
-           disabled={isSubmitting}
-           title=""
-         >
+        <button
+          className={styles.actionBtn}
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          title=""
+        >
           {type === 'BUY' ? 'Alış Emri Ver' : 'Satış Emri Ver'}
         </button>
       </div>

@@ -26,7 +26,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
       return true;
     }
 
-    const emailExists = customers.some(c => 
+    const emailExists = customers.some(c =>
       c.id !== customer.id && c.email === email
     );
 
@@ -40,16 +40,17 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
   };
 
   const {
-    step,         
-    start,        
-    cancel,       
+    step,
+    start,
+    cancel,
     confirmIdentity,
     confirmCode,
     modalOpen,
-    modalProps,          
+    modalProps,
     closeModal,
     maxAttempts,
     attemptsLeft,
+    isProcessing,
   } = useAuthFlow(async () => {
     if (!pendingUpdateData) return;
 
@@ -94,7 +95,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
       [name]: value,
     }));
 
-  
+
     if (name === 'email') {
       checkEmailAvailability(value);
     }
@@ -117,7 +118,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
       return;
     }
 
-    
+
     if (!checkEmailAvailability(formData.email)) {
       return;
     }
@@ -158,6 +159,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
   };
 
   const handleCancel = () => {
+    if (isProcessing) return;
     onClose();
   };
 
@@ -170,7 +172,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
           <div className="customer-update-modal-header">
             <h2>Müşteri Güncelle</h2>
             <button className="customer-update-modal-close" onClick={handleCancel}
-             disabled={loading}
+              disabled={loading}
               aria-label="Close">
               ✕
             </button>
@@ -254,7 +256,11 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
                 className="btn-update"
                 disabled={loading || !hasChanges() || !!emailError}
               >
-                {loading ? 'Güncelleniyor...' : 'Güncelle'}
+                {loading
+                  ? 'Güncelleniyor...'
+                  : isProcessing
+                    ? (step === 'ASK_CODE' ? 'Doğrulanıyor...' : 'Kod gönderiliyor...')
+                    : 'Güncelle'}
               </button>
             </div>
           </form>
@@ -263,7 +269,8 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = 
 
       <AuthModal
         isOpen={step === 'ASK_ID' && !modalOpen}
-        onClose={cancel}
+        isProcessing={isProcessing}
+        onClose={isProcessing ? undefined : cancel}
         onConfirm={confirmIdentity}
       />
       <CodeVerificationModal

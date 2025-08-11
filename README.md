@@ -13,6 +13,7 @@
 - [Genel Bakış](#genel-bakış)
 - [Sistem Mimarisi](#sistem-mimarisi)
 - [Özellikler](#özellikler)
+- [Ekran Görüntüleri](#ekran-görüntüleri)
 - [Teknoloji Altyapısı](#teknoloji-altyapısı)
 - [Proje Yapısı](#proje-yapısı)
 - [API Dokümantasyonu](#api-dokümantasyonu)
@@ -102,6 +103,80 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 - Cüzdan işlemleri
 - Müşteri yönetimi (bireysel/kurumsal)
 - Adres ve belge yönetimi
+
+---
+
+## Ekran Görüntüleri
+
+### Ana Sayfa
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935867/sqtlosc2xnjkhy1zzojj.png" alt="HisseNet Ana Sayfa" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Ana sayfa - Genel bakış ve navigasyon</em>
+</div>
+
+### Müşteri Anasayfa
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935919/ursjcal6saktikrloflk.png" alt="Müşteri Anasayfa" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Müşteri anasayfa - Kişisel bilgiler ve portföy özeti</em>
+</div>
+
+### Müşteri Portföyü
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935920/ldspererqpivvdrmuo43.png" alt="Müşteri Portföyü" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Müşteri portföyü - Hisse detayları ve performans takibi</em>
+</div>
+
+### Personel Giriş
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935915/trr9repvr6x4de2gmojt.png" alt="Personel Giriş" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Personel giriş ekranı - Çalışan kimlik doğrulama</em>
+</div>
+
+### Kullanıcı Yönetimi
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935918/rwjfdnucv8i9twlqapml.png" alt="Kullanıcı Yönetimi" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Kullanıcı yönetimi - Müşteri ve çalışan yönetimi paneli</em>
+</div>
+
+### Hisseler
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935916/m8nos1g3eseue5zarive.png" alt="Hisseler" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Hisseler - Canlı fiyat takibi ve hisse listesi</em>
+</div>
+
+### Şifremi Unuttum
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935865/bbyozy6vp40wyjfuxnfe.png" alt="Şifremi Unuttum" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Şifremi unuttum - Şifre sıfırlama ekranı</em>
+</div>
+
+### Alış Satış Ekranı
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935866/xdod5e8xin3kk8xlcdtk.png" alt="Alış Satış Ekranı" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Alış satış ekranı - Hisse alım satım işlemleri</em>
+</div>
+
+### Cüzdan
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935868/yv5obtgsjpe5jhkaqxh3.png" alt="Cüzdan" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Cüzdan - Bakiye yönetimi ve işlem geçmişi</em>
+</div>
+
+### Chat AI
+<div align="center">
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754935869/kvgzcdzqwkplcgqks3dv.png" alt="Chat AI" style="max-width: 100%; height: auto; cursor: pointer;" onclick="window.open(this.src, '_blank')" title="Resmi yakınlaştırmak için tıklayın"/>
+  <br/>
+  <em>Chat AI - Yapay zeka destekli müşteri hizmetleri</em>
+</div>
 
 ---
 

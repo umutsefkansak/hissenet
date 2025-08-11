@@ -5,7 +5,7 @@ import AuthModal from '../../AuthModal/AuthModal';
 import { CodeVerificationModal } from '../../AuthModal/CodeVerificationModal';
 import Modal from '../../common/Modal/Modal';
 
-const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
+const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate, customers = [] }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,8 +15,29 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
   const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(false);
   const [pendingUpdateData, setPendingUpdateData] = useState(null);
+  const [emailError, setEmailError] = useState('');
 
   const isCorporate = customer?.customerType === 'CORPORATE';
+
+  // Email kontrolü fonksiyonu
+  const checkEmailAvailability = (email) => {
+    if (!email || email === originalData.email) {
+      setEmailError('');
+      return true;
+    }
+
+    const emailExists = customers.some(c => 
+      c.id !== customer.id && c.email === email
+    );
+
+    if (emailExists) {
+      setEmailError('Bu email zaten kullanılıyor');
+      return false;
+    } else {
+      setEmailError('');
+      return true;
+    }
+  };
 
   const {
     step,         
@@ -30,7 +51,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
     maxAttempts,
     attemptsLeft,
   } = useAuthFlow(async () => {
-
     if (!pendingUpdateData) return;
 
     try {
@@ -40,7 +60,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
       onClose();
     } catch (err) {
       console.error('Customer update error:', err);
-   
     } finally {
       setLoading(false);
     }
@@ -64,18 +83,24 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
 
       setFormData(initialData);
       setOriginalData(initialData);
+      setEmailError(''); // Modal açıldığında email hatasını temizle
     }
   }, [customer, isOpen, isCorporate]);
 
-   const handleInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Email değiştiğinde kontrol et
+    if (name === 'email') {
+      checkEmailAvailability(value);
+    }
   };
 
-   const hasChanges = () => {
+  const hasChanges = () => {
     return (
       formData.firstName !== originalData.firstName ||
       (!isCorporate && formData.lastName !== originalData.lastName) ||
@@ -83,12 +108,18 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
       formData.phone !== originalData.phone
     );
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!hasChanges()) {
       onClose();
       return;
+    }
+
+    // Email kontrolü yap
+    if (!checkEmailAvailability(formData.email)) {
+      return; // Email hatası varsa submit etme
     }
 
     const updateData = isCorporate
@@ -110,7 +141,6 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
 
     setPendingUpdateData(updateData);
 
-   
     if (customer.tcNumber) {
       confirmIdentity(customer.tcNumber);
     } else {
@@ -127,7 +157,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
     }
   };
 
-   const handleCancel = () => {
+  const handleCancel = () => {
     onClose();
   };
 
@@ -189,7 +219,13 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
                 onChange={handleInputChange}
                 placeholder="Email"
                 required
+                className={emailError ? 'error' : ''}
               />
+              {emailError && (
+                <div className="error-message">
+                  {emailError}
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -216,7 +252,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
               <button
                 type="submit"
                 className="btn-update"
-                disabled={loading || !hasChanges()}
+                disabled={loading || !hasChanges() || !!emailError}
               >
                 {loading ? 'Güncelleniyor...' : 'Güncelle'}
               </button>
@@ -225,7 +261,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
         </div>
       </div>
 
-       <AuthModal
+      <AuthModal
         isOpen={step === 'ASK_ID' && !modalOpen}
         onClose={cancel}
         onConfirm={confirmIdentity}
@@ -244,7 +280,7 @@ const CustomerUpdateModal = ({ isOpen, onClose, customer, onUpdate }) => {
           message={modalProps.message}
           onClose={closeModal}
         />
-        )}
+      )}
     </>
   );
 };

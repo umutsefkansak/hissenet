@@ -105,7 +105,7 @@ const CustomerDetailPage = () => {
   const getRiskProfile = () => {
     if (!customer || !customer.riskProfile) return 'Belirtilmemiş';
     switch (customer.riskProfile.toUpperCase()) {
-      case 'CONSERVATIVE': return 'Muhafazakar';
+      case 'CONSERVATIVE': return 'Düşük Risk';
       case 'MODERATE': return 'Orta Risk';
       case 'AGGRESSIVE': return 'Agresif';
       case 'VERY_AGGRESSIVE': return 'Çok Agresif';
@@ -143,6 +143,7 @@ const CustomerDetailPage = () => {
       case 'FILLED': return 'Onaylandı';
       case 'COMPLETED': return 'Tamamlandı';
       case 'CANCELLED': return 'İptal Edildi';
+      case 'CANCELED': return 'İptal Edildi';
       case 'REJECTED': return 'Reddedildi';
       default: return status;
     }

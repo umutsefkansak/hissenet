@@ -452,7 +452,7 @@ const Portfolio = () => {
       <div className="portfolio-summary">
         <div className="summary-card total-value">
           <div className="card-content">
-            <h3>Toplam Değer</h3>
+            <h3>Tüm Portföyler Değeri</h3>
             <p className="card-amount">{formatCurrency(calculateAllPortfoliosTotal())}</p>
           </div>
         </div>

@@ -192,6 +192,7 @@ const CustomerList = ({ customers = [], loading, error, onUpdate }) => {
         onClose={handleCloseUpdateModal}
         customer={selectedCustomer}
         onUpdate={handleUpdateSubmit}
+        customers={customers}
       />
     </div>
   );

@@ -3,7 +3,7 @@ import styles from './TradePanel.module.css';
 import { orderApi } from '../../server/order';
 import { walletApi } from '../../server/wallet';
 import { customerApi } from '../../server/customerApi';
-import { sendMail } from '../../server/mail';
+import { sendNotification } from '../../server/mail';
 import Modal from '../../components/common/Modal/Modal';
 
 const TradePanel = ({ stock, onBack }) => {
@@ -169,6 +169,40 @@ const TradePanel = ({ stock, onBack }) => {
     });
   }, [sellableQty]);
 
+  const showLoadingModal = () => {
+    openModal({
+      variant: 'confirm',
+      title: 'İşleminiz gönderiliyor...',
+      message: buildConfirmMessage(),
+      cancelText: 'Vazgeç',
+      confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
+      confirmDisabled: true,
+      cancelDisabled: true,
+      disableBackdropClick: true,
+      disableEsc: true
+    });
+  };
+
+  const showTradeConfirmModal = () => {
+    openModal({
+      variant: 'confirm',
+      title: 'HİSSENET İŞLEM BİLDİRİMİ',
+      message: buildConfirmMessage(),
+      cancelText: 'Vazgeç',
+      confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
+      onConfirm: () => {
+        setIsSubmitting(true);
+        showLoadingModal();
+        submitOrder();
+      },
+      onClose: closeModal,
+      confirmDisabled: isSubmitting,
+      cancelDisabled: isSubmitting,
+      disableBackdropClick: false,
+      disableEsc: false
+    });
+  };
+
   const handleSubmit = () => {
     if (!customerId || !stock?.code || !quantity || Number(quantity) <= 0) {
       openModal({
@@ -191,19 +225,7 @@ const TradePanel = ({ stock, onBack }) => {
           cancelText: 'Düzenle',
           confirmText: 'Devam Et',
           onConfirm: () => {
-            closeModal();
-            openModal({
-              variant: 'confirm',
-              title: type === 'BUY' ? 'Alış Emrini Onayla' : 'Satış Emrini Onayla',
-              message: buildConfirmMessage(),
-              cancelText: 'Vazgeç',
-              confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
-              onConfirm: () => {
-                closeModal();
-                submitOrder();
-              },
-              onClose: closeModal
-            });
+            showTradeConfirmModal();
           },
           onClose: closeModal
         });
@@ -211,18 +233,7 @@ const TradePanel = ({ stock, onBack }) => {
       }
     }
 
-    openModal({
-      variant: 'confirm',
-      title: type === 'BUY' ? 'Alış Emrini Onayla' : 'Satış Emrini Onayla',
-      message: buildConfirmMessage(),
-      cancelText: 'Vazgeç',
-      confirmText: type === 'BUY' ? 'Onayla ve Al' : 'Onayla ve Sat',
-      onConfirm: () => {
-        closeModal();
-        submitOrder();
-      },
-      onClose: closeModal
-    });
+    showTradeConfirmModal();
   };
 
   const submitOrder = async () => {
@@ -255,7 +266,7 @@ const TradePanel = ({ stock, onBack }) => {
         let content = '';
 
         if (statusStr === 'FILLED' || (category === 'MARKET' && statusStr !== 'REJECTED')) {
-          subject = `Hisse ${type === 'BUY' ? 'Alım' : 'Satım'} İşlemi Gerçekleşti`;
+          subject = 'HİSSENET İŞLEM BİLDİRİMİ';
           content = `
             <h2>${subject}</h2>
             <p>${stock.code} hissesinden ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} işleminiz ${formatPrice(unitPrice)} TL fiyatından gerçekleşti.</p>
@@ -265,7 +276,7 @@ const TradePanel = ({ stock, onBack }) => {
             <p><strong>Net:</strong> ${formatPrice(net)} TL</p>
           `;
         } else if (statusStr === 'OPEN' || category === 'LIMIT') {
-          subject = `Limit ${type === 'BUY' ? 'Alım' : 'Satım'} Emri Alındı`;
+          subject = 'HİSSENET İŞLEM BİLDİRİMİ';
           content = `
             <h2>${subject}</h2>
             <p>${stock.code} için ${quantity} adet ${type === 'BUY' ? 'alım' : 'satım'} limit emriniz oluşturuldu ve beklemede.</p>
@@ -274,7 +285,7 @@ const TradePanel = ({ stock, onBack }) => {
             <p><strong>Emir Numarası:</strong> ${txn}</p>
           `;
         } else {
-          subject = `Emir Durumu: ${statusStr || 'Bilinmiyor'}`;
+          subject = 'HİSSENET İŞLEM BİLDİRİMİ';
           content = `
             <h2>${subject}</h2>
             <p>${stock.code} için verdiğiniz emir durumu: ${statusStr || 'Bilinmiyor'}.</p>
@@ -283,7 +294,7 @@ const TradePanel = ({ stock, onBack }) => {
         }
 
         if (to) {
-          await sendMail({ to, subject, content, recipientName });
+          await sendNotification({ email: to, recipientName, message: content, title: subject });
         }
       } catch {}
 
@@ -298,6 +309,7 @@ const TradePanel = ({ stock, onBack }) => {
       }
 
       setIsSubmitting(false);
+      closeModal();
       openModal({
         variant: 'success',
         title: 'İşlem Başarılı',
@@ -309,6 +321,7 @@ const TradePanel = ({ stock, onBack }) => {
       });
     } catch (err) {
       setIsSubmitting(false);
+      closeModal();
       openModal({
         variant: 'error',
         title: 'İşlem Başarısız',

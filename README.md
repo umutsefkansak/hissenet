@@ -142,39 +142,121 @@ HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerle
 
 ```
 HisseNet/
-├── backend/                 # Spring Boot uygulaması
-│   ├── hissenet/          # Ana uygulama modülü
-│   │   ├── src/main/java/com/infina/hissenet/
-│   │   │   ├── controller/    # REST API endpoint'leri
-│   │   │   ├── service/       # İş mantığı
-│   │   │   ├── entity/        # JPA varlıkları
-│   │   │   ├── config/        # Yapılandırma sınıfları
-│   │   │   ├── security/      # Güvenlik yapılandırması
-│   │   │   └── scheduler/     # Zamanlanmış görevler
-│   │   ├── pom.xml
-│   │   └── Dockerfile
-│   └── pom.xml
-├── frontend/               # React uygulaması
-│   ├── src/
-│   │   ├── components/     # React bileşenleri
-│   │   ├── pages/         # Sayfa bileşenleri
-│   │   ├── hooks/         # Özel hook'lar
-│   │   ├── server/        # API ve WebSocket servisleri
-│   │   └── utils/         # Yardımcı fonksiyonlar
-│   ├── package.json
-│   ├── Dockerfile
-│   └── default.conf       # Nginx yapılandırması
-├── chatbot/               # Django chatbot uygulaması
-│   ├── chatbot_api/       # Django proje ayarları
-│   ├── chat/             # Ana uygulama
-│   ├── LLM/              # Dil modeli entegrasyonu
-│   ├── Embed/            # Gömme işleme
-│   ├── Database/         # Veritabanı işlemleri
-│   ├── Preprocessing/    # Veri ön işleme
-│   ├── requirements.txt
-│   └── Dockerfile
-└── README.md
+├── .git/                                   # Git repository
+├── .gitignore                              # Proje git ignore
+├── docker-compose.yml                      # Docker Compose yapılandırması
+├── python-backend/                         # Python backend (boş)
+├── backend/                                # Java backend ana klasörü
+│   ├── pom.xml/                            # Parent Maven POM klasörü
+│   ├── src/                                # Backend src klasörü (boş)
+│   └── hissenet/                           # Ana Spring Boot uygulaması
+│       ├── src/main/java/com/infina/hissenet/
+│       │   ├── controller/                 # REST API endpoint'leri
+│       │   ├── service/                    # İş mantığı katmanı
+│       │   ├── entity/                     # JPA varlıkları
+│       │   ├── repository/                 # Veri erişim katmanı
+│       │   ├── dto/                        # Veri transfer nesneleri
+│       │   ├── mapper/                     # Nesne eşleme (MapStruct)
+│       │   ├── config/                     # Yapılandırma sınıfları
+│       │   ├── security/                   # Güvenlik katmanı
+│       │   ├── scheduler/                  # Zamanlanmış görevler
+│       │   ├── websocket/                  # WebSocket işlemleri
+│       │   ├── interceptor/                # Interceptor'lar
+│       │   ├── exception/                  # Özel exception sınıfları
+│       │   ├── validation/                 # Doğrulama sınıfları
+│       │   ├── utils/                      # Yardımcı sınıflar
+│       │   ├── constants/                  # Sabit değerler
+│       │   ├── listener/                   # Event listener'lar
+│       │   ├── event/                      # Event sınıfları
+│       │   ├── client/                     # Harici API client'ları
+│       │   ├── properties/                 # Konfigürasyon özellikleri
+│       │   ├── common/                     # Ortak sınıflar
+│       │   └── logging/                    # Logging yapılandırması
+│       ├── src/main/resources/
+│       ├── src/test/java/                  # Test sınıfları
+│       ├── pom.xml                         # Maven bağımlılıkları
+│       ├── Dockerfile                      # Docker yapılandırması
+│       ├── mvnw                            # Maven wrapper
+│       └── .gitignore                      # Git ignore dosyası
+├── frontend/                               # React uygulaması
+│   ├── node_modules/                       # Node.js bağımlılıkları
+│   ├── public/                             # Statik dosyalar
+│   │   ├── fonts/                          # Font dosyaları
+│   ├── src/                                # React kaynak kodları
+│   │   ├── components/                     # React bileşenleri
+│   │   ├── pages/                          # Sayfa bileşenleri
+│   │   ├── hooks/                          # Özel React hook'ları
+│   │   ├── server/                         # API ve WebSocket servisleri
+│   │   │   └── websocket/                  # WebSocket servisleri
+│   │   ├── utils/                          # Yardımcı fonksiyonlar
+│   │   ├── constants/                      # Sabit değerler
+│   │   ├── images/                         # Görsel dosyalar
+│   │   ├── App.jsx                         # Ana uygulama bileşeni
+│   │   ├── App.css                         # Ana uygulama stilleri
+│   │   ├── index.js                        # Giriş noktası
+│   │   ├── index.css                       # Ana stiller
+│   │   ├── logo.svg                        # Logo SVG
+│   │   ├── reportWebVitals.js              # Web vitals raporlama
+│   │   └── App.test.js                     # Ana uygulama testi
+│   ├── .vscode/                            # VS Code ayarları (boş)
+│   ├── package.json                        # Node.js bağımlılıkları
+│   ├── package-lock.json                   # Bağımlılık kilidi
+│   ├── Dockerfile                          # Docker yapılandırması
+│   ├── default.conf                        # Nginx yapılandırması
+│   ├── .gitignore                          # Git ignore dosyası
+│   └── README.md                           # Frontend README
+├── chatbot/                                # Django chatbot uygulaması
+│   ├── chatbot_api/                        # Django proje ayarları
+│   ├── chat/                               # Ana Django uygulaması
+│   ├── LLM/                                # Dil modeli entegrasyonu
+│   ├── Embed/                              # Gömme işleme
+│   ├── Database/                           # Veritabanı işlemleri
+│   ├── Preprocessing/                      # Veri ön işleme
+│   ├── __init__.py                         # Python paket tanımı
+│   ├── requirements.txt                    # Python bağımlılıkları
+│   ├── Dockerfile                          # Docker yapılandırması
+│   ├── .dockerignore                       # Docker ignore dosyası
+│   ├── run_django.py                       # Django çalıştırma betiği
+│   ├── run_chatbot.bat                     # Windows çalıştırma betiği
+│   ├── run_chatbot.sh                      # Linux çalıştırma betiği
+│   └── manage.py                           # Django yönetim betiği
+├── README.md                               # Ana proje README
 ```
+
+
+### Proje Yapısı Açıklaması:
+
+**Backend (Spring Boot):**
+- **controller/**: REST API endpoint'leri ve HTTP isteklerinin işlenmesi
+- **service/**: İş mantığı ve iş kurallarının uygulanması
+- **entity/**: Veritabanı tablolarının Java sınıf karşılıkları
+- **repository/**: Veri erişim katmanı ve veritabanı sorguları
+- **dto/**: Veri transfer nesneleri (request/response)
+- **mapper/**: MapStruct ile nesne eşleme işlemleri
+- **config/**: Uygulama yapılandırmaları ve bean tanımları
+- **security/**: JWT, authentication ve authorization
+- **scheduler/**: Zamanlanmış görevler ve cron job'lar
+- **websocket/**: Gerçek zamanlı veri iletişimi
+- **interceptor/**: HTTP isteklerinin ön işlenmesi
+- **exception/**: Özel hata sınıfları ve yönetimi
+- **properties/**: Konfigürasyon özellikleri ve ayarlar
+
+**Frontend (React):**
+- **components/**: Yeniden kullanılabilir UI bileşenleri
+- **pages/**: Sayfa bileşenleri ve routing
+- **hooks/**: Özel React hook'ları ve state yönetimi
+- **server/**: API çağrıları ve WebSocket bağlantıları
+- **utils/**: Yardımcı fonksiyonlar ve utility'ler
+- **constants/**: Sabit değerler ve konfigürasyon
+- **images/**: Görsel dosyalar ve asset'ler
+
+**Chatbot (Django):**
+- **chatbot_api/**: Django proje ayarları ve konfigürasyon
+- **chat/**: Ana uygulama ve view'lar
+- **LLM/**: Google Gemini entegrasyonu ve AI servisleri
+- **Embed/**: Vektör gömme işlemleri
+- **Database/**: MongoDB Atlas bağlantısı
+- **Preprocessing/**: Veri ön işleme ve hazırlama
 
 ---
 
@@ -417,7 +499,7 @@ services:
 
 ## Lisans
 
-Bu proje Infina Akademi stajında geliştirilmiş yazılımdır.
+Bu proje Infina Akademi staj için geliştirilmiş yazılımdır.
 
 ---
 
@@ -523,5 +605,5 @@ Teknik destek veya sorular için:
 ---
 
 <div align="center">
-  <strong>Derin Hissedenler Geliştirme Ekibi tarafından ❤️ ile geliştirildi</strong>
+  <strong>Derin Hissedenler Geliştirme Ekibi tarafından geliştirildi</strong>
 </div> 

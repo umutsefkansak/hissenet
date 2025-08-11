@@ -22,6 +22,9 @@ const TransactionHistory = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [scopedCustomerId, setScopedCustomerId] = useState(null);
 
+  const readBlocked = (o) => Number(o?.blockedBalance ?? o?.blocked_balance ?? o?.blocked ?? o?.wallet?.blockedBalance ?? 0);
+  const getBlockedClass = (amt) => (Number(amt) > 0 ? "blocked-balance active" : "blocked-balance none");
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -74,12 +77,11 @@ const TransactionHistory = () => {
   };
   const getOrderCategoryLabel = (c) => (c === "MARKET" ? "Piyasa" : c === "LIMIT" ? "Limit" : c);
   const formatDate = (s) => (s ? new Date(s).toLocaleString("tr-TR") : "-");
-
   const normalized = (v) => (v ?? "").toString().toLowerCase().trim();
 
   const filteredOrders = useMemo(() => {
     const q = normalized(searchTerm);
-    let arr = orders;
+    let arr = orders.map(o => ({ ...o, blockedBalance: readBlocked(o) }));
     if (q) {
       arr = arr.filter((o) => {
         const code = normalized(o.stockCode);
@@ -91,12 +93,13 @@ const TransactionHistory = () => {
         const categoryRaw = normalized(o.category);
         const price = normalized(Number(o.price) ? Number(o.price).toLocaleString("tr-TR") : "");
         const total = normalized(Number(o.totalAmount) ? Number(o.totalAmount).toLocaleString("tr-TR") : "");
+        const blocked = normalized(Number(o.blockedBalance) ? Number(o.blockedBalance).toLocaleString("tr-TR") : "");
         return (
           code.includes(q) ||
           typeLabel.includes(q) || typeRaw.includes(q) ||
           statusLabel.includes(q) || statusRaw.includes(q) ||
           categoryLabel.includes(q) || categoryRaw.includes(q) ||
-          price.includes(q) || total.includes(q)
+          price.includes(q) || total.includes(q) || blocked.includes(q)
         );
       });
     }
@@ -164,7 +167,8 @@ const TransactionHistory = () => {
     { key: "quantity", label: "Adet", formatter: fmtQtyPdf },
     { key: "price", label: "Fiyat", formatter: fmtMoneyPdf },
     { key: "totalAmount", label: "Toplam", formatter: fmtMoneyPdf },
-    { key: "status", label: "Durum", formatter: (v) => getOrderStatusLabel(v) }
+    { key: "status", label: "Durum", formatter: (v) => getOrderStatusLabel(v) },
+    { key: "blockedBalance", label: "Bloke Tutarı", formatter: fmtMoneyPdf }
   ];
 
   if (loading) {
@@ -191,7 +195,6 @@ const TransactionHistory = () => {
         <h2>{scopedCustomerId ? "Müşterinin İşlemleri" : "Tüm İşlemler"}</h2>
         <span className="transaction-count">Toplam: {totalElements} işlem</span>
       </div>
-
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
         <input
           type="text"
@@ -216,7 +219,6 @@ const TransactionHistory = () => {
           pdfSubtitle={scopedCustomerId ? `Müşteri ID: ${scopedCustomerId} • Toplam ${totalElements} işlem` : `Toplam ${totalElements} işlem`}
         />
       </div>
-
       <div className="transaction-table-container">
         <table className="transaction-table">
           <thead>
@@ -227,6 +229,7 @@ const TransactionHistory = () => {
               <SortableHeader columnKey="price" label="Fiyat" sortConfig={sortConfig} onSort={handleSort} />
               <SortableHeader columnKey="totalAmount" label="Toplam" sortConfig={sortConfig} onSort={handleSort} />
               <SortableHeader columnKey="status" label="İşlem Durumu" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableHeader columnKey="blockedBalance" label="Bloke Tutarı" sortConfig={sortConfig} onSort={handleSort} />
               <th className="action-col">İşlem</th>
             </tr>
           </thead>
@@ -243,6 +246,16 @@ const TransactionHistory = () => {
                     {getOrderStatusLabel(order.status)}
                   </span>
                 </td>
+                <td>
+                  {(() => {
+                    const amt = readBlocked(order);
+                    return (
+                      <span className={getBlockedClass(amt)}>
+                        {Number(amt).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+                      </span>
+                    );
+                  })()}
+                </td>
                 <td className="action-cell">
                   {order.status === "OPEN" ? (
                     <button className="table-action-btn" onClick={() => openCancelModal(order)}>
@@ -255,7 +268,6 @@ const TransactionHistory = () => {
           </tbody>
         </table>
       </div>
-
       <div style={{ marginTop: 12 }}>
         <Pagination
           currentPage={page}
@@ -269,7 +281,6 @@ const TransactionHistory = () => {
           showTotalElements={true}
         />
       </div>
-
       {showCancelModal && targetOrder && (
         <Modal
           variant="confirm"

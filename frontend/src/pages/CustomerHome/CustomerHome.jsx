@@ -85,20 +85,21 @@ const CustomerHome = () => {
 
   const getRiskProfileText = (riskProfile) => {
     const riskMap = {
-      LOW: 'Düşük Risk',
+      CONSERVATIVE: 'Düşük Risk',
       MODERATE: 'Orta Risk',
       HIGH: 'Yüksek Risk',
-      AGGRESSIVE: 'Yüksek Risk'
+      AGGRESSIVE: 'Yüksek Risk',
+      VERY_AGGRESSIVE: 'Çok Yüksek Risk'
     };
     return riskMap[riskProfile] || riskProfile;
   };
 
   const getRiskProfileColor = (riskProfile) => {
     const colorMap = {
-      LOW: '#10B981',
+      CONSERVATIVE: '#10B981',
       MODERATE: '#F59E0B',
-      HIGH: '#EF4444',
-      AGGRESSIVE: '#EF4444'
+      AGGRESSIVE: '#EF4444',
+      VERY_AGGRESSIVE: '#DC2626'
     };
     return colorMap[riskProfile] || '#6B7280';
   };
@@ -232,10 +233,12 @@ const CustomerHome = () => {
             className="risk-badge"
             style={{
               backgroundColor: getRiskProfileColor(customer.riskProfile) === '#10B981' ? '#F0FDF4' :
-                              getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FFFBEB' : '#FEF2F2',
+                              getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FFFBEB' :
+                              getRiskProfileColor(customer.riskProfile) === '#EF4444' ? '#FEF2F2' : '#FEF2F2',
               color: getRiskProfileColor(customer.riskProfile),
               borderColor: getRiskProfileColor(customer.riskProfile) === '#10B981' ? '#BBF7D0' :
-                          getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FED7AA' : '#FECACA'
+                          getRiskProfileColor(customer.riskProfile) === '#F59E0B' ? '#FED7AA' :
+                          getRiskProfileColor(customer.riskProfile) === '#EF4444' ? '#FECACA' : '#FECACA'
             }}
           >
             {getRiskProfileText(customer.riskProfile)}

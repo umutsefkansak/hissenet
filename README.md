@@ -1,7 +1,7 @@
-# 🚀 Sardis - HisseNet B2B Alım Satım Platformu
+# 🚀 HisseNet - B2B Alım Satım Platformu
 
 <div align="center">
-  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754924876/kexgebnphuvu2xsaflhp.png" alt="Sardis Logo" width="200"/>
+  <img src="https://res.cloudinary.com/dtmebvljq/image/upload/v1754924876/kexgebnphuvu2xsaflhp.png" alt="HisseNet Logo" width="200"/>
   <br/>
   <em>Gerçek zamanlı veri akışı ile modern, ölçeklenebilir B2B hisse alım satım platformu</em>
 </div>
@@ -27,7 +27,7 @@
 
 ## 🎯 Genel Bakış
 
-Sardis, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlendirmesi ve yapay zeka destekli müşteri hizmetleri sunan kapsamlı bir B2B hisse alım satım platformudur. Sistem üç ana bileşenden oluşur:
+HisseNet, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlendirmesi ve yapay zeka destekli müşteri hizmetleri sunan kapsamlı bir B2B hisse alım satım platformudur. Sistem üç ana bileşenden oluşur:
 
 - **Backend**: İş mantığı ve gerçek zamanlı veri işleyen Spring Boot mikroservisi
 - **Frontend**: Canlı fiyat akışı ile React tabanlı web uygulaması
@@ -132,7 +132,7 @@ Sardis, gerçek zamanlı hisse fiyat takibi, portföy yönetimi, risk değerlend
 ## 📁 Proje Yapısı
 
 ```
-Sardis/
+HisseNet/
 ├── backend/                 # Spring Boot uygulaması
 │   ├── hissenet/          # Ana uygulama modülü
 │   │   ├── src/main/java/com/infina/hissenet/

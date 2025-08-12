@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 
-// Gelen JSON içindeki “HisseFiyat” liste elemanı
 public record HisseFiyatEntry(
         @JsonProperty("record_id")   String recordId,
         @JsonProperty("asset_code")  String assetCode,

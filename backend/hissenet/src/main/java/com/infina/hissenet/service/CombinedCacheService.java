@@ -39,17 +39,12 @@ public class CombinedCacheService implements ICombinedCacheService {
     @Override
     public Mono<Void> refreshAsync() {
         if (!refreshing.compareAndSet(false, true)) {
-            System.out.println("[CombinedCacheService] refresh atlandı (zaten çalışıyor)");
             return Mono.empty();
         }
-        System.out.println("[CombinedCacheService] refresh başlıyor...");
         return refresher.buildSnapshot()
                 .doOnNext(list -> {
-                    System.out.println("[CombinedCacheService] yeni snapshot adet=" + list.size());
-                    if (list.isEmpty()) {
-                        System.out.println("[CombinedCacheService] BOS liste → cache yazılmayacak");
-                    } else {
-                        cache.putIfNonEmpty(CACHE_NAME, list);
+                    if (!list.isEmpty()) {
+                        cache.putIfNonEmpty(CACHE_NAME, list);                    } else {
                     }
                 })
                 .doFinally(sig -> refreshing.set(false))

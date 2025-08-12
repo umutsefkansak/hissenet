@@ -42,20 +42,9 @@ public class CombinedRefreshService implements ICacheRefreshService<CombinedStoc
 
         return collect.fetchStocks()
                 .map(resp -> resp != null && resp.result() != null ? resp.result() : Collections.<StockData>emptyList())
-                .doOnNext(list -> {
-                    System.out.println("[CombinedRefresh] Collect listesi alındı → adet=" + list.size());
-                    list.stream().limit(5).forEach(s ->
-                            System.out.println("  - " + s.code() + " last=" + s.lastprice() + " rate=" + s.rate()));
-                })
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(s -> buildCombinedSafe(s, todayStr, yesterdayStr), fetchProps.getConcurrency())
                 .collectList()
-                .doOnNext(list -> {
-                    System.out.println("[CombinedRefresh] Combine sonucu → adet=" + list.size());
-                    list.stream().limit(5).forEach(cs ->
-                            System.out.println("  - " + cs.code() + " last=" + cs.lastPrice()
-                                    + " open=" + cs.openPrice() + " change=" + cs.changePrice()));
-                })
                 .retry(fetchProps.getRetry())
                 .onErrorReturn(Collections.emptyList());
     }
@@ -64,23 +53,17 @@ public class CombinedRefreshService implements ICacheRefreshService<CombinedStoc
         String code = s.code().toUpperCase();
         String assetCode = code + ".E";
 
-        Mono<Optional<HisseFiyatEntry>> todayOpt = infina.fetchPriceByCodeAndDate(assetCode, "2025-08-08")
+        Mono<Optional<HisseFiyatEntry>> todayOpt = infina.fetchPriceByCodeAndDate(assetCode, todayStr)
                 .timeout(fetchProps.getRequestTimeout())
                 .map(this::firstEntry)
                 .map(Optional::ofNullable)
-                .onErrorResume(e -> {
-                    System.out.println("[CombinedRefresh] Infina BUGÜN HATA code=" + code + " : " + e.getMessage());
-                    return Mono.just(Optional.empty());
-                });
+                .onErrorResume(e -> Mono.just(Optional.empty()));
 
-        Mono<Optional<HisseFiyatEntry>> yesterdayOpt = infina.fetchPriceByCodeAndDate(assetCode, "2025-08-07")
+        Mono<Optional<HisseFiyatEntry>> yesterdayOpt = infina.fetchPriceByCodeAndDate(assetCode, yesterdayStr)
                 .timeout(fetchProps.getRequestTimeout())
                 .map(this::firstEntry)
                 .map(Optional::ofNullable)
-                .onErrorResume(e -> {
-                    System.out.println("[CombinedRefresh] Infina DÜN HATA code=" + code + " : " + e.getMessage());
-                    return Mono.just(Optional.empty());
-                });
+                .onErrorResume(e -> Mono.just(Optional.empty()));
 
         return Mono.zipDelayError(todayOpt, yesterdayOpt)
                 .map(tuple -> {
@@ -88,10 +71,7 @@ public class CombinedRefreshService implements ICacheRefreshService<CombinedStoc
                     HisseFiyatEntry yest = tuple.getT2().orElse(null);
                     return toCombined(code, s, today, yest);
                 })
-                .onErrorResume(e -> {
-                    System.out.println("[CombinedRefresh] zip hata, Collect-only fallback code=" + code + " : " + e.getMessage());
-                    return Mono.just(toCombined(code, s, null, null));
-                });
+                .onErrorResume(e -> Mono.just(toCombined(code, s, null, null)));
     }
 
     private HisseFiyatEntry firstEntry(HisseApiResponse resp) {
@@ -130,16 +110,13 @@ public class CombinedRefreshService implements ICacheRefreshService<CombinedStoc
 
     private BigDecimal computeChange(BigDecimal last, BigDecimal open, BigDecimal ratePct) {
         try {
-            // 1) En doğru: last - open
             if (last != null && open != null) {
                 return last.subtract(open).setScale(2, RoundingMode.HALF_UP);
             }
-            // 2) open × (rate/100)
             if (open != null && ratePct != null) {
                 return open.multiply(ratePct)
                         .divide(HUNDRED, 2, RoundingMode.HALF_UP);
             }
-            // 3) open'ı rate'ten tahmin et: open ≈ last / (1 + rate/100)
             if (last != null && ratePct != null) {
                 BigDecimal denom = BigDecimal.ONE.add(
                         ratePct.divide(HUNDRED, 8, RoundingMode.HALF_UP)

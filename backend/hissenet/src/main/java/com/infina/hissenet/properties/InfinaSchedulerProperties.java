@@ -8,13 +8,10 @@ import java.time.Duration;
 @Component
 @ConfigurationProperties(prefix = "infina.scheduler.publish")
 public class InfinaSchedulerProperties {
-    /** WebSocket topic to publish to */
     private String topic;
     private String errorTopic;
 
-    /** Fixed rate for scheduling */
     private Duration rate;
-    /** Initial delay before first run */
     private Duration initialDelay;
 
     public String getTopic() {

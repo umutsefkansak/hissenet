@@ -1,9 +1,13 @@
 package com.infina.hissenet.client;
 
 import com.infina.hissenet.dto.response.HisseApiResponse;
+import com.infina.hissenet.exception.stock.InfinaApiRateLimitException;
+import com.infina.hissenet.exception.stock.InfinaApiUpstreamException;
 import com.infina.hissenet.properties.InfinaApiProperties;
+import com.infina.hissenet.utils.MessageUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -26,14 +30,13 @@ public class InfinaApiClient {
                         .build())
                 .retrieve()
                 .bodyToMono(HisseApiResponse.class)
-                .doOnNext(resp -> {
-                    int n = 0;
-                    if (resp != null && resp.result() != null && resp.result().data() != null && resp.result().data().HisseFiyat() != null)
-                        n = resp.result().data().HisseFiyat().size();
-                    //System.out.println("[InfinaApiClient] " + assetCode + " @" + date + " → kayıt=" + n);
-                })
-                .onErrorResume(err -> {
-                    //System.out.println("[InfinaApiClient] HATA " + assetCode + " @" + date + ": " + err.getMessage());
+                .defaultIfEmpty(new HisseApiResponse(null))
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException wex) {
+                        int sc = wex.getRawStatusCode();
+                        if (sc == 429) return Mono.error(new InfinaApiRateLimitException(MessageUtils.getMessage("collect.api.rate.limit")));
+                        else if (sc >= 500) return Mono.error(new InfinaApiUpstreamException(MessageUtils.getMessage("collect.api.upstream.stocks")));
+                    }
                     return Mono.just(new HisseApiResponse(null));
                 });
     }

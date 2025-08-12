@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bildirim</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 30px; padding: 20px 0; border-bottom: 3px solid #2c5aa0;">
+        <h1 style="color: #2c5aa0; margin: 0; font-size: 28px;">HisseNet</h1>
+        <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Güvenilir Aracı Kurum Platformu</p>
+    </div>
+
+    <!-- Greeting -->
+    <div style="margin-bottom: 25px;">
+        <h2 style="color: #2c5aa0; margin-bottom: 10px;">
+            <span th:if="${recipientName}" th:text="'Sayın ' + ${recipientName} + ','">Sayın Müşterimiz,</span>
+            <span th:unless="${recipientName}">Sayın Müşterimiz,</span>
+        </h2>
+    </div>
+
+    <!-- Notification Content -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #2c5aa0; margin: 20px 0; border-radius: 0 6px 6px 0;">
+        <div th:utext="${message}">Bildirim mesajı burada görünecek</div>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 30px;">
+        <div style="text-align: center; color: #666; font-size: 12px;">
+            <p style="margin: 0 0 10px 0;">Bu e-posta otomatik olarak gönderilmiştir, lütfen yanıtlamayın.</p>
+            <p style="margin: 0 0 15px 0;">
+                <strong>HisseNet Aracı Kurum A.Ş.</strong><br>
+                Destek: support@hissenet.com | Tel: +90 (212) 555-0123
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

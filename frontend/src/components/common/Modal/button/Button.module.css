@@ -1,0 +1,33 @@
+/* Button.module.css */
+
+.button {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Beyaz zemin + gri border */
+.default {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #cccccc;
+}
+.default:hover {
+  background-color: #f5f5f5;
+}
+
+.primary,
+.danger {
+  background-color: #1d293d;
+  color: #ffffff;
+  border: none;
+}
+.primary:hover,
+.danger:hover {
+  background-color: #333333;
+}

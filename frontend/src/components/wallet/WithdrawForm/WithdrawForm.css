@@ -1,0 +1,107 @@
+.withdraw-form {
+  margin-bottom: 20px;
+}
+
+.balance-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px; 
+  border: 1px solid #e9ecef;
+  margin-bottom: 16px; 
+}
+
+.balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0; 
+  border-bottom: 1px solid #e9ecef;
+}
+
+.balance-item:last-child {
+  border-bottom: none;
+}
+
+.balance-item label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 13px; 
+}
+
+.total-balance {
+  font-weight: 600;
+  color: #28a745;
+  font-size: 14px; 
+}
+
+.blocked-balance {
+  font-weight: 600;
+  color: #dc3545;
+  font-size: 14px; 
+}
+
+.available-balance {
+  font-weight: 600;
+  color: #007bff;
+  font-size: 14px; 
+}
+
+.form-section {
+  margin-bottom: 20px; 
+}
+
+.form-section label {
+  display: block;
+  margin-bottom: 8px; 
+  font-weight: 600;
+  color: #333;
+  font-size: 14px; 
+}
+
+.form-section input,
+.form-section select {
+  width: 100%;
+  padding: 12px 16px; 
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px; 
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-section input:focus,
+.form-section select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.form-section input:disabled,
+.form-section select:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.form-note {
+  margin-top: 6px;
+  font-size: 12px; 
+  color: #666;
+}
+
+.customer-name-note {
+  margin-top: 6px; 
+  font-size: 12px; 
+  color: #999;
+}
+
+
+@media (max-width: 768px) {
+  .balance-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .balance-item span {
+    font-size: 12px; 
+  }
+}

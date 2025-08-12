@@ -1,0 +1,102 @@
+.recentTransactions {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  flex: 1;
+}
+
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.transactionsHeader h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.viewAll {
+  background-color: #003366;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.viewAll:hover {
+  background-color: #002244;
+  color: white;
+}
+
+.transactionsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.transactionsTable th,
+.transactionsTable td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.transactionsTable th:last-child,
+.transactionsTable td:last-child {
+  text-align: right;
+}
+
+.transactionsTable .green {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.transactionsTable .red {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.transactionsTable .right {
+  text-align: right;
+}
+
+.dashboardModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.dashboardModalContent {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  width: min(900px, 92vw);
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.dashboardModalCloseButton {
+  margin-top: 12px;
+  background-color: #003366;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dashboardModalCloseButton:hover {
+  background-color: #002244;
+  color: white;
+}

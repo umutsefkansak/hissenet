@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>HisseNet Asistan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #555879;
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #chat-container {
+            width: 400px;
+            height: 600px;
+            background: #333446;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #chatbox {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background-color: #898ac4;
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot {
+            background-color: #34699A;
+            color: #fff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .welcome-message {
+            border: 1px solid #000;
+            background-color: #555879;
+            color: #fff;
+            align-self: left;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        #inputArea {
+            display: flex;
+            border-top: 1px solid #17313E;
+            padding: 10px;
+            background-color: #333446;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            outline: none;
+            background-color: #2c2c2c;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        button#sendBtn {
+            background-color: #555879;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            margin-left: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        button#sendBtn:hover {
+            background-color: #898ac4;
+        }
+
+        #chatbox::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chatbox"></div>
+    <div id="inputArea">
+        <input type="text" id="userInput" placeholder="Asistan'a sor..." />
+        <button id="sendBtn" onclick="sendMessage()">Gönder</button>
+    </div>
+</div>
+
+<script>
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('userInput');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        chatbox.innerHTML += `<div class="welcome-message">Merhaba, ben HisseNet Asistan. Size nasıl yardımcı olabilirim?</div>`;
+    });
+
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+        userInput.value = '';
+
+        chatbox.innerHTML += `<div class="message user">${message}</div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        try {
+            const response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            chatbox.innerHTML += `<div class="message bot">${data.response}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+        } catch (error) {
+            chatbox.innerHTML += `<div class="message bot">Bir hata oluştu.</div>`;
+        }
+    }
+
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>

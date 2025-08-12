@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: ./chatbot
+      dockerfile: Dockerfile
+    image: hissenetchatbot
+    container_name: hissenetchatbot
+    ports:
+      - "8000:8000"

@@ -1,11 +1,56 @@
 .App {
   text-align: center;
+  transition: margin-left 0.3s ease;
+}
+
+/* Desktop'ta drawer için margin */
+@media (min-width: 769px) {
+  .App {
+    margin-left: 280px;
+  }
+
+  /* Login sayfasını biraz sağa kaydır */
+  .App .login-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    background: #f8fafc;
+
+  }
+}
+
+/* Auth sayfaları için drawer gizleme */
+.App.auth-page {
+  margin-left: 0 !important;
+}
+
+/* Mobile'da margin yok */
+@media (max-width: 768px) {
+  .App {
+    margin-left: 0;
+  }
+  
+  /* Mobile'da login sayfası normal akışta */
+  .App .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+  }
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: hissenet
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: true
+      timeout: 6000ms
+      database: 0
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+  cache:
+    type: caffeine
+    cache-names:
+      - ${stock.cache.default.name}
+    caffeine:
+      spec: maximumSize=${stock.cache.default.max-size},expireAfterWrite=${stock.cache.default.ttl}
+
+mail:
+  from:
+    email: ${MAIL_FROM:noreply@hissenet.com}
+    name: ${MAIL_FROM_NAME:HisseNet Aracı Kurum}
+  company:
+    name: ${COMPANY_NAME:HİSSENET}
+  verification:
+    code-length: 6
+    default-expiry-minutes: 10
+    default-max-attempts: 3
+    ip-limit-per-hour: 20
+    max-codes-per-day: 100
+  templates:
+    enabled: true
+
+fetch:
+  request-timeout: 6s
+  concurrency: 12
+  retry: 1
+
+stock:
+  cache:
+    default:
+      name: stockPrice
+      ttl: 5m
+      max-size: 1000
+  scheduler:
+    refresh:
+      rate: 3s
+      initial-delay: 0s
+
+    publish:
+      topic: /topic/prices
+      rate: 30s
+      initial-delay: 30s
+
+    borsa-istanbul-publish:
+      topic: /topic/bist100
+      rate: 10s
+      initial-delay: 0s
+
+collectapi:
+  api-key: ${COLLECTAPI_APIKEY}
+  base-url: https://api.collectapi.com/economy
+  cooldown: 30s
+  endpoints:
+    stocks: /hisseSenedi
+    borsaIstanbul: /borsaIstanbul
+
+infina:
+  api:
+    base-url: https://apitest.infina.com.tr/infina-services/rest/srv/v1.1
+    api-key: ${INFINA_API_KEY}
+    endpoint: /HisseFiyat
+  cache:
+    name: infinaPrice
+    ttl: 5m
+    max-size: 1000
+  scheduler:
+    publish:
+      topic: /topic/infina-prices
+      rate: 30s
+      initial-delay: 30s
+      error-topic: /topic/infina-prices-error

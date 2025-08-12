@@ -1,0 +1,51 @@
+.row {
+  transition: background 0.2s;
+}
+.row:hover {
+  background: rgba(0,0,0,0.03);
+}
+/* 2, 3 ve 4. sütunlar sağdan */
+
+.code {
+  font-weight: 600;
+  gap: 10px;
+  display: flex;          /* logo + metni yan yana koy */
+  align-items: center;
+}
+
+
+.price {
+  font-feature-settings:"numr";  
+}
+
+.logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.80;
+  transition: opacity 0.2s ease;
+  
+}
+
+
+.change, .rate {
+  font-weight: 500;
+  font-feature-settings: "tnum"; 
+}
+
+.arrowIcon {              /* 👈 eski .icon ismini netleştirelim */
+  margin-right: 0.25em;
+  align-items: center;
+}
+
+
+
+/* Renkler */
+.positive {
+  color: #2ea44f; /* yeşil ton */
+}
+
+.negative {
+  color: #cf222e; /* kırmızı ton */
+}

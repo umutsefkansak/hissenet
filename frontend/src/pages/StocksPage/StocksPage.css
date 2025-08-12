@@ -1,0 +1,26 @@
+.stocks-container {
+    display: flex;
+    height: 100vh;
+    background: #f3f6fc;
+    padding: 24px
+}
+
+/* Sol panel: tıklanmadığında tam genişlik, seçiliyse yarı genişlik */
+.stocks-left.full {
+    flex: 1;
+    transition: width 0.3s ease;
+}
+
+.stocks-left.half {
+    width: 50%;
+    transition: width 0.3s ease;
+}
+
+/* Sağ panel: seçili olduğunda yarı genişlik */
+.stocks-right.half {
+    width: 50%;
+    border-left: 1px solid #e0e0e0;
+    background: #fff;
+    overflow-y: auto;
+    transition: width 0.3s ease;
+}
